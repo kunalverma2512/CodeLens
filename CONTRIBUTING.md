@@ -14,8 +14,6 @@ We adhere to strict branch naming conventions:
 1. **Strict Brutalism:** No rounded corners (`rounded-none` implicitly or explicitly). Colors are restricted to pure `black` and `white`, plus grayscale for disabled elements.
 2. **Generous Whitespace:** Utilize extremely large padding (`py-20`, `py-32`) to allow typography to breathe.
 3. **Massive Typography:** Headers should scale dramatically (`text-5xl` to `text-9xl`). Use `font-black` and `uppercase tracking-widest` heavily.
-4. **No `.jsx` Imports:** In your import statements, omit the explicit `.jsx` extension (e.g., `import Hero from './components/Hero'`).
-5. **No TypeScript:** We use modern vanilla ES6+ Javascript.
 
 ### The Backend Rulebook
 1. **ES Modules Only:** `require()` is strictly forbidden. Use `import` and `export` everywhere. Ensure all local imports contain the `.js` extension (e.g., `import db from './config/db.js'`).

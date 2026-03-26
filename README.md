@@ -22,7 +22,6 @@ We follow a strict, highly modular, and production-ready MERN stack methodology.
 - **Styling:** Tailwind CSS v4 (Strict Black & White Brutalist Design System)
 - **Routing:** React Router v6
 - **Architecture:** Feature-based modular structure (`src/features`, `src/components`, `src/layouts`).
-- *Note: Pure JavaScript. No TypeScript. No `.jsx` extensions in import paths.*
 
 ### Backend (The Core Engine)
 - **Runtime:** Node.js + Express
