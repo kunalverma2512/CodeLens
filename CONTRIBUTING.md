@@ -1,20 +1,32 @@
 # Contributing to CodeLens
 
-First off, thank you for considering contributing to CodeLens.
+First off, thank you for considering contributing to CodeLens. By participating in this project, you are helping build an unapologetically honest engineering tool.
 
-### 1. Where do I go from here?
-If you've noticed a bug or have a request, make one! The issue tracker is the best place to start.
+## 1. Branching Strategy
+We adhere to strict branch naming conventions:
+- `feat/feature-name` (for new UI modules, backend routes, algorithms)
+- `fix/bug-description` (for hotfixes and CSS corrections)
+- `chore/task-name` (for documentation, dependency updates, and tooling)
 
-### 2. Fork & create a branch
-If this is something you think you can fix, then fork CodeLens and create a branch with a descriptive name. A good branch name would be `feat/add-new-dashboard` or `bug/fix-login-typo`.
+## 2. Code Standards
 
-### 3. Implement your fix or feature
-At this point, you're ready to make your changes. Make sure to keep the code clean and well-commented.
+### The Frontend Rulebook
+1. **Strict Brutalism:** No rounded corners (`rounded-none` implicitly or explicitly). Colors are restricted to pure `black` and `white`, plus grayscale for disabled elements.
+2. **Generous Whitespace:** Utilize extremely large padding (`py-20`, `py-32`) to allow typography to breathe.
+3. **Massive Typography:** Headers should scale dramatically (`text-5xl` to `text-9xl`). Use `font-black` and `uppercase tracking-widest` heavily.
+4. **No `.jsx` Imports:** In your import statements, omit the explicit `.jsx` extension (e.g., `import Hero from './components/Hero'`).
+5. **No TypeScript:** We use modern vanilla ES6+ Javascript.
 
-### 4. Code Standards
-* Use ES Modules entirely on the backend (`import`/`export`).
-* Avoid using TypeScript, stick to plain modern JavaScript.
-* Maintain the highly hierarchical and modular folder structures defined.
+### The Backend Rulebook
+1. **ES Modules Only:** `require()` is strictly forbidden. Use `import` and `export` everywhere. Ensure all local imports contain the `.js` extension (e.g., `import db from './config/db.js'`).
+2. **Modular Architecture:** Do not dump logic into monolithic files. Controllers parse the request, Services execute business/AI logic, and the Database layer handles queries.
+3. **AI Determinism:** When modifying the Gemini API interfaces, strictly enforce prompt engineering that demands deterministic JSON structures (no markdown wrappers).
 
-### 5. Make a Pull Request (PR)
-When you're ready, submit a standard PR. We will review it as soon as possible.
+## 3. Pull Request Submission
+1. Ensure your code satisfies `npm run lint` if applicable.
+2. If modifying UI, test on both desktop `lg` views and mobile viewports (`flex-col` scaling).
+3. Draft a thorough PR description mapping your solution to the original GitHub issue.
+4. Request review from a core maintainer.
+
+## 4. Issues & Feedback
+If you locate a bug, please check the existing issue tracker before creating a duplicate. For new features, open a discussion thread outlining the architectural approach before submitting large PRs.
