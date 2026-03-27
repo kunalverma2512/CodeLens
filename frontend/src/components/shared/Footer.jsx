@@ -30,8 +30,8 @@ export default function Footer() {
 
           <div className="flex flex-col space-y-5">
             <h3 className="font-black text-black uppercase tracking-tighter text-xl mb-2 border-b-[3px] border-black pb-2 inline-block">Legal</h3>
-            <a href="#" className="text-black font-black text-sm uppercase tracking-widest hover:underline underline-offset-8 decoration-[3px]">Privacy Policy</a>
-            <a href="#" className="text-black font-black text-sm uppercase tracking-widest hover:underline underline-offset-8 decoration-[3px]">Terms of Service</a>
+            <Link to="/privacy" className="text-black font-black text-sm uppercase tracking-widest hover:underline underline-offset-8 decoration-[3px]">Privacy Policy</Link>
+            <Link to="/terms" className="text-black font-black text-sm uppercase tracking-widest hover:underline underline-offset-8 decoration-[3px]">Terms of Service</Link>
           </div>
         </div>
       </div>
