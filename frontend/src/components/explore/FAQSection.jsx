@@ -2,16 +2,20 @@ import { useState } from "react";
 
 const faqs = [
   {
-    q: "What role does the AI play in CodeLens?",
-    a: "The platfrom uses Google's Gemini LLM as a seasoned Staff Engineer, analyzing the developer's combined data to identify bottlenecks and recommend a precise, personalized learning path.",
+    q: "What is CodeLens?",
+    a: "CodeLens is a platform that helps developers track their coding progress across different platforms like Codeforces, LeetCode, and GitHub in one place.",
   },
   {
-    q: "What are the platforms CodeLens integrates?",
-    a: "CodeLens integrates three major developer platforms to build a complete picture of a developer's skills. GitHub is used to track code velocity, architectural complexity, and open source collaboration, while LeetCode evaluates algorithmic problem-solving and data structure fluency. Codeforces rounds out the trio by measuring competitive programming speed and advanced mathematical optimization.",
+    q: "What problem does CodeLens solve?",
+    a: "It brings all your coding activity into one place so you can understand your progress, stay consistent, and know what to improve next.",
   },
   {
     q: "Is my repository data private?",
     a: "The platform is built to be an open API engine. Configuration determines visibility and update frequency. Privacy is guaranteed.",
+  },
+  {
+    q: "How can I contribute to CodeLens?",
+    a: "You can contribute by solving issues, adding features, improving UI, or fixing bugs. Check the repository and start with beginner-friendly issues.",
   },
 ];
 
