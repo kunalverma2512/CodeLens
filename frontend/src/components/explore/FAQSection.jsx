@@ -11,7 +11,7 @@ const faqs = [
   },
   {
     q: "Is my repository data private?",
-    a: "The platform is built to be an open API engine. Configuration determines visibility and update frequency. Privacy is guaranteed.",
+    a: "CodeLens only uses publicly available data from connected platforms and does not store any sensitive information.",
   },
   {
     q: "How can I contribute to CodeLens?",
