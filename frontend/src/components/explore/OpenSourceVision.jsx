@@ -15,9 +15,14 @@ export default function OpenSourceVision() {
             </p>
           </div>
           <div className="w-full flex justify-center lg:justify-end">
-            <button className="mt-10 w-full sm:w-auto px-8 sm:px-10 py-4 sm:py-5 bg-white text-black text-base sm:text-lg font-black uppercase tracking-widest hover:bg-gray-100 transition-colors border-[4px] border-black rounded-none shadow-[8px_8px_0_0_rgba(0,0,0,1)] md:hover:-translate-y-1">
+            <a
+              href="https://github.com/kunalverma2512/CodeLens"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-10 w-full sm:w-auto px-8 sm:px-10 py-4 sm:py-5 bg-white text-black text-base sm:text-lg font-black uppercase tracking-widest hover:bg-gray-100 transition-colors border-[4px] border-black rounded-none shadow-[8px_8px_0_0_rgba(0,0,0,1)] md:hover:-translate-y-1 inline-block text-center"
+            >
               Contribute Code
-            </button>
+            </a>
           </div>
         </div>
         <div className="flex-1 w-full grid grid-cols-2 gap-4 sm:gap-6">
