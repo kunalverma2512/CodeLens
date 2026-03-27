@@ -28,7 +28,7 @@ export default function FAQSection() {
     <div className="w-full px-6 py-20 md:py-32 min-h-screen flex flex-col justify-center items-center border-b-[4px] border-black bg-white">
       <div className="max-w-5xl mx-auto w-full">
         <h2 className="text-4xl sm:text-6xl lg:text-7xl font-black uppercase tracking-tighter text-black mb-12 sm:mb-20 text-center leading-none">
-          Frequently Asked
+          Frequently Asked Questions
         </h2>
         <div className="space-y-6 sm:space-y-8 w-full">
           {faqs.map((item, index) => {
