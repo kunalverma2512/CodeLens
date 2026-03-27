@@ -5,6 +5,8 @@ import LoginPage from "./pages/LoginPage";
 import SignupPage from "./pages/SignupPage";
 import DashboardPage from "./pages/DashboardPage";
 import ExplorePage from "./pages/ExplorePage";
+import TermsPage from "./pages/TermsPage";
+import PrivacyPage from "./pages/PrivacyPage";
 
 export default function App() {
   return (
@@ -16,6 +18,8 @@ export default function App() {
           <Route path="/signup" element={<SignupPage />} />
           <Route path="/dashboard" element={<DashboardPage />} />
           <Route path="/explore" element={<ExplorePage />} />
+          <Route path="/terms" element={<TermsPage/>} />
+          <Route path="/privacy" element={<PrivacyPage/>} />
         </Routes>
       </MainLayout>
     </BrowserRouter>
