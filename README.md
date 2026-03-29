@@ -62,10 +62,57 @@ VITE_GEMINI_KEY=your_optional_client_side_key
 **`server/.env`**
 ```env
 PORT=5000
-MONGO_URI=mongodb://localhost:27017/codelens
+MONGO_URI=your_mongodb_connection_string_here
 JWT_SECRET=super_secret_dev_key
 GEMINI_API_KEY=your_gemini_api_key_here
 ```
+
+---
+
+### 🍃 Getting Your `MONGO_URI` (Free MongoDB Atlas Setup)
+
+> **Skip this if** you already have a local MongoDB instance running — you can use `mongodb://localhost:27017/codelens` directly.
+
+MongoDB Atlas provides a **free cloud-hosted database** (no credit card required). Follow these steps:
+
+**1. Create a free account**  
+Go to [mongodb.com/cloud/atlas](https://www.mongodb.com/cloud/atlas) → click **"Try Free"** and sign up.
+
+**2. Create a free cluster**  
+- Click **"Build a Database"** → choose **"M0 Free"** tier.  
+- Select any cloud provider & region closest to you → click **"Create"**.
+
+**3. Set up access credentials**  
+- Under **"Security → Database Access"** → click **"Add New Database User"**.  
+- Choose **Password** authentication. Set a username and a strong password. **Save these — you'll need them shortly.**  
+- Set role to **"Read and write to any database"** → click **"Add User"**.
+
+**4. Whitelist your IP**  
+- Under **"Security → Network Access"** → click **"Add IP Address"**.  
+- Click **"Allow Access From Anywhere"** (`0.0.0.0/0`) for development → click **"Confirm"**.
+
+**5. Get your connection string**  
+- Go to **"Database"** in the left sidebar → click **"Connect"** on your cluster.  
+- Choose **"Compass"** or **"Drivers"** → select **Node.js** as the driver.  
+- Copy the connection string. It looks like this:
+```
+  mongodb+srv://<username>:<password>@cluster0.xxxxx.mongodb.net/?retryWrites=true&w=majority
+```
+- Replace `<username>` and `<password>` with the credentials from Step 3.  
+- Append your database name before the `?`:
+```
+  mongodb+srv://youruser:yourpass@cluster0.xxxxx.mongodb.net/codelens?retryWrites=true&w=majority
+```
+
+**6. Paste it into your `.env`**
+```env
+MONGO_URI=mongodb+srv://youruser:yourpass@cluster0.xxxxx.mongodb.net/codelens?retryWrites=true&w=majority
+```
+
+> 📖 Prefer a visual walkthrough? The official MongoDB guide covers this in detail:  
+> [Create an Atlas Account & Free Cluster](https://www.mongodb.com/docs/atlas/getting-started/)
+
+---
 
 ### 3. Initialize the Platform
 ```bash
