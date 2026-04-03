@@ -6,7 +6,7 @@ class AuthController {
   static async register(req, res, next) {
     try {
       const result = await AuthService.register(req.body);
-      res.status(201).json(ApiResponse.success(result.message, result.user));
+      res.status(201).json(ApiResponse.success(result.message));
     } catch (error) {
       next(error instanceof ApiError ? error : new ApiError(500, error.message));
     }

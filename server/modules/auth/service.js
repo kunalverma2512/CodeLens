@@ -15,78 +15,42 @@ class AuthService {
 
     // Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
-
-    // Create user
-    const user = await AuthRepository.createUser({
-      name,
-      email,
-      password: hashedPassword,
-      isVerified: false
-    });
-
     // Generate OTP
     const plainOtp = generateOTP();
     const hashedOtp = await bcrypt.hash(plainOtp, 4);
 
-    // Store hashed OTP
-    await AuthRepository.createOtp({
+    // Store user data + hashed OTP in Redis instead of creating a DB record
+    await AuthRepository.storePendingUser(email, {
+      name,
       email,
-      otp: hashedOtp,
-      purpose: "signup"
+      password: hashedPassword,
+      otp: hashedOtp
     });
 
     // Send verification email with plain OTP
     await sendVerificationOTP(email, plainOtp);
 
-    return {
-      message: "Registration successful. Please check your email for OTP verification.",
-      user: {
-        id: user._id,
-        name: user.name,
-        email: user.email,
-        isVerified: user.isVerified
-      }
-    };
+    return { message: "OTP sent to your email for verification." };
   }
 
   static async verifyOtp({ email, otp }) {
-    // Find OTP record
-    const otpRecord = await AuthRepository.findOtp(email, "signup");
-    if (!otpRecord) {
-      throw new ApiError(400, "OTP expired or not found");
-    }
+    const pendingUser = await AuthRepository.getPendingUser(email);
+    if (!pendingUser) throw new ApiError(400, "OTP expired or invalid session");
 
-    // Compare OTP
-    const isValidOtp = await bcrypt.compare(otp, otpRecord.otp);
-    if (!isValidOtp) {
-      throw new ApiError(400, "Invalid OTP");
-    }
+    const isValidOtp = await bcrypt.compare(otp, pendingUser.otp);
+    if (!isValidOtp) throw new ApiError(400, "Invalid OTP");
 
-    // Mark user as verified
-    await AuthRepository.updateUserVerification(email);
-
-    // Delete OTP record
-    await AuthRepository.deleteOtp(email, "signup");
-
-    // Get user and generate token
-    const user = await AuthRepository.findUserByEmailWithoutPassword(email);
-    const token = generateAccessToken({
-      userId: user._id,
-      email: user.email,
-      role: user.role
+    // Persist to MongoDB ONLY after verification
+    const user = await AuthRepository.createUser({
+      name: pendingUser.name,
+      email: pendingUser.email,
+      password: pendingUser.password
     });
 
-    return {
-      message: "Email verified successfully",
-      token,
-      user: {
-        id: user._id,
-        name: user.name,
-        email: user.email,
-        role: user.role,
-        isVerified: true
-      }
-    };
+    await AuthRepository.deletePendingUser(email);
+
+    const token = generateAccessToken({ userId: user._id, email: user.email, role: user.role });
+    return { message: "Email verified and account created", token, user };
   }
 
   static async login({ email, password }) {
@@ -102,11 +66,6 @@ class AuthService {
       throw new ApiError(401, "Invalid credentials");
     }
 
-    // Check if verified
-    if (!user.isVerified) {
-      throw new ApiError(403, "Please verify your email first");
-    }
-
     // Generate token
     const token = generateAccessToken({
       userId: user._id,
@@ -118,19 +77,7 @@ class AuthService {
     user.activity.lastActive = new Date();
     await user.save();
 
-    return {
-      message: "Login successful",
-      token,
-      user: {
-        id: user._id,
-        name: user.name,
-        email: user.email,
-        role: user.role,
-        isVerified: user.isVerified,
-        profile: user.profile,
-        handles: user.handles
-      }
-    };
+    return { message: "Login successful", token, user };
   }
 
   static async forgotPassword({ email }) {
@@ -144,12 +91,8 @@ class AuthService {
     const plainOtp = generateOTP();
     const hashedOtp = await bcrypt.hash(plainOtp, 4);
 
-    // Store hashed OTP
-    await AuthRepository.createOtp({
-      email,
-      otp: hashedOtp,
-      purpose: "forgot-password"
-    });
+    // Store hashed OTP in Redis
+    await AuthRepository.storeOtp(email, "forgot-password", hashedOtp);
 
     // Send password reset email
     await sendPasswordResetOTP(email, plainOtp);
@@ -160,14 +103,14 @@ class AuthService {
   }
 
   static async resetPassword({ email, otp, newPassword }) {
-    // Find OTP record
-    const otpRecord = await AuthRepository.findOtp(email, "forgot-password");
-    if (!otpRecord) {
+    // Retrieve OTP record from Redis
+    const storedHashedOtp = await AuthRepository.getOtp(email, "forgot-password");
+    if (!storedHashedOtp) {
       throw new ApiError(400, "Invalid or expired OTP");
     }
 
     // Verify OTP
-    const isValidOtp = await bcrypt.compare(otp, otpRecord.otp);
+    const isValidOtp = await bcrypt.compare(otp, storedHashedOtp);
     if (!isValidOtp) {
       throw new ApiError(400, "Invalid or expired OTP");
     }
@@ -178,7 +121,7 @@ class AuthService {
     // Update user password
     await AuthRepository.updateUserPassword(email, hashedPassword);
 
-    // Delete OTP record
+    // Delete OTP record from Redis
     await AuthRepository.deleteOtp(email, "forgot-password");
 
     return {
@@ -187,36 +130,45 @@ class AuthService {
   }
 
   static async resendOtp({ email, purpose }) {
-    // Find user
-    const user = await AuthRepository.findUserByEmailWithoutPassword(email);
-    if (!user) {
-      throw new ApiError(404, "User not found");
-    }
-
-    // Check if already verified for signup
-    if (purpose === "signup" && user.isVerified) {
-      throw new ApiError(400, "Already verified");
-    }
-
-    // Delete existing OTPs
-    await AuthRepository.deleteOtp(email, purpose);
-
     // Generate new OTP
     const plainOtp = generateOTP();
     const hashedOtp = await bcrypt.hash(plainOtp, 4);
 
-    // Store hashed OTP
-    await AuthRepository.createOtp({
-      email,
-      otp: hashedOtp,
-      purpose
-    });
-
-    // Send appropriate email
     if (purpose === "signup") {
+      // Check if user already exists in DB (meaning they are already verified)
+      const user = await AuthRepository.findUserByEmailWithoutPassword(email);
+      if (user) {
+        throw new ApiError(400, "Already verified");
+      }
+
+      // Find pending registration in Redis
+      const pendingUser = await AuthRepository.getPendingUser(email);
+      if (!pendingUser) {
+        throw new ApiError(404, "No pending registration found. Please register again.");
+      }
+
+      // Update the OTP in Redis for the pending user
+      pendingUser.otp = hashedOtp;
+      await AuthRepository.storePendingUser(email, pendingUser);
+
+      // Send verification email
       await sendVerificationOTP(email, plainOtp);
-    } else {
+      
+    } else if (purpose === "forgot-password") {
+      // Find user
+      const user = await AuthRepository.findUserByEmailWithoutPassword(email);
+      if (!user) {
+        throw new ApiError(404, "User not found");
+      }
+
+      // Overwrite existing OTP in Redis
+      await AuthRepository.storeOtp(email, purpose, hashedOtp);
+
+      // Send password reset email
       await sendPasswordResetOTP(email, plainOtp);
+      
+    } else {
+      throw new ApiError(400, "Invalid OTP purpose");
     }
 
     return {

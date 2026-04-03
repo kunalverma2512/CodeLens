@@ -1,5 +1,5 @@
 import User from "../../models/User.js";
-import Otp from "../../models/Otp.js";
+import redis from "../../config/redis.js";
 
 class AuthRepository {
   static async createUser(userData) {
@@ -15,41 +15,32 @@ class AuthRepository {
     return await User.findOne({ email });
   }
 
-  static async findUserById(id) {
-    return await User.findById(id);
+  // --- Redis OTP Methods ---
+  static async storePendingUser(email, data, ttl = 600) {
+    // Stores user data and OTP in Redis with a 10-minute expiry
+    await redis.set(`pending_user:${email}`, JSON.stringify(data), "EX", ttl);
+  }
+  static async getPendingUser(email) {
+    const data = await redis.get(`pending_user:${email}`);
+    return data ? JSON.parse(data) : null;
   }
 
-  static async updateUserVerification(email) {
-    return await User.findOneAndUpdate(
-      { email },
-      { isVerified: true },
-      { new: true }
-    );
+  static async deletePendingUser(email) {
+    await redis.del(`pending_user:${email}`);
   }
 
-  static async updateUserPassword(email, hashedPassword) {
-    return await User.findOneAndUpdate(
-      { email },
-      { password: hashedPassword },
-      { new: true }
-    );
+  static async storeOtp(email, purpose, otp, ttl = 600) {
+    await redis.set(`otp:${purpose}:${email}`, otp, "EX", ttl);
   }
 
-  static async createOtp({ email, otp, purpose }) {
-    // Delete any existing OTPs for same email+purpose
-    await Otp.deleteMany({ email, purpose });
-    
-    const otpRecord = new Otp({ email, otp, purpose });
-    return await otpRecord.save();
-  }
-
-  static async findOtp(email, purpose) {
-    return await Otp.findOne({ email, purpose }).sort({ createdAt: -1 });
+  static async getOtp(email, purpose) {
+    return await redis.get(`otp:${purpose}:${email}`);
   }
 
   static async deleteOtp(email, purpose) {
-    return await Otp.deleteMany({ email, purpose });
+    await redis.del(`otp:${purpose}:${email}`);
   }
 }
 
 export default AuthRepository;
+
