@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 
 export default function Footer() {
   return (
-    <footer className="w-full bg-white border-t-[4px] border-black pt-16 pb-8 px-8 flex-shrink-0">
+    <footer className="w-full bg-white border-t-4 border-black pt-16 pb-8 px-8 flex-shrink-0">
       <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between gap-12 mb-16">
         <div className="flex flex-col max-w-sm">
           <Link to="/" className="text-4xl font-black tracking-tighter uppercase text-black mb-6 inline-block hover:text-gray-800">
@@ -35,7 +35,7 @@ export default function Footer() {
         </div>
       </div>
       
-      <div className="max-w-7xl mx-auto border-t-[4px] border-black pt-8 flex flex-col md:flex-row items-center justify-between">
+      <div className="max-w-7xl mx-auto border-t-4 border-black pt-8 flex flex-col md:flex-row items-center justify-between">
         <p className="text-sm font-black text-black uppercase tracking-widest">
           &copy; {new Date().getFullYear()} CodeLens. All Rights Reserved.
         </p>

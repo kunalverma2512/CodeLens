@@ -25,7 +25,7 @@ export default function FAQSection() {
   const toggle = (index) => setOpenIdx(openIdx === index ? null : index);
 
   return (
-    <div className="w-full px-6 py-20 md:py-32 min-h-screen flex flex-col justify-center items-center border-b-[4px] border-black bg-white">
+    <div className="w-full px-6 py-20 md:py-32 min-h-screen flex flex-col justify-center items-center border-b-4 border-black bg-white">
       <div className="max-w-5xl mx-auto w-full">
         <h2 className="text-4xl sm:text-6xl lg:text-7xl font-black uppercase tracking-tighter text-black mb-12 sm:mb-20 text-center leading-none">
           Frequently Asked Questions
@@ -36,7 +36,7 @@ export default function FAQSection() {
             return (
               <div
                 key={index}
-                className="border-[4px] border-black shadow-[8px_8px_0_0_rgba(0,0,0,1)] md:shadow-[12px_12px_0_0_rgba(0,0,0,1)] bg-white w-full transition-transform md:hover:-translate-y-1"
+                className="border-4 border-black shadow-[8px_8px_0_0_rgba(0,0,0,1)] md:shadow-[12px_12px_0_0_rgba(0,0,0,1)] bg-white w-full transition-transform md:hover:-translate-y-1"
               >
                 <button
                   onClick={() => toggle(index)}
@@ -46,7 +46,7 @@ export default function FAQSection() {
                     Q: {item.q}
                   </h3>
                   <span
-                    className="text-2xl font-black flex-shrink-0 transition-transform duration-200"
+                    className="text-2xl font-black shrink-0 transition-transform duration-200"
                     style={{
                       transform: isOpen ? "rotate(45deg)" : "rotate(0deg)",
                     }}

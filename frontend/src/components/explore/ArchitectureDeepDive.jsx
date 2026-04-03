@@ -1,6 +1,6 @@
 export default function ArchitectureDeepDive() {
   return (
-    <section className="w-full px-6 py-20 md:py-32 min-h-screen flex flex-col justify-center items-center border-b-[4px] border-black bg-white">
+    <section className="w-full px-6 py-20 md:py-32 min-h-screen flex flex-col justify-center items-center border-b-4 border-black bg-white">
       <div className="max-w-7xl w-full mx-auto flex flex-col lg:flex-row gap-12 lg:gap-16 items-center">
         <div className="flex-1 w-full text-center lg:text-left">
           <h2 className="text-4xl sm:text-6xl lg:text-7xl font-black uppercase tracking-tighter text-black mb-8 leading-none">
@@ -15,18 +15,18 @@ export default function ArchitectureDeepDive() {
             </p>
           </div>
           <div className="w-full flex justify-center lg:justify-start">
-            <button className="mt-10 w-full sm:w-auto px-8 sm:px-10 py-4 sm:py-5 bg-black text-white text-base sm:text-xl font-black uppercase tracking-widest hover:bg-gray-800 transition-colors border-[4px] border-black rounded-none shadow-[8px_8px_0_0_rgba(200,200,200,1)]">
+            <button className="mt-10 w-full sm:w-auto px-8 sm:px-10 py-4 sm:py-5 bg-black text-white text-base sm:text-xl font-black uppercase tracking-widest hover:bg-gray-800 transition-colors border-4 border-black rounded-none shadow-[8px_8px_0_0_rgba(200,200,200,1)]">
               Read System Specs
             </button>
           </div>
         </div>
-        <div className="flex-1 w-full border-[4px] border-black p-4 sm:p-6 md:p-8 bg-gray-50 shadow-[4px_4px_0_0_rgba(0,0,0,1)] sm:shadow-[8px_8px_0_0_rgba(0,0,0,1)] md:shadow-[16px_16px_0_0_rgba(0,0,0,1)] md:hover:-translate-y-2 transition-transform overflow-x-auto text-left">
+        <div className="flex-1 w-full border-4 border-black p-4 sm:p-6 md:p-8 bg-gray-50 shadow-[4px_4px_0_0_rgba(0,0,0,1)] sm:shadow-[8px_8px_0_0_rgba(0,0,0,1)] md:shadow-[16px_16px_0_0_rgba(0,0,0,1)] md:hover:-translate-y-2 transition-transform overflow-x-auto text-left">
           <pre className="font-mono text-xs sm:text-sm font-bold text-black leading-loose whitespace-pre-wrap sm:whitespace-pre">
             <p className="text-gray-500">// Telemetry Payload Protocol</p>
             <p><span className="text-blue-600">const</span> <span className="text-black">engine</span> = <span className="text-purple-600">new</span> CodeLensCore();</p>
             <p><span className="text-blue-600">await</span> <span className="text-black">engine</span>.sync([<span className="text-green-700">'GITHUB'</span>, <span className="text-green-700">'LEETCODE'</span>]);</p>
             <br />
-            <p className="border-l-[4px] border-black pl-4">
+            <p className="border-l-4 border-black pl-4">
               [SYSTEM] Normalized data streams... <br />
               [SYSTEM] Invoking Gemini AI model... <br />
               [OK] Roadmap generated in 240ms.

@@ -10,10 +10,10 @@ export default function Hero() {
         Stop scattering your progress across LeetCode, GitHub, and Codeforces. CodeLens aggregates your raw data and delivers AI-driven, actionable roadmaps to shatter stagnation and accelerate your growth.
       </p>
       <div className="flex flex-col sm:flex-row items-center justify-center gap-8 w-full">
-        <Link to="/dashboard" className="w-full sm:w-auto px-12 py-6 bg-black text-white text-xl font-black uppercase tracking-widest hover:bg-gray-900 transition-colors border-[4px] border-black rounded-none">
+        <Link to="/dashboard" className="w-full sm:w-auto px-12 py-6 bg-black text-white text-xl font-black uppercase tracking-widest hover:bg-gray-900 transition-colors border-4 border-black rounded-none">
           Start Building
         </Link>
-        <Link to="/explore" className="w-full sm:w-auto px-12 py-6 bg-white text-black text-xl font-black uppercase tracking-widest hover:bg-gray-100 transition-colors border-[4px] border-black rounded-none">
+        <Link to="/explore" className="w-full sm:w-auto px-12 py-6 bg-white text-black text-xl font-black uppercase tracking-widest hover:bg-gray-100 transition-colors border-4 border-black rounded-none">
           Explore Platform
         </Link>
       </div>
