@@ -26,7 +26,6 @@ class AuthService {
       password: hashedPassword,
       otp: hashedOtp
     });
-
     // Send verification email with plain OTP
     await sendVerificationOTP(email, plainOtp);
 

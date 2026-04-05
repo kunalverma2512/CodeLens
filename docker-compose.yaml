@@ -1,0 +1,26 @@
+services:
+  mongo:
+    image: mongo
+    restart: always
+    volumes:
+      - mongo_data:/data/db
+    env_file: ./server/.env
+  redis:
+    image: redis
+    restart: always
+  backend:
+    build:
+      context: ./server
+      dockerfile: Dockerfile.dev
+    depends_on:
+      - mongo
+      - redis
+    ports:
+      - "8000:8000"
+    volumes:
+      - /app/node_modules
+      - ./server:/app
+    env_file:
+      - ./server/.env
+volumes:
+  mongo_data:
