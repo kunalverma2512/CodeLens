@@ -49,7 +49,10 @@ class AuthService {
     await AuthRepository.deletePendingUser(email);
 
     const token = generateAccessToken({ userId: user._id, email: user.email, role: user.role });
-    return { message: "Email verified and account created", token, user };
+    const sanitizedUser = user.toObject ? user.toObject() : { ...user };
+    delete sanitizedUser.password;
+
+    return { message: "Email verified and account created", token, user: sanitizedUser };
   }
 
   static async login({ email, password }) {
