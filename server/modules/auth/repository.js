@@ -18,13 +18,7 @@ class AuthRepository {
   }
 
   static async findUserByEmailWithoutPassword(email) {
-    try{
-      const res = await User.findOne({ email });
-      return res;
-    }catch(error){
-      console.log("Error from repositry findUserByEmailWithoutPassword: ",error);
-    }
-
+    return await User.findOne({ email });
   }
 
   // --- Redis OTP Methods ---
