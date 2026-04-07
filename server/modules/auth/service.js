@@ -76,7 +76,10 @@ class AuthService {
     user.activity.lastActive = new Date();
     await user.save();
 
-    return { message: "Login successful", token, user };
+    const sanitizedUser = user.toObject();
+    delete sanitizedUser.password;
+
+    return { message: "Login successful", token, user: sanitizedUser };
   }
 
   static async forgotPassword({ email }) {
