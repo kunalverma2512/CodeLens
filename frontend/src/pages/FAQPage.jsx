@@ -160,10 +160,10 @@ export default function FAQPage() {
 
       {/* ── Content ── */}
       <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-16">
-        <div className="flex flex-col lg:flex-row gap-0 border-4 border-black">
+        <div className="flex flex-col lg:flex-row gap-6 lg:items-start">
 
           {/* ── Category Sidebar ── */}
-          <aside className="lg:w-64 shrink-0 border-b-4 lg:border-b-0 lg:border-r-4 border-black">
+          <aside className="lg:w-64 shrink-0 border-4 border-black">
             <p className="text-[10px] font-black uppercase tracking-[0.25em] text-black/40 px-6 pt-6 pb-3">
               Categories
             </p>
@@ -172,7 +172,7 @@ export default function FAQPage() {
                 <button
                   key={cat.id}
                   onClick={() => handleCategoryChange(cat.id)}
-                  className={`shrink-0 lg:shrink text-left px-6 py-4 text-sm font-black uppercase tracking-widest transition-colors duration-150 border-r-4 lg:border-r-0 lg:border-b-4 border-black last:border-0 flex items-center gap-3 ${
+                  className={`shrink-0 lg:shrink text-left px-6 py-4 text-sm font-black uppercase tracking-widest transition-colors duration-150 border-r-4 lg:border-r-0 lg:border-t-4 border-black first:border-t-0 flex items-center gap-3 ${
                     activeCategory === cat.id
                       ? "bg-black text-white"
                       : "bg-white text-black hover:bg-gray-50"
@@ -186,7 +186,7 @@ export default function FAQPage() {
           </aside>
 
           {/* ── Accordion Panel ── */}
-          <div className="flex-1 min-w-0">
+          <div className="flex-1 min-w-0 border-4 border-black">
             {/* Panel header */}
             <div className="flex items-center gap-3 px-6 py-5 border-b-4 border-black bg-gray-50">
               <span className="text-xl leading-none">{currentCategory?.icon}</span>
@@ -215,24 +215,27 @@ export default function FAQPage() {
         </div>
 
         {/* ── Still have questions CTA ── */}
-        <div className="mt-0 border-4 border-t-0 border-black p-6 sm:p-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-black text-white">
-          <div>
-            <h3 className="font-black text-base uppercase tracking-widest mb-1">
-              Still have questions?
-            </h3>
-            <p className="text-sm font-bold text-white/50 uppercase tracking-wide">
-              Open an issue on GitHub or check the contributing guide.
-            </p>
+        <div className="mt-8 border-4 border-black flex flex-col sm:flex-row items-stretch">
+          <div className="w-2 bg-black shrink-0 hidden sm:block" />
+          <div className="flex-1 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 px-6 sm:px-8 py-6 sm:py-8">
+            <div>
+              <h3 className="font-black text-lg uppercase tracking-widest mb-1">
+                Still have questions?
+              </h3>
+              <p className="text-sm font-bold text-black/50 uppercase tracking-wide">
+                Open an issue on GitHub or check the contributing guide.
+              </p>
+            </div>
+            <a
+              href="https://github.com/kunalverma2512/CodeLens/issues"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="shrink-0 inline-flex items-center gap-2 bg-black text-white text-sm font-black uppercase tracking-widest px-6 py-3 border-4 border-black hover:bg-white hover:text-black transition-colors duration-150"
+            >
+              Open an Issue
+              <span aria-hidden="true">→</span>
+            </a>
           </div>
-          <a
-            href="https://github.com/kunalverma2512/CodeLens/issues"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="shrink-0 inline-flex items-center gap-2 bg-white text-black text-sm font-black uppercase tracking-widest px-6 py-3 border-4 border-white hover:bg-black hover:text-white hover:border-white transition-colors duration-150"
-          >
-            Open an Issue
-            <span aria-hidden="true">→</span>
-          </a>
         </div>
       </div>
     </main>
