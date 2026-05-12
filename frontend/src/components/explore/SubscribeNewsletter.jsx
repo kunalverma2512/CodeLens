@@ -4,23 +4,15 @@ export default function SubscribeNewsletter() {
   const [email, setEmail] = useState("");
   const [error, setError] = useState("");
 
-  const validateEmail = (value) => {
-    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return regex.test(value);
-  };
-
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    const trimmedEmail = email.trim();
-
-    if (!validateEmail(trimmedEmail)) {
+    if (!e.target.checkValidity()) {
       setError("Please enter a valid email address.");
       return;
     }
 
     setError("");
-
     setEmail("");
   };
 
