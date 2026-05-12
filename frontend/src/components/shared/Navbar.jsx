@@ -174,6 +174,9 @@ export default function Navbar() {
           <Link to="/explore" className={linkCls("/explore")}>
             Explore
           </Link>
+          <Link to="/faq" className={linkCls("/faq")}>
+            FAQ
+          </Link>
           {isAuthenticated && (
             <Link to="/codeforces" className={linkCls("/codeforces")}>
               Codeforces
@@ -419,6 +422,13 @@ export default function Navbar() {
               className="px-5 py-4 text-sm font-black uppercase tracking-widest text-black border-b-2 border-black hover:bg-black hover:text-white transition-colors duration-150 flex items-center justify-between"
             >
               Explore <span className="opacity-40">→</span>
+            </Link>
+            <Link
+              to="/faq"
+              onClick={closeMenu}
+              className="px-5 py-4 text-sm font-black uppercase tracking-widest text-black border-b-2 border-black hover:bg-black hover:text-white transition-colors duration-150 flex items-center justify-between"
+            >
+              FAQ <span className="opacity-40">→</span>
             </Link>
             {isAuthenticated && (
               <Link

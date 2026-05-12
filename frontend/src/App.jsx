@@ -21,6 +21,7 @@ import NotFoundPage from "./pages/NotFoundPage";
 import ForgotPassword from "./components/auth/ForgotPassword";
 import ProtectedRoute from "./components/shared/ProtectedRoute";
 import PublicRoute from "./components/shared/PublicRoute";
+import FAQPage from "./pages/FAQPage";
 
 export default function App() {
   return (
@@ -80,6 +81,7 @@ export default function App() {
             />
             <Route path="/terms" element={<TermsPage/>} />
             <Route path="/privacy" element={<PrivacyPage/>} />
+            <Route path="/faq" element={<FAQPage/>} />
             <Route path="*" element={<NotFoundPage />} />
           </Routes>
         </MainLayout>
