@@ -6,7 +6,7 @@ export default function Hero() {
       <h1 className="text-4xl sm:text-6xl md:text-7xl lg:text-9xl font-black uppercase tracking-tighter leading-none text-black mb-8 sm:mb-12 max-w-6xl break-words">
         Unify Your Coder Journey.
       </h1>
-      <p className="text-base sm:text-lg md:text-xl lg:text-2xl font-bold text-black max-w-4xl mb-12 sm:mb-15 leading-relaxed uppercase tracking-wide">
+      <p className="text-base sm:text-lg md:text-xl lg:text-2xl font-bold text-black max-w-4xl mb-12 sm:mb-16 leading-relaxed uppercase tracking-wide">
         Stop scattering your progress across LeetCode, GitHub, and Codeforces.
         CodeLens aggregates your raw data and delivers AI-driven, actionable
         roadmaps to shatter stagnation and accelerate your growth.
