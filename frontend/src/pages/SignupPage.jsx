@@ -43,7 +43,7 @@ export default function SignupPage() {
       setStep(2);
       setCooldown(60);
     } catch (err) {
-      setError(err.response?.data?.message );
+      setError(err.response?.data?.message || 'Registration failed');
     } finally {
       setLoading(false);
     }
