@@ -1,0 +1,50 @@
+name: PR Welcome Comment
+
+on:
+  pull_request_target:
+    types: [opened]
+
+permissions:
+  pull-requests: write
+
+jobs:
+  welcome:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Welcome Contributor
+        uses: actions/github-script@v7
+
+        with:
+          script: |
+            github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: `## 🚀 PR Received Successfully
+
+Hello @${context.payload.pull_request.user.login},
+
+Thank you for taking the initiative to contribute to this project.
+
+Please ensure that your PR follows all project guidelines properly before requesting review.
+
+### ⚠️ Important Instructions
+- Maintain proper code quality and structure
+- Do not make unnecessary changes/files
+- Ensure responsiveness across devices
+- Follow existing project conventions strictly
+- Attach screenshots/videos for UI-related changes
+- Resolve merge conflicts before requesting review
+- Avoid AI-generated low quality PRs or copied implementations
+
+### 📌 Mandatory for GSSoC'26 Participants
+Joining the community group and announcement channel is compulsory for all contributors participating through GSSoC'26.
+
+- Telegram Group: [Group](https://t.me/c/3991077814/1)
+- Telegram Channel: [Channel](https://t.me/+g4esQdo-DyNlZWE1)
+
+Failure to follow contribution guidelines may lead to PR rejection.
+
+We appreciate your effort and wish you a great open-source journey ahead. ✨`
+            })
