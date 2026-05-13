@@ -401,7 +401,7 @@ export default function Navbar() {
 
       {/* ── Mobile Menu ── */}
       {isMenuOpen && (
-        <div className="lg:hidden w-full bg-white border-t-4 border-black">
+        <div className="lg:hidden w-full bg-white border-t-4 border-black max-h-[calc(100vh-64px)] overflow-y-auto">
           <div className="flex flex-col">
             {/* Nav links */}
             {isAuthenticated && (
@@ -445,7 +445,7 @@ export default function Navbar() {
             </button>
 
             {mobileMegaOpen && (
-              <div className="border-b-2 border-black bg-gray-50">
+              <div className="border-b-2 border-black bg-gray-50 max-h-[45vh] overflow-y-auto overscroll-contain">
                 {MEGA_MENU_ITEMS.map((item) => {
                   const hasSubmenu = item.submenu && item.submenu.length > 0;
                   
