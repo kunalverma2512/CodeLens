@@ -21,7 +21,7 @@ import NotFoundPage from "./pages/NotFoundPage";
 import ForgotPassword from "./components/auth/ForgotPassword";
 import ProtectedRoute from "./components/shared/ProtectedRoute";
 import PublicRoute from "./components/shared/PublicRoute";
-
+import FAQSection from "./components/explore/FAQSection";
 export default function App() {
   return (
     <AuthProvider>
@@ -85,5 +85,6 @@ export default function App() {
         </MainLayout>
       </BrowserRouter>
     </AuthProvider>
+    
   );
 }
