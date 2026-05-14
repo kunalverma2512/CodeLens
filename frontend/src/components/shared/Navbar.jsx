@@ -204,116 +204,119 @@ export default function Navbar() {
             </button>
 
             {/* ── Mega Menu Panel ── */}
-            {megaOpen && (
-              <div
-                ref={megaRef}
-                onMouseEnter={handleMegaMouseEnter}
-                onMouseLeave={handleMegaMouseLeave}
-                className="absolute top-full left-1/2 mt-[18px] w-[640px] bg-white border-4 border-black z-50"
-                style={{ transform: "translateX(-50%)" }}
-              >
-                {/* Top accent bar */}
-                <div className="h-[3px] w-full bg-black" />
+            <div
+              ref={megaRef}
+              onMouseEnter={handleMegaMouseEnter}
+              onMouseLeave={handleMegaMouseLeave}
+              className={`absolute top-full left-1/2 mt-4 w-[580px] bg-white border-4 border-black z-50 transition-all duration-200 origin-top ${
+                megaOpen 
+                  ? "opacity-100 translate-y-0 scale-100 visible" 
+                  : "opacity-0 -translate-y-2 scale-95 invisible"
+              }`}
+              style={{ transform: "translateX(-50%)" }}
+            >
+              {/* Top accent bar */}
+              <div className="h-1 w-full bg-black" />
 
-                <div className="p-6">
-                  <p className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 mb-4 border-b-2 border-black pb-3">
+              <div className="p-5">
+                <div className="flex items-center justify-between mb-4 border-b-2 border-black pb-2">
+                  <p className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-500">
                     AI-Powered Tools — GSSoC '26
                   </p>
-                  <div className="grid grid-cols-2 gap-0">
-                    {MEGA_MENU_ITEMS.map((item, i) => {
-                      const Wrapper = item.to ? Link : "div";
-                      const hasSubmenu = item.submenu && item.submenu.length > 0;
-                      
-                      if (hasSubmenu) {
-                        return (
-                          <div
-                            key={item.label}
-                            className={`col-span-2 border-black ${
-                              i < MEGA_MENU_ITEMS.length - 1 ? "border-b-2" : ""
-                            }`}
-                          >
-                            <div className="group p-4 bg-black text-white cursor-default">
-                              <div className="flex items-center gap-2 mb-1">
-                                <span className="text-base font-black leading-none">{item.icon}</span>
-                                <span className="text-sm font-black uppercase tracking-widest">
-                                  {item.label}
-                                </span>
-                                {item.tag && (
-                                  <span className="text-[9px] font-black tracking-widest border-2 border-current px-[5px] py-[1px] leading-tight">
-                                    {item.tag}
-                                  </span>
-                                )}
-                              </div>
-                              <p className="text-xs font-bold tracking-wide leading-snug opacity-80 pl-6">
-                                {item.desc}
-                              </p>
-                            </div>
-                            <div className="grid grid-cols-2 gap-0 bg-gray-50">
-                              {item.submenu.map((subItem, subIdx) => (
-                                <Link
-                                  key={subItem.label}
-                                  to={subItem.to}
-                                  onClick={closeMenu}
-                                  className={`group text-left p-4 border-black transition-colors duration-150 hover:bg-black hover:text-white ${
-                                    subIdx % 2 === 0 ? "border-r-2" : ""
-                                  } ${subIdx < item.submenu.length - 2 ? "border-b-2" : ""}`}
-                                >
-                                  <div className="flex items-center gap-2 mb-1">
-                                    <span className="text-base font-black leading-none">{subItem.icon}</span>
-                                    <span className="text-xs font-black uppercase tracking-widest">
-                                      {subItem.label}
-                                    </span>
-                                  </div>
-                                  <p className="text-[11px] font-bold tracking-wide leading-snug opacity-60 group-hover:opacity-80 pl-6">
-                                    {subItem.desc}
-                                  </p>
-                                </Link>
-                              ))}
-                            </div>
-                          </div>
-                        );
-                      }
-                      
+                  <span className="text-[9px] font-black bg-black text-white px-2 py-0.5 tracking-widest">
+                    v2.0
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-2 gap-[2px] bg-black border-2 border-black overflow-hidden">
+                  {MEGA_MENU_ITEMS.map((item, i) => {
+                    const Wrapper = item.to ? Link : "div";
+                    const hasSubmenu = item.submenu && item.submenu.length > 0;
+                    
+                    if (hasSubmenu) {
                       return (
-                        <Wrapper
+                        <div
                           key={item.label}
-                          to={item.to}
-                          onClick={closeMenu}
-                          className={`group text-left p-4 border-black transition-colors duration-150 hover:bg-black hover:text-white ${
-                            i % 2 === 0 ? "border-r-2" : ""
-                          } ${i < MEGA_MENU_ITEMS.length - 2 ? "border-b-2" : ""}`}
+                          className="col-span-2 bg-white"
                         >
-                          <div className="flex items-center gap-2 mb-1">
-                            <span className="text-base font-black leading-none">{item.icon}</span>
-                            <span className="text-sm font-black uppercase tracking-widest">
-                              {item.label}
-                            </span>
+                          <div className="p-3 bg-black text-white flex items-center justify-between">
+                            <div className="flex items-center gap-2">
+                              <span className="text-sm">{item.icon}</span>
+                              <span className="text-xs font-black uppercase tracking-widest">
+                                {item.label}
+                              </span>
+                            </div>
                             {item.tag && (
-                              <span className="text-[9px] font-black tracking-widest border-2 border-current px-[5px] py-[1px] leading-tight">
+                              <span className="text-[8px] font-black tracking-widest border border-white px-1.5 py-0.5">
                                 {item.tag}
                               </span>
                             )}
                           </div>
-                          <p className="text-xs font-bold tracking-wide leading-snug opacity-60 group-hover:opacity-80 pl-6">
-                            {item.desc}
-                          </p>
-                        </Wrapper>
+                          <div className="grid grid-cols-2 gap-[2px] bg-black">
+                            {item.submenu.map((subItem) => (
+                              <Link
+                                key={subItem.label}
+                                to={subItem.to}
+                                onClick={closeMenu}
+                                className="group flex flex-col p-3 bg-white hover:bg-gray-50 transition-colors"
+                              >
+                                <div className="flex items-center gap-2 mb-0.5">
+                                  <span className="text-xs group-hover:scale-110 transition-transform">{subItem.icon}</span>
+                                  <span className="text-[11px] font-black uppercase tracking-wider group-hover:underline decoration-2">
+                                    {subItem.label}
+                                  </span>
+                                </div>
+                                <p className="text-[10px] font-bold text-gray-500 pl-5 leading-tight">
+                                  {subItem.desc}
+                                </p>
+                              </Link>
+                            ))}
+                          </div>
+                        </div>
                       );
-                    })}
-                  </div>
+                    }
+                    
+                    return (
+                      <Wrapper
+                        key={item.label}
+                        to={item.to}
+                        onClick={closeMenu}
+                        className="group flex flex-col p-4 bg-white hover:bg-black hover:text-white transition-all duration-150"
+                      >
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className="text-lg group-hover:scale-110 transition-transform">{item.icon}</span>
+                          <span className="text-xs font-black uppercase tracking-widest">
+                            {item.label}
+                          </span>
+                          {item.tag && (
+                            <span className="text-[8px] font-black tracking-widest border-2 border-current px-1.5 py-0.5">
+                              {item.tag}
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-[10px] font-bold opacity-60 group-hover:opacity-100 pl-6 leading-relaxed">
+                          {item.desc}
+                        </p>
+                      </Wrapper>
+                    );
+                  })}
+                </div>
 
-                  {/* Footer strip */}
-                  <div className="mt-4 pt-3 border-t-2 border-black flex items-center justify-between">
-                    <span className="text-[10px] font-black uppercase tracking-[0.15em] text-gray-500">
-                      More tools shipping soon
-                    </span>
-                    <span className="text-[10px] font-black uppercase tracking-widest border-b-2 border-black hover:opacity-60 cursor-pointer">
-                      View All →
-                    </span>
-                  </div>
+                {/* Footer strip */}
+                <div className="mt-4 pt-3 border-t-2 border-black flex items-center justify-between">
+                  <span className="text-[9px] font-black uppercase tracking-[0.1em] text-gray-400">
+                    Next update: June 2026
+                  </span>
+                  <Link 
+                    to="/tools" 
+                    onClick={closeMenu}
+                    className="text-[10px] font-black uppercase tracking-widest bg-black text-white px-3 py-1 hover:bg-white hover:text-black border-2 border-black transition-colors"
+                  >
+                    All Tools →
+                  </Link>
                 </div>
               </div>
-            )}
+            </div>
           </div>
         </div>
 
