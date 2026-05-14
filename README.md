@@ -710,7 +710,7 @@ Uses **Nodemailer** with SMTP transport. Two styled HTML email templates:
 
 | Variable | Required | Description |
 |---|---|---|
-| `PORT` | ✅ | Server port (e.g., `5000`) |
+| `PORT` | ✅ | Server port (e.g., `8000`) |
 | `MONGO_URI` | ✅ | MongoDB connection string |
 | `JWT_SECRET` | ✅ | Secret key for JWT signing |
 | `JWT_EXPIRES_IN` | ✅ | JWT expiry duration (e.g., `7d`) |
@@ -734,7 +734,7 @@ MONGO_URI=
 
 | Variable | Description |
 |---|---|
-| `VITE_API_BASE_URL` | Backend API base URL (e.g., `http://localhost:5000/api`) |
+| `VITE_API_BASE_URL` | Backend API base URL (e.g., `http://localhost:8000/api`) |
 
 ---
 
@@ -767,11 +767,11 @@ cp .env.example .env
 node server.js
 ```
 
-The API will be available at `http://localhost:5000`.
+The API will be available at `http://localhost:8000`.
 
 **Health check:**
 ```bash
-curl http://localhost:5000/api/health
+curl http://localhost:8000/api/health
 # → { "status": "ok", "message": "CodeLens API is running" }
 ```
 
@@ -787,7 +787,7 @@ cd CodeLens/frontend
 npm install
 
 # 3. Create environment file
-echo "VITE_API_BASE_URL=http://localhost:5000/api" > .env
+echo "VITE_API_BASE_URL=http://localhost:8000/api" > .env
 
 # 4. Start the development server
 npm run dev
@@ -863,3 +863,53 @@ This project uses the [MIT License](./LICENSE).
   <strong>CodeLens — Stop the Guesswork. Dictate the Path.</strong><br>
   Built with ❤️ for the developer community as part of GSSoC 2026.
 </div>
+
+---
+
+### MongoDB Atlas Setup
+
+1. Go to [cloud.mongodb.com](https://cloud.mongodb.com) and create a free account
+2. Create a new **Cluster** (free M0 tier works fine)
+3. Under **Database Access**, create a user with read/write permissions
+4. Under **Network Access**, add your IP (or `0.0.0.0/0` for development)
+5. Click **Connect** → **Connect your application** and copy the connection string
+6. Replace `<username>`, `<password>` in the connection string
+7. Set `MONGO_URI` in `server/.env` to the connection string
+
+**Example:**
+```env
+MONGO_URI=mongodb+srv://youruser:yourpassword@cluster0.xxxxx.mongodb.net/codelens?retryWrites=true&w=majority
+```
+
+---
+
+### SMTP Setup
+
+**Using Gmail:**
+1. Enable 2-Factor Authentication on your Google account
+2. Go to Google Account → Security → **App Passwords**
+3. Generate an app password for "Mail"
+4. Use in `server/.env`:
+
+```env
+SMTP_HOST=smtp.gmail.com
+SMTP_PORT=587
+SMTP_USER=your.email@gmail.com
+SMTP_PASS=your-16-char-app-password
+```
+
+**Using Mailtrap (for testing):**
+1. Sign up at [mailtrap.io](https://mailtrap.io)
+2. Go to Email Testing → your inbox → SMTP Settings
+3. Copy the credentials into `server/.env`
+
+---
+
+### Troubleshooting
+
+| Issue | Cause | Fix |
+|---|---|---|
+| `ECONNREFUSED` on API calls | Port mismatch | Ensure `VITE_API_BASE_URL` in `frontend/.env` matches `PORT` in `server/.env` (default: `8000`) |
+| MongoDB connection fails | Wrong URI or IP not whitelisted | Check `MONGO_URI` format and whitelist your IP in Atlas Network Access |
+| Emails not sending | Wrong SMTP credentials | Use Gmail App Password, not your account password |
+| JWT errors | Missing secret | Set a long random string as `JWT_SECRET` in `server/.env` |

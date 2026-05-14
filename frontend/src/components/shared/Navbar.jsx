@@ -401,7 +401,7 @@ export default function Navbar() {
 
       {/* ── Mobile Menu ── */}
       {isMenuOpen && (
-        <div className="lg:hidden w-full bg-white border-t-4 border-black">
+        <div className="lg:hidden w-full bg-white border-t-4 border-black max-h-[calc(100vh-4rem)] overflow-y-auto">
           <div className="flex flex-col">
             {/* Nav links */}
             {isAuthenticated && (
