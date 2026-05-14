@@ -208,6 +208,7 @@ export default function Navbar() {
               ref={megaRef}
               onMouseEnter={handleMegaMouseEnter}
               onMouseLeave={handleMegaMouseLeave}
+              aria-hidden={!megaOpen}
               className={`absolute top-full left-1/2 mt-4 w-[580px] bg-white border-4 border-black z-50 transition-all duration-200 origin-top ${
                 megaOpen 
                   ? "opacity-100 translate-y-0 scale-100 visible" 
@@ -230,7 +231,7 @@ export default function Navbar() {
 
                 <div className="grid grid-cols-2 gap-[2px] bg-black border-2 border-black overflow-hidden">
                   {MEGA_MENU_ITEMS.map((item, i) => {
-                    const Wrapper = item.to ? Link : "div";
+                    const Wrapper = item.to ? Link : "button";
                     const hasSubmenu = item.submenu && item.submenu.length > 0;
                     
                     if (hasSubmenu) {
@@ -509,7 +510,7 @@ export default function Navbar() {
                   return (
                     <Wrapper
                       key={item.label}
-                      to={item.to}
+                      {...(item.to ? { to: item.to } : { type: "button" })} 
                       onClick={closeMenu}
                       className="w-full text-left px-8 py-3 border-b border-black/10 hover:bg-black hover:text-white transition-colors duration-150 group"
                     >
