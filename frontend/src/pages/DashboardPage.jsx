@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useAuth } from "../context/AuthContext";
-import { Link } from "react-router-dom";
+import { Link,useNavigate } from "react-router-dom";
 import Loader from "../components/shared/Loader";
 import { useCodeforces } from "../hooks/useCodeforces";
 import ConnectBanner from "../components/codeforces/ConnectBanner";
@@ -8,7 +8,8 @@ import VerifyModal from "../components/codeforces/VerifyModal";
 import AIInsightPanel from "../components/ai/AIInsightPanel";
 
 export default function DashboardPage() {
-  const { user, loading  } = useAuth();
+  const { user, loading, logout  } = useAuth();
+  const navigate = useNavigate();
   const [modalOpen, setModalOpen] = useState(false);
 
   const {
@@ -21,6 +22,11 @@ export default function DashboardPage() {
     connectLoading,
     connectError,
   } = useCodeforces(true); // dashboard mode = lightweight summary only
+  
+  const handleLogout = () => {
+  logout();
+  navigate("/");
+};
 
   
 
@@ -31,7 +37,7 @@ export default function DashboardPage() {
   return (
     <div className="w-full flex-1 flex flex-col px-4 sm:px-6 md:px-8 py-12 sm:py-16 bg-white overflow-hidden">
       <div className="max-w-7xl mx-auto w-full">
-        <header className="mb-12 sm:mb-16 border-b-4 border-black pb-6 sm:pb-8">
+       <header className="mb-12 sm:mb-16 border-b-4 border-black pb-6 sm:pb-8 flex flex-col md:flex-row md:items-end md:justify-between gap-4 sm:gap-6">
           <div>
             <h1 className="text-3xl sm:text-5xl md:text-7xl font-black uppercase tracking-tighter text-black mb-4 sm:mb-6">
               Command Center
