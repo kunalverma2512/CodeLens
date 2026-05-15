@@ -8,7 +8,7 @@ import DashboardPage from "./pages/DashboardPage";
 import ExplorePage from "./pages/ExplorePage";
 import CodeforcesPage from "./pages/CodeforcesPage";
 import PracticePage from "./pages/PracticePage";
-import VelaAIPage from "./pages/VelaAIPage";
+
 import ApexAIPage from "./pages/ApexAIPage";
 import AlgoVersePage from "./pages/AlgoVersePage";
 import ContestCodeforcesPage from "./pages/ContestCodeforcesPage";
@@ -84,7 +84,7 @@ export default function App() {
             {/* GitHub OAuth callback — must be public, no auth required */}
             <Route path="/auth/github/callback" element={<GitHubCallbackPage />} />
             <Route path="/practice" element={<PracticePage />} />
-            <Route path="/vela-ai" element={<VelaAIPage />} />
+
             <Route path="/apex-ai" element={<ApexAIPage />} />
             <Route path="/algoverse" element={<AlgoVersePage />} />
             <Route path="/contests/codeforces" element={<ContestCodeforcesPage />} />

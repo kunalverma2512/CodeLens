@@ -17,8 +17,14 @@ async function ghFetch(url, token, params = {}) {
     return res.data;
   } catch (err) {
     if (err.response?.status === 404) return null;
-    if (err.response?.status === 403) throw new ApiError(403, "GitHub rate limit exceeded.");
+    if (err.response?.status === 403) {
+      if (err.response.headers && err.response.headers['x-ratelimit-remaining'] === '0') {
+        throw new ApiError(403, "GitHub rate limit exceeded.");
+      }
+      return null; // Silent fail for missing scopes (like /user/orgs)
+    }
     if (err.response?.status === 422) return null;
+    if (err.response?.status === 401) throw new ApiError(401, "GitHub token invalid or expired. Please reconnect.");
     return null; // silent fail for non-critical endpoints
   }
 }

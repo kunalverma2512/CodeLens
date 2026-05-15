@@ -368,15 +368,15 @@ export default function Navbar() {
           )}
         </div>
 
-        {/* ── Mobile Right: VELA + Hamburger ── */}
+        {/* ── Mobile Right: APEX + Hamburger ── */}
         <div className="lg:hidden flex items-center gap-3">
           <Link
-            to="/vela-ai"
+            to="/apex-ai"
             className="flex items-center gap-1 px-3 py-2 bg-black text-white text-xs font-black uppercase tracking-widest border-2 border-black hover:bg-white hover:text-black transition-colors duration-150"
-            title="VELA AI"
+            title="APEX AI"
           >
-            <span>✦</span>
-            VELA
+            <span>◆</span>
+            APEX
           </Link>
           <button
             onClick={toggleMenu}
