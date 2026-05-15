@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useAuth } from "../context/AuthContext";
-import { useNavigate, Link } from "react-router-dom";
+import { Link } from "react-router-dom";
 import Loader from "../components/shared/Loader";
 import { useCodeforces } from "../hooks/useCodeforces";
 import ConnectBanner from "../components/codeforces/ConnectBanner";
@@ -8,8 +8,7 @@ import VerifyModal from "../components/codeforces/VerifyModal";
 import AIInsightPanel from "../components/ai/AIInsightPanel";
 
 export default function DashboardPage() {
-  const { user, loading, logout } = useAuth();
-  const navigate = useNavigate();
+  const { user, loading } = useAuth();
   const [modalOpen, setModalOpen] = useState(false);
 
   const {
@@ -22,11 +21,6 @@ export default function DashboardPage() {
     connectLoading,
     connectError,
   } = useCodeforces(true); // dashboard mode = lightweight summary only
-
-  const handleLogout = () => {
-    logout();
-    navigate("/");
-  };
 
   if (loading) {
     return <Loader />;
@@ -44,12 +38,6 @@ export default function DashboardPage() {
               Welcome back, {user?.name || "Engineer"}. Here is your unified growth telemetry.
             </p>
           </div>
-          <button
-            onClick={handleLogout}
-            className="px-6 sm:px-8 py-3 sm:py-4 border-4 border-black bg-white text-black font-black uppercase tracking-widest hover:bg-black hover:text-white transition-colors rounded-none w-full md:w-auto"
-          >
-            Logout
-          </button>
         </header>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-10 mb-12 sm:mb-16">
