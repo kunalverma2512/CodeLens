@@ -296,7 +296,6 @@ export default function Navbar() {
                   })}
                 </div>
 
-                {/* Footer strip */}
                 
               </div>
             </div>
