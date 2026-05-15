@@ -219,15 +219,8 @@ export default function Navbar() {
               {/* Top accent bar */}
               <div className="h-1 w-full bg-black" />
 
-              <div className="p-5">
-                <div className="flex items-center justify-between mb-4 border-b-2 border-black pb-2">
-                  <p className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-500">
-                    AI-Powered Tools — GSSoC '26
-                  </p>
-                  <span className="text-[9px] font-black bg-black text-white px-2 py-0.5 tracking-widest">
-                    v2.0
-                  </span>
-                </div>
+              <div className="p-3">
+                
 
                 <div className="grid grid-cols-2 gap-[2px] bg-black border-2 border-black overflow-hidden">
                   {MEGA_MENU_ITEMS.map((item, i) => {
@@ -304,18 +297,7 @@ export default function Navbar() {
                 </div>
 
                 {/* Footer strip */}
-                <div className="mt-4 pt-3 border-t-2 border-black flex items-center justify-between">
-                  <span className="text-[9px] font-black uppercase tracking-[0.1em] text-gray-400">
-                    Next update: June 2026
-                  </span>
-                  <Link 
-                    to="/tools" 
-                    onClick={closeMenu}
-                    className="text-[10px] font-black uppercase tracking-widest bg-black text-white px-3 py-1 hover:bg-white hover:text-black border-2 border-black transition-colors"
-                  >
-                    All Tools →
-                  </Link>
-                </div>
+                
               </div>
             </div>
           </div>
