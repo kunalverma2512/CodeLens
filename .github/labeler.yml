@@ -1,0 +1,11 @@
+# Add 'frontend' label to any change within the 'frontend' folder
+frontend:
+  - "frontend/**"
+
+# Add 'backend' label to any change within the 'server' folder
+backend:
+  - "server/**"
+
+# Add 'docs' label to any markdown files
+docs:
+  - "**/*.md"
