@@ -136,47 +136,44 @@ CodeLens/
 │   ├── src/
 │   │   ├── assets/                  # Images and SVGs
 │   │   ├── components/
-│   │   │   ├── auth/
-│   │   │   │   └── ForgotPassword.jsx
-│   │   │   ├── explore/             # 14 Explore page sections
-│   │   │   │   ├── AIExplanation.jsx
-│   │   │   │   ├── ArchitectureDeepDive.jsx
-│   │   │   │   ├── DailyChallenge.jsx
-│   │   │   │   ├── DataPrivacy.jsx
-│   │   │   │   ├── ExploreHero.jsx
-│   │   │   │   ├── FAQSection.jsx
-│   │   │   │   ├── FeatureGrid.jsx
-│   │   │   │   ├── FinalCTA.jsx
-│   │   │   │   ├── Leaderboard.jsx
-│   │   │   │   ├── OpenSourceVision.jsx
-│   │   │   │   ├── PlatformSync.jsx
-│   │   │   │   ├── RoadmapVisualizer.jsx
-│   │   │   │   ├── SubscribeNewsletter.jsx
-│   │   │   │   └── Testimonials.jsx
-│   │   │   ├── shared/
-│   │   │   │   ├── Footer.jsx
-│   │   │   │   ├── Loader.jsx
-│   │   │   │   ├── Navbar.jsx
-│   │   │   │   ├── ProtectedRoute.jsx
-│   │   │   │   └── PublicRoute.jsx
-│   │   │   └── ui/
-│   │   │       └── Hero.jsx
+│   │   │   ├── ai/                  # AI insight components
+│   │   │   ├── auth/                # Authentication components
+│   │   │   ├── codeforces/          # Codeforces specific components
+│   │   │   ├── explore/             # Explore page sections
+│   │   │   ├── github/              # GitHub data visualization components
+│   │   │   ├── shared/              # Reusable UI components
+│   │   │   └── ui/                  # Generic UI components
 │   │   ├── context/
 │   │   │   └── AuthContext.jsx      # Global auth state (React Context)
+│   │   ├── hooks/                   # Custom React hooks
 │   │   ├── layouts/
 │   │   │   └── MainLayout.jsx       # Navbar + Footer wrapper
-│   │   ├── pages/
+│   │   ├── pages/                   # Application routes
+│   │   │   ├── AccountCenterPage.jsx
+│   │   │   ├── AlgoVersePage.jsx
+│   │   │   ├── ApexAIPage.jsx
+│   │   │   ├── CodeforcesPage.jsx
+│   │   │   ├── ContestAtCoderPage.jsx
+│   │   │   ├── ContestCodeChefPage.jsx
+│   │   │   ├── ContestCodeforcesPage.jsx
+│   │   │   ├── ContestLeetCodePage.jsx
 │   │   │   ├── DashboardPage.jsx
 │   │   │   ├── ExplorePage.jsx
+│   │   │   ├── GitHubCallbackPage.jsx
+│   │   │   ├── GitHubIntelligencePage.jsx
 │   │   │   ├── LandingPage.jsx
 │   │   │   ├── LoginPage.jsx
+│   │   │   ├── NotFoundPage.jsx
+│   │   │   ├── PracticePage.jsx
 │   │   │   ├── PrivacyPage.jsx
 │   │   │   ├── SignupPage.jsx
 │   │   │   └── TermsPage.jsx
-│   │   ├── services/
+│   │   ├── services/                # API integration
 │   │   │   ├── api.js               # Axios instance with interceptors
-│   │   │   ├── authService.js       # Auth API calls
-│   │   │   └── userService.js       # User profile API calls
+│   │   │   ├── authService.js
+│   │   │   ├── codeforcesService.js
+│   │   │   ├── githubService.js
+│   │   │   └── userService.js
 │   │   ├── App.jsx                  # Root component + routing
 │   │   ├── index.css                # Global styles
 │   │   └── main.jsx                 # React DOM entry point
@@ -188,33 +185,29 @@ CodeLens/
     ├── config/
     │   ├── db.js                    # MongoDB connection
     │   ├── env.js                   # Environment variable validation
-    │   └── gemini.js                # Gemini AI client (scaffolded)
+    │   ├── gemini.js                # Gemini AI client
+    │   └── nvidia.js                # Nvidia NIM / AI integrations
     ├── middlewares/
     │   ├── authMiddleware.js        # JWT verification middleware
     │   └── errorHandler.js          # Global error handler
     ├── models/
+    │   ├── CodeforcesProfile.js
+    │   ├── CodeforcesRatingHistory.js
+    │   ├── CodeforcesSubmission.js
     │   ├── Otp.js                   # OTP schema (10-min TTL)
     │   └── User.js                  # User schema (full telemetry model)
     ├── modules/
+    │   ├── ai/                      # AI integration module
     │   ├── auth/                    # Authentication module
-    │   │   ├── controller.js
-    │   │   ├── repository.js
-    │   │   ├── routes.js
-    │   │   ├── service.js
-    │   │   └── validation.js
-    │   ├── user/                    # User profile module
-    │   │   ├── controller.js
-    │   │   ├── repository.js
-    │   │   ├── routes.js
-    │   │   ├── service.js
-    │   │   └── validation.js
-    │   ├── ai/                      # Gemini AI module (scaffolded)
-    │   ├── cp/                      # Competitive programming module (scaffolded)
-    │   ├── github/                  # GitHub data module (scaffolded)
-    │   └── tasks/                   # Task tracking module (scaffolded)
+    │   ├── codeforces/              # Codeforces stats and synchronization
+    │   ├── cp/                      # Competitive programming module
+    │   ├── github/                  # GitHub telemetry module
+    │   ├── tasks/                   # Task tracking module
+    │   └── user/                    # User profile module
     ├── utils/
     │   ├── ApiError.js             # Custom error class
     │   ├── ApiResponse.js          # Standardized response class
+    │   ├── codeforcesApi.js        # Codeforces API wrapper
     │   ├── emailService.js         # Nodemailer OTP email templates
     │   ├── otpHelper.js            # OTP generation utility
     │   └── tokenHelper.js          # JWT sign & verify utilities
@@ -235,14 +228,27 @@ The frontend is a **React 19 SPA** built with Vite and styled exclusively using 
 
 **Application Route Map:**
 ```
-/              → LandingPage
-/login         → LoginPage (PublicRoute)
-/signup        → SignupPage (PublicRoute)
-/forgot-password → ForgotPassword (PublicRoute)
-/dashboard     → DashboardPage (ProtectedRoute)
-/explore       → ExplorePage (public)
-/terms         → TermsPage (public)
-/privacy       → PrivacyPage (public)
+/                      → LandingPage
+/login                 → LoginPage (PublicRoute)
+/signup                → SignupPage (PublicRoute)
+/forgot-password       → ForgotPassword (PublicRoute)
+/dashboard             → DashboardPage (ProtectedRoute)
+/explore               → ExplorePage (public)
+/terms                 → TermsPage (public)
+/privacy               → PrivacyPage (public)
+/account               → AccountCenterPage (ProtectedRoute)
+/codeforces            → CodeforcesPage (ProtectedRoute)
+/github                → GitHubIntelligencePage (ProtectedRoute)
+/practice              → PracticePage (ProtectedRoute)
+
+/apex                  → ApexAIPage (ProtectedRoute)
+/algoverse             → AlgoVersePage (ProtectedRoute)
+/contests/codeforces   → ContestCodeforcesPage (ProtectedRoute)
+/contests/leetcode     → ContestLeetCodePage (ProtectedRoute)
+/contests/codechef     → ContestCodeChefPage (ProtectedRoute)
+/contests/atcoder      → ContestAtCoderPage (ProtectedRoute)
+/auth/github/callback  → GitHubCallbackPage
+/*                     → NotFoundPage
 ```
 
 **Layout:** All pages are wrapped in `MainLayout` which renders `<Navbar>` at the top and `<Footer>` at the bottom with a `flex-col min-h-screen` structure.

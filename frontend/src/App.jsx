@@ -8,7 +8,7 @@ import DashboardPage from "./pages/DashboardPage";
 import ExplorePage from "./pages/ExplorePage";
 import CodeforcesPage from "./pages/CodeforcesPage";
 import PracticePage from "./pages/PracticePage";
-import VelaAIPage from "./pages/VelaAIPage";
+
 import ApexAIPage from "./pages/ApexAIPage";
 import AlgoVersePage from "./pages/AlgoVersePage";
 import ContestCodeforcesPage from "./pages/ContestCodeforcesPage";
@@ -19,6 +19,9 @@ import TermsPage from "./pages/TermsPage";
 import PrivacyPage from "./pages/PrivacyPage";
 import NotFoundPage from "./pages/NotFoundPage";
 import ForgotPassword from "./components/auth/ForgotPassword";
+import AccountCenterPage from "./pages/AccountCenterPage";
+import GitHubIntelligencePage from "./pages/GitHubIntelligencePage";
+import GitHubCallbackPage from "./pages/GitHubCallbackPage";
 import ProtectedRoute from "./components/shared/ProtectedRoute";
 import PublicRoute from "./components/shared/PublicRoute";
 
@@ -53,6 +56,22 @@ export default function App() {
                 </ProtectedRoute>
               } 
             />
+            <Route
+              path="/account-center"
+              element={
+                <ProtectedRoute>
+                  <AccountCenterPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/github-intelligence"
+              element={
+                <ProtectedRoute>
+                  <GitHubIntelligencePage />
+                </ProtectedRoute>
+              }
+            />
             <Route 
               path="/forgot-password" 
               element={
@@ -62,8 +81,10 @@ export default function App() {
               } 
             />
             <Route path="/explore" element={<ExplorePage />} />
+            {/* GitHub OAuth callback — must be public, no auth required */}
+            <Route path="/auth/github/callback" element={<GitHubCallbackPage />} />
             <Route path="/practice" element={<PracticePage />} />
-            <Route path="/vela-ai" element={<VelaAIPage />} />
+
             <Route path="/apex-ai" element={<ApexAIPage />} />
             <Route path="/algoverse" element={<AlgoVersePage />} />
             <Route path="/contests/codeforces" element={<ContestCodeforcesPage />} />

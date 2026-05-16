@@ -19,6 +19,10 @@ class AuthRepository {
     return await User.findById(id);
   }
 
+  static async findUserByGithubId(githubId) {
+    return await User.findOne({ "oauth.github.id": githubId });
+  }
+
   static async updateUserVerification(email) {
     return await User.findOneAndUpdate(
       { email },
@@ -32,6 +36,28 @@ class AuthRepository {
       { email },
       { password: hashedPassword },
       { new: true }
+    );
+  }
+
+  static async updateUserGithubIdentity(userId, githubIdentity = {}) {
+    const updateData = {
+      "oauth.github.id":          githubIdentity.id,
+      "oauth.github.username":    githubIdentity.username,
+      "oauth.github.profileUrl":  githubIdentity.profileUrl,
+      "handles.github":           githubIdentity.username,
+    };
+
+    if (githubIdentity.avatarUrl) {
+      updateData["profile.avatar"] = githubIdentity.avatarUrl;
+    }
+    if (githubIdentity.accessToken) {
+      updateData["oauth.github.accessToken"] = githubIdentity.accessToken;
+    }
+
+    return await User.findByIdAndUpdate(
+      userId,
+      updateData,
+      { new: true, runValidators: true }
     );
   }
 
