@@ -80,13 +80,6 @@ export default function Navbar() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Close mega menu on route change
-  useEffect(() => {
-    setMegaOpen(false);
-    setIsMenuOpen(false);
-    setMobileMegaOpen(false);
-  }, [location.pathname]);
-
   // Close mega on outside click
   useEffect(() => {
     const handler = (e) => {
@@ -154,7 +147,6 @@ export default function Navbar() {
     <nav className="sticky top-0 z-50 w-full bg-white border-b-4 border-black">
       {/* ── Main Row ── */}
       <div className="max-w-[1400px] mx-auto flex items-center justify-between px-4 sm:px-6 lg:px-8 py-3 md:py-4 gap-4">
-
         {/* Logo */}
         <Link
           to="/"
@@ -179,6 +171,11 @@ export default function Navbar() {
               Codeforces
             </Link>
           )}
+          {isAuthenticated && (
+            <Link to="/account-center" className={linkCls("/account-center")}>
+              Account Center
+            </Link>
+          )}
 
           {/* ── Tools Mega Menu Trigger ── */}
           <div
@@ -188,16 +185,35 @@ export default function Navbar() {
           >
             <button
               ref={megaTriggerRef}
-              className={`text-sm font-black uppercase tracking-widest text-black flex items-center gap-1 transition-all duration-150 hover:underline underline-offset-8 decoration-4 decoration-black focus:outline-none ${
-                megaOpen ? "underline underline-offset-8 decoration-4 decoration-black" : ""
-              }`}
+              className={`text-sm font-black uppercase tracking-widest text-black flex items-center gap-1 transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2`}
               aria-haspopup="true"
               aria-expanded={megaOpen}
+              aria-controls="tools-mega-menu"
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  e.preventDefault();
+                  setMegaOpen((v) => !v);
+                }
+
+                if (e.key === "Escape") {
+                  setMegaOpen(false);
+                }
+              }}
             >
-              Tools
+              <span
+                className={`${
+                  megaOpen
+                    ? "underline underline-offset-8 decoration-4 decoration-black"
+                    : ""
+                }`}
+              >
+                Tools
+              </span>
               <span
                 className="inline-block transition-transform duration-200 text-xs"
-                style={{ transform: megaOpen ? "rotate(180deg)" : "rotate(0deg)" }}
+                style={{
+                  transform: megaOpen ? "rotate(180deg)" : "rotate(0deg)",
+                }}
               >
                 ▾
               </span>
@@ -228,6 +244,84 @@ export default function Navbar() {
                     const hasSubmenu = item.submenu && item.submenu.length > 0;
                     
                     if (hasSubmenu) {
+            {megaOpen && (
+              <div
+                id="tools-mega-menu"
+                role="region"
+                aria-label="Tools menu"
+                ref={megaRef}
+                onMouseEnter={handleMegaMouseEnter}
+                onMouseLeave={handleMegaMouseLeave}
+                className="absolute top-full left-1/2 mt-[18px] w-[640px] bg-white border-4 border-black z-50"
+                style={{ transform: "translateX(-50%)" }}
+              >
+                {/* Top accent bar */}
+                <div className="h-[3px] w-full bg-black" />
+
+                <div className="p-6">
+                  <p className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 mb-4 border-b-2 border-black pb-3">
+                    AI-Powered Tools — GSSoC '26
+                  </p>
+                  <div className="grid grid-cols-2 gap-0">
+                    {MEGA_MENU_ITEMS.map((item, i) => {
+                      const Wrapper = item.to ? Link : "div";
+                      const hasSubmenu =
+                        item.submenu && item.submenu.length > 0;
+
+                      if (hasSubmenu) {
+                        return (
+                          <div
+                            key={item.label}
+                            className={`col-span-2 border-black ${
+                              i < MEGA_MENU_ITEMS.length - 1 ? "border-b-2" : ""
+                            }`}
+                          >
+                            <div className="group p-4 bg-black text-white cursor-default">
+                              <div className="flex items-center gap-2 mb-1">
+                                <span className="text-base font-black leading-none">
+                                  {item.icon}
+                                </span>
+                                <span className="text-sm font-black uppercase tracking-widest">
+                                  {item.label}
+                                </span>
+                                {item.tag && (
+                                  <span className="text-[9px] font-black tracking-widest border-2 border-current px-[5px] py-[1px] leading-tight">
+                                    {item.tag}
+                                  </span>
+                                )}
+                              </div>
+                              <p className="text-xs font-bold tracking-wide leading-snug opacity-80 pl-6">
+                                {item.desc}
+                              </p>
+                            </div>
+                            <div className="grid grid-cols-2 gap-0 bg-gray-50">
+                              {item.submenu.map((subItem, subIdx) => (
+                                <Link
+                                  key={subItem.label}
+                                  to={subItem.to}
+                                  onClick={closeMenu}
+                                  className={`group text-left p-4 border-black transition-colors duration-150 hover:bg-black hover:text-white ${
+                                    subIdx % 2 === 0 ? "border-r-2" : ""
+                                  } ${subIdx < item.submenu.length - 2 ? "border-b-2" : ""}`}
+                                >
+                                  <div className="flex items-center gap-2 mb-1">
+                                    <span className="text-base font-black leading-none">
+                                      {subItem.icon}
+                                    </span>
+                                    <span className="text-xs font-black uppercase tracking-widest">
+                                      {subItem.label}
+                                    </span>
+                                  </div>
+                                  <p className="text-[11px] font-bold tracking-wide leading-snug opacity-60 group-hover:opacity-80 pl-6">
+                                    {subItem.desc}
+                                  </p>
+                                </Link>
+                              ))}
+                            </div>
+                          </div>
+                        );
+                      }
+
                       return (
                         <div
                           key={item.label}
@@ -240,6 +334,13 @@ export default function Navbar() {
                                 {item.label}
                               </span>
                             </div>
+                          <div className="flex items-center gap-2 mb-1">
+                            <span className="text-base font-black leading-none">
+                              {item.icon}
+                            </span>
+                            <span className="text-sm font-black uppercase tracking-widest">
+                              {item.label}
+                            </span>
                             {item.tag && (
                               <span className="text-[8px] font-black tracking-widest border border-white px-1.5 py-0.5">
                                 {item.tag}
@@ -339,6 +440,12 @@ export default function Navbar() {
                   {getUserDisplayName()}
                 </span>
               </div>
+              <Link
+                to="/github-intelligence"
+                className="px-4 py-2 bg-white text-black text-xs font-black uppercase tracking-widest border-4 border-black hover:bg-black hover:text-white transition-colors duration-150"
+              >
+                GitHub Data
+              </Link>
               <button
                 onClick={handleLogout}
                 className="px-4 py-2 bg-white text-black text-sm font-black uppercase tracking-widest border-4 border-black hover:bg-black hover:text-white transition-colors duration-150"
@@ -349,19 +456,19 @@ export default function Navbar() {
           )}
         </div>
 
-        {/* ── Mobile Right: VELA + Hamburger ── */}
+        {/* ── Mobile Right: APEX + Hamburger ── */}
         <div className="lg:hidden flex items-center gap-3">
           <Link
-            to="/vela-ai"
+            to="/apex-ai"
             className="flex items-center gap-1 px-3 py-2 bg-black text-white text-xs font-black uppercase tracking-widest border-2 border-black hover:bg-white hover:text-black transition-colors duration-150"
-            title="VELA AI"
+            title="APEX AI"
           >
-            <span>✦</span>
-            VELA
+            <span>◆</span>
+            APEX
           </Link>
           <button
             onClick={toggleMenu}
-            className="flex flex-col justify-center items-center w-10 h-10 gap-[6px] border-2 border-black focus:outline-none"
+            className="flex flex-col justify-center items-center w-10 h-10 gap-[6px] border-2 border-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2"
             aria-label="Toggle menu"
             aria-expanded={isMenuOpen}
           >
@@ -414,16 +521,29 @@ export default function Navbar() {
                 Codeforces <span className="opacity-40">→</span>
               </Link>
             )}
+            {isAuthenticated && (
+              <Link
+                to="/account-center"
+                onClick={closeMenu}
+                className="px-5 py-4 text-sm font-black uppercase tracking-widest text-black border-b-2 border-black hover:bg-black hover:text-white transition-colors duration-150 flex items-center justify-between"
+              >
+                Account Center <span className="opacity-40">→</span>
+              </Link>
+            )}
 
             {/* Tools accordion */}
             <button
+              aria-expanded={mobileMegaOpen}
+              aria-haspopup="true"
               onClick={() => setMobileMegaOpen((v) => !v)}
               className="px-5 py-4 text-sm font-black uppercase tracking-widest text-black border-b-2 border-black hover:bg-gray-50 transition-colors duration-150 flex items-center justify-between w-full text-left"
             >
               <span>Tools</span>
               <span
                 className="transition-transform duration-200 text-xs"
-                style={{ transform: mobileMegaOpen ? "rotate(180deg)" : "rotate(0deg)" }}
+                style={{
+                  transform: mobileMegaOpen ? "rotate(180deg)" : "rotate(0deg)",
+                }}
               >
                 ▾
               </span>
@@ -433,19 +553,29 @@ export default function Navbar() {
               <div className="border-b-2 border-black bg-gray-50">
                 {MEGA_MENU_ITEMS.map((item) => {
                   const hasSubmenu = item.submenu && item.submenu.length > 0;
-                  
+
                   if (hasSubmenu) {
                     const isExpanded = expandedSubmenu === item.label;
                     return (
-                      <div key={item.label} className="border-b border-black/10">
+                      <div
+                        key={item.label}
+                        className="border-b border-black/10"
+                      >
                         <button
-                          onClick={() => setExpandedSubmenu(isExpanded ? null : item.label)}
+                          aria-expanded={isExpanded}
+                          onClick={() =>
+                            setExpandedSubmenu(isExpanded ? null : item.label)
+                          }
                           className="w-full text-left px-8 py-3 bg-black text-white transition-colors duration-150 group flex items-center justify-between"
                         >
                           <div className="flex-1">
                             <div className="flex items-center gap-2">
-                              <span className="text-sm font-black">{item.icon}</span>
-                              <span className="text-xs font-black uppercase tracking-widest">{item.label}</span>
+                              <span className="text-sm font-black">
+                                {item.icon}
+                              </span>
+                              <span className="text-xs font-black uppercase tracking-widest">
+                                {item.label}
+                              </span>
                               {item.tag && (
                                 <span className="text-[9px] font-black tracking-widest border border-current px-1 leading-tight">
                                   {item.tag}
@@ -458,7 +588,11 @@ export default function Navbar() {
                           </div>
                           <span
                             className="text-white transition-transform duration-200 text-xs ml-2"
-                            style={{ transform: isExpanded ? "rotate(180deg)" : "rotate(0deg)" }}
+                            style={{
+                              transform: isExpanded
+                                ? "rotate(180deg)"
+                                : "rotate(0deg)",
+                            }}
                           >
                             ▾
                           </span>
@@ -472,9 +606,13 @@ export default function Navbar() {
                                 onClick={closeMenu}
                                 className="w-full text-left px-12 py-3 border-b border-black/5 hover:bg-black hover:text-white transition-colors duration-150 group flex items-start gap-2"
                               >
-                                <span className="text-sm font-black mt-0.5">{subItem.icon}</span>
+                                <span className="text-sm font-black mt-0.5">
+                                  {subItem.icon}
+                                </span>
                                 <div className="flex-1">
-                                  <div className="text-xs font-black uppercase tracking-widest">{subItem.label}</div>
+                                  <div className="text-xs font-black uppercase tracking-widest">
+                                    {subItem.label}
+                                  </div>
                                   <p className="text-[11px] font-bold tracking-wide text-gray-500 group-hover:text-white mt-0.5 leading-snug">
                                     {subItem.desc}
                                   </p>
@@ -486,7 +624,7 @@ export default function Navbar() {
                       </div>
                     );
                   }
-                  
+
                   const Wrapper = item.to ? Link : "button";
                   return (
                     <Wrapper
@@ -497,7 +635,9 @@ export default function Navbar() {
                     >
                       <div className="flex items-center gap-2">
                         <span className="text-sm font-black">{item.icon}</span>
-                        <span className="text-xs font-black uppercase tracking-widest">{item.label}</span>
+                        <span className="text-xs font-black uppercase tracking-widest">
+                          {item.label}
+                        </span>
                         {item.tag && (
                           <span className="text-[9px] font-black tracking-widest border border-current px-1 leading-tight">
                             {item.tag}
@@ -541,6 +681,13 @@ export default function Navbar() {
                     {getUserDisplayName()}
                   </span>
                 </div>
+                <Link
+                  to="/github-intelligence"
+                  onClick={closeMenu}
+                  className="px-5 py-4 text-sm font-black uppercase tracking-widest text-black border-b-2 border-black hover:bg-black hover:text-white transition-colors duration-150 flex items-center justify-between"
+                >
+                  GitHub Data <span className="opacity-40">→</span>
+                </Link>
                 <button
                   onClick={handleLogout}
                   className="px-5 py-4 text-sm font-black uppercase tracking-widest text-black border-b-2 border-black hover:bg-black hover:text-white transition-colors duration-150 text-left"
