@@ -859,6 +859,30 @@ Please read [CONTRIBUTING.md](./CONTRIBUTING.md) before submitting issues or PRs
 
 ---
 
+## 💖 Contributors  
+
+A huge thanks to all the amazing contributors who helped make **CodeLens** better 🚀✨  
+
+<div align="center">
+  <a href="https://github.com/kunalverma2512/CodeLens/graphs/contributors">
+    <img src="https://contrib.rocks/image?repo=kunalverma2512/CodeLens" alt="Contributors" />
+  </a>
+</div>
+
+<br/><br/>
+
+## ⭐ Project Support
+
+<div align="center">
+
+[![Stars](https://img.shields.io/github/stars/kunalverma2512/CodeLens?style=social)](https://github.com/kunalverma2512/CodeLens/stargazers)
+&nbsp;&nbsp;
+[![Forks](https://img.shields.io/github/forks/kunalverma2512/CodeLens?style=social)](https://github.com/kunalverma2512/CodeLens/network/members)
+
+</div>
+
+---
+
 ## License
 
 This project uses the [MIT License](./LICENSE).
