@@ -11,7 +11,6 @@ export default function DashboardPage() {
   const { user, loading, logout } = useAuth();
   const navigate = useNavigate();
   const [modalOpen, setModalOpen] = useState(false);
-  const load = true
 
   const {
     dashboardSummary: cfData,

@@ -1,8 +1,12 @@
 const Spinner = () => {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-white">
+    <div
+      role="status"
+      aria-live="polite"
+      className="min-h-screen flex items-center justify-center bg-white"
+    >
+      <span className="sr-only">Loading, please wait...</span>
       <div className="grid grid-cols-2 gap-3">
-        
         {[...Array(4)].map((_, i) => (
           <div
             key={i}
