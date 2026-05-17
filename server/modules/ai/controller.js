@@ -1,5 +1,6 @@
 import AiService from "./service.js";
 import ApiError from "../../utils/ApiError.js";
+import ApiResponse from "../../utils/ApiResponse.js";
 
 class AiController {
   /**
@@ -16,6 +17,18 @@ class AiController {
         return;
       }
       next(err instanceof ApiError ? err : new ApiError(500, err.message));
+    }
+  }
+  /**
+   * GET /api/ai/dashboard-summary
+   * Fetches the cached dashboard summary or generates a new one.
+   */
+  static async getDashboardSummary(req, res, next) {
+    try {
+      const summary = await AiService.getDashboardSummary(req.user._id);
+      res.json(new ApiResponse(200, "Dashboard summary retrieved successfully.", { summary }));
+    } catch (err) {
+      next(err);
     }
   }
 }

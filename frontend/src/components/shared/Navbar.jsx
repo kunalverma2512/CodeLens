@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 
-// ─── Mega Menu Data ────────────────────────────────────────────────────────────
+// ─── Mega Menu Data (unchanged) ───────────────────────────────────────────────
 const MEGA_MENU_ITEMS = [
   {
     label: "Practice CP",
@@ -67,27 +67,187 @@ const MEGA_MENU_ITEMS = [
   },
 ];
 
+// ─── Tag Badge ─────────────────────────────────────────────────────────────────
+// Refined: thinner border, tighter tracking, color-coded per type
+const TAG_COLORS = {
+  HOT: "border-orange-400 text-orange-500",
+  NEW: "border-emerald-400 text-emerald-600",
+  PRO: "border-zinc-400 text-zinc-500",
+};
+
+function Tag({ label }) {
+  if (!label) return null;
+  return (
+    <span
+      className={`text-[9px] font-bold tracking-[0.12em] uppercase border px-1.5 py-px leading-tight rounded-[2px] ${
+        TAG_COLORS[label] ?? "border-zinc-400 text-zinc-500"
+      }`}
+    >
+      {label}
+    </span>
+  );
+}
+
+// ─── Chevron Icon ──────────────────────────────────────────────────────────────
+function Chevron({ open, className = "" }) {
+  return (
+    <svg
+      viewBox="0 0 12 12"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      className={`w-3 h-3 transition-transform duration-200 ${open ? "rotate-180" : ""} ${className}`}
+    >
+      <path d="M2 4l4 4 4-4" />
+    </svg>
+  );
+}
+
+// ─── Desktop Mega Menu Panel ───────────────────────────────────────────────────
+function MegaMenuPanel({ megaRef, onMouseEnter, onMouseLeave, onClose, megaTriggerRef, firstMenuItemRef, }) {
+  return (
+    <div
+      id="tools-mega-menu"
+      role="region"
+      aria-label="Tools menu"
+      ref={megaRef}
+      tabIndex={-1}
+      onKeyDown={(e) => {
+        if (e.key === "Escape") {
+          e.preventDefault();
+          onClose();
+          setTimeout(() => {
+            megaTriggerRef.current?.focus();
+          }, 0);
+        }
+      }}
+      onMouseEnter={onMouseEnter}
+      onMouseLeave={onMouseLeave}
+      className="absolute top-full left-1/2 mt-4 w-[620px] bg-white border border-zinc-200 shadow-2xl shadow-black/8 z-50 rounded-sm"
+      style={{ transform: "translateX(-50%)" }}
+    >
+      {/* Single thin top accent — replaces aggressive border-4 */}
+      <div className="h-0.5 w-full bg-black rounded-t-sm" />
+
+      <div className="p-5">
+        {/* Section label */}
+        <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-zinc-400 mb-4 pb-3 border-b border-zinc-100">
+          AI-Powered Tools — GSSoC '26
+        </p>
+
+        {/* Item grid — gap-px with bg-zinc-100 creates razor-thin dividers */}
+        <div className="grid grid-cols-2 gap-px bg-zinc-100 rounded-[2px] overflow-hidden">
+          {MEGA_MENU_ITEMS.map((item) => {
+            const hasSubmenu = item.submenu && item.submenu.length > 0;
+
+            // ── Contest Arsenal: full-width with nested submenu ────────────
+            if (hasSubmenu) {
+              return (
+                <div key={item.label} className="col-span-2">
+                  {/* Parent header */}
+                  <div className="bg-zinc-900 text-white px-4 py-3">
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm leading-none opacity-70">{item.icon}</span>
+                      <span className="text-xs font-bold uppercase tracking-[0.1em]">{item.label}</span>
+                      <Tag label={item.tag} />
+                    </div>
+                    <p className="text-[11px] text-zinc-400 mt-1 pl-5 leading-snug font-normal">
+                      {item.desc}
+                    </p>
+                  </div>
+                  {/* Submenu grid */}
+                  <div className="grid grid-cols-2 gap-px bg-zinc-100">
+                    {item.submenu.map((sub) => (
+                      <Link
+                        key={sub.label}
+                        to={sub.to}
+                        onClick={onClose}
+                        className="group bg-white px-4 py-3 hover:bg-zinc-900 hover:text-white transition-colors duration-150"
+                      >
+                        <div className="flex items-center gap-2 mb-0.5">
+                          <span className="text-sm leading-none">{sub.icon}</span>
+                          <span className="text-xs font-semibold uppercase tracking-[0.09em] group-hover:text-white">
+                            {sub.label}
+                          </span>
+                        </div>
+                        <p className="text-[11px] text-zinc-400 pl-5 leading-snug group-hover:text-zinc-300 font-normal">
+                          {sub.desc}
+                        </p>
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              );
+            }
+
+            // ── Standard grid item ─────────────────────────────────────────
+            const Wrapper = item.to ? Link : "div";
+            const wrapperProps = item.to ? { to: item.to, onClick: onClose } : {};
+
+            return (
+              <Wrapper
+                ref={item.label === "Practice CP" ? firstMenuItemRef : null}
+                key={item.label}
+                {...wrapperProps}
+                className={`bg-white px-4 py-3 transition-colors duration-150 ${
+                  item.to
+                    ? "cursor-pointer hover:bg-zinc-900 hover:text-white group"
+                    : "cursor-default opacity-50"
+                }`}
+              >
+                <div className="flex items-center gap-2 mb-0.5">
+                  <span className="text-sm leading-none opacity-70">{item.icon}</span>
+                  <span className="text-xs font-semibold uppercase tracking-[0.09em]">{item.label}</span>
+                  <Tag label={item.tag} />
+                </div>
+                <p className="text-[11px] text-zinc-400 pl-5 leading-snug group-hover:text-zinc-300 font-normal">
+                  {item.desc}
+                </p>
+              </Wrapper>
+            );
+          })}
+        </div>
+
+        {/* Footer strip */}
+        <div className="mt-4 pt-3 border-t border-zinc-100 flex items-center justify-between">
+          <span className="text-[10px] font-medium uppercase tracking-[0.12em] text-zinc-400">
+            More tools shipping soon
+          </span>
+          <span className="text-[10px] font-semibold uppercase tracking-[0.1em] text-zinc-700 underline underline-offset-2 hover:text-black cursor-pointer transition-colors">
+            View All →
+          </span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── Main Navbar ───────────────────────────────────────────────────────────────
 export default function Navbar() {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [megaOpen, setMegaOpen] = useState(false);
+  const [isMenuOpen, setIsMenuOpen]       = useState(false);
+  const [megaOpen, setMegaOpen]           = useState(false);
   const [mobileMegaOpen, setMobileMegaOpen] = useState(false);
   const [expandedSubmenu, setExpandedSubmenu] = useState(null);
-  const megaRef = useRef(null);
+  const [scrolled, setScrolled]           = useState(false);
+
+  const megaRef        = useRef(null);
+  const firstMenuItemRef = useRef(null);
   const megaTriggerRef = useRef(null);
   const megaLeaveTimer = useRef(null);
 
   const { isAuthenticated, user, logout } = useAuth();
-  const navigate = useNavigate();
-  const location = useLocation();
+  const navigate  = useNavigate();
+  const location  = useLocation();
 
-  // Close mega menu on route change
+  // ── Scroll elevation shadow ──────────────────────────────────────────────
   useEffect(() => {
-    setMegaOpen(false);
-    setIsMenuOpen(false);
-    setMobileMegaOpen(false);
-  }, [location.pathname]);
+    const onScroll = () => setScrolled(window.scrollY > 4);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
-  // Close mega on outside click
+  // ── Close mega on outside click ──────────────────────────────────────────
   useEffect(() => {
     const handler = (e) => {
       if (
@@ -103,18 +263,46 @@ export default function Navbar() {
     return () => document.removeEventListener("mousedown", handler);
   }, []);
 
+  // ── Close mobile menu on route change ───────────────────────────────────
+  useEffect(() => {
+    setIsMenuOpen(false);
+    setMobileMegaOpen(false);
+  }, [location.pathname]);
+
+  useEffect(() => {
+  return () => {
+    clearTimeout(megaLeaveTimer.current);
+  };
+}, []);
+
+
+  // ── Handlers ────────────────────────────────────────────────────────────
   const handleLogout = () => {
     logout();
     navigate("/");
     setIsMenuOpen(false);
   };
-
   const toggleMenu = () => setIsMenuOpen((v) => !v);
-  const closeMenu = () => {
+  const closeMenu  = () => {
     setIsMenuOpen(false);
     setMobileMegaOpen(false);
+    setMegaOpen(false);
   };
 
+  const handleMegaMouseEnter = () => {
+  clearTimeout(megaLeaveTimer.current);
+  setMegaOpen(true);
+
+  setTimeout(() => {
+    firstMenuItemRef.current?.focus();
+  }, 0);
+  };
+
+  const handleMegaMouseLeave = () => {
+    megaLeaveTimer.current = setTimeout(() => setMegaOpen(false), 120);
+  };
+
+  // ── User helpers ─────────────────────────────────────────────────────────
   const getUserDisplayName = () => {
     if (!user) return "";
     return user.name
@@ -123,67 +311,73 @@ export default function Navbar() {
       ? user.email.split("@")[0].toUpperCase()
       : "";
   };
-
   const getUserInitial = () => {
-    if (!user) return "";
-    if (user.name) return user.name.charAt(0).toUpperCase();
+    if (!user) return "U";
+    if (user.name)  return user.name.charAt(0).toUpperCase();
     if (user.email) return user.email.charAt(0).toUpperCase();
     return "U";
   };
 
-  // Hover intent — stay open when moving cursor from trigger to panel
-  const handleMegaMouseEnter = () => {
-    clearTimeout(megaLeaveTimer.current);
-    setMegaOpen(true);
-  };
-
-  const handleMegaMouseLeave = () => {
-    megaLeaveTimer.current = setTimeout(() => setMegaOpen(false), 120);
-  };
-
-  const isActive = (path) => location.pathname === path;
-
-  const linkCls = (path) =>
-    `text-sm font-black uppercase tracking-widest transition-all duration-150 ${
+  // ── Active link style ────────────────────────────────────────────────────
+  // font-semibold + thin underline instead of font-black + decoration-4
+  const isActive    = (path) => location.pathname === path;
+  const navLinkCls  = (path) =>
+    `text-[13px] font-semibold uppercase tracking-[0.09em] transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2 ${
       isActive(path)
-        ? "text-black underline underline-offset-8 decoration-4 decoration-black"
-        : "text-black hover:underline underline-offset-8 decoration-4 decoration-black"
+        ? "text-black underline underline-offset-4 decoration-[1.5px] decoration-black"
+        : "text-zinc-500 hover:text-black"
     }`;
 
-  return (
-    <nav className="sticky top-0 z-50 w-full bg-white border-b-4 border-black">
-      {/* ── Main Row ── */}
-      <div className="max-w-[1400px] mx-auto flex items-center justify-between px-4 sm:px-6 lg:px-8 py-3 md:py-4 gap-4">
+  // ── Mobile link row style ────────────────────────────────────────────────
+  const mobileLinkCls =
+    "px-5 py-3.5 text-[13px] font-semibold uppercase tracking-[0.09em] text-zinc-600 border-b border-zinc-100 hover:bg-zinc-50 hover:text-black transition-colors duration-150 flex items-center justify-between";
 
-        {/* Logo */}
+  return (
+    <nav
+      className={`sticky top-0 z-50 w-full bg-white border-b border-zinc-200 transition-shadow duration-200 ${
+        scrolled ? "shadow-sm shadow-black/5" : ""
+      }`}
+    >
+      {/* ── Main Row ─────────────────────────────────────────────────────── */}
+      <div className="max-w-[1400px] mx-auto flex items-center justify-between px-4 sm:px-6 lg:px-8 h-14 gap-4">
+
+        {/* ── Wordmark ──────────────────────────────────────────────────── */}
         <Link
           to="/"
           onClick={closeMenu}
-          className="text-xl sm:text-2xl font-black tracking-tighter uppercase text-black hover:opacity-70 transition-opacity flex-shrink-0"
+          className="text-lg font-black tracking-tighter uppercase text-black hover:opacity-60 transition-opacity flex-shrink-0"
         >
           CODELENS
         </Link>
 
-        {/* ── Desktop Centre Nav ── */}
-        <div className="hidden lg:flex items-center gap-6 xl:gap-8">
+        {/* ── Desktop Centre Nav ────────────────────────────────────────── */}
+        <div className="hidden lg:flex items-center gap-7 xl:gap-8">
           {isAuthenticated && (
-            <Link to="/dashboard" className={linkCls("/dashboard")}>
+            <Link to="/dashboard" className={navLinkCls("/dashboard")}>
               Dashboard
             </Link>
           )}
-          <Link to="/explore" className={linkCls("/explore")}>
+
+          <Link to="/explore" className={navLinkCls("/explore")}>
             Explore
           </Link>
           <Link to="/faq" className={linkCls("/faq")}>
             FAQ
           </Link>
+
           {isAuthenticated && (
-            <Link to="/codeforces" className={linkCls("/codeforces")}>
+            <Link to="/codeforces" className={navLinkCls("/codeforces")}>
               Codeforces
             </Link>
           )}
 
-          {/* ── Tools Mega Menu Trigger ── */}
+          {isAuthenticated && (
+            <Link to="/account-center" className={navLinkCls("/account-center")}>
+              Account
+            </Link>
+          )}
+
+          {/* ── Tools Mega Menu Trigger ───────────────────────────────── */}
           <div
             className="relative"
             onMouseEnter={handleMegaMouseEnter}
@@ -191,175 +385,110 @@ export default function Navbar() {
           >
             <button
               ref={megaTriggerRef}
-              className={`text-sm font-black uppercase tracking-widest text-black flex items-center gap-1 transition-all duration-150 hover:underline underline-offset-8 decoration-4 decoration-black focus:outline-none ${
-                megaOpen ? "underline underline-offset-8 decoration-4 decoration-black" : ""
+              className={`flex items-center gap-1 text-[13px] font-semibold uppercase tracking-[0.09em] transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2 ${
+                megaOpen ? "text-black" : "text-zinc-500 hover:text-black"
               }`}
               aria-haspopup="true"
               aria-expanded={megaOpen}
+              aria-controls="tools-mega-menu"
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  e.preventDefault();
+                  setMegaOpen((v) => !v);
+                  
+                  setTimeout(() => {
+                    firstMenuItemRef.current?.focus();
+                  }, 0);
+                }
+                if (e.key === "Escape") {
+                  e.preventDefault();
+                  setMegaOpen(false);
+                  setTimeout(() => {
+                    megaTriggerRef.current?.focus();
+                  }, 0);
+                }
+              }}
             >
-              Tools
               <span
-                className="inline-block transition-transform duration-200 text-xs"
-                style={{ transform: megaOpen ? "rotate(180deg)" : "rotate(0deg)" }}
+                className={
+                  megaOpen
+                    ? "underline underline-offset-4 decoration-[1.5px] decoration-black"
+                    : ""
+                }
               >
-                ▾
+                Tools
               </span>
+              <Chevron open={megaOpen} className="text-zinc-400" />
             </button>
 
-            {/* ── Mega Menu Panel ── */}
             {megaOpen && (
-              <div
-                ref={megaRef}
+              <MegaMenuPanel
+                megaRef={megaRef}
+                megaTriggerRef={megaTriggerRef}
+                firstMenuItemRef={firstMenuItemRef}
                 onMouseEnter={handleMegaMouseEnter}
                 onMouseLeave={handleMegaMouseLeave}
-                className="absolute top-full left-1/2 mt-[18px] w-[640px] bg-white border-4 border-black z-50"
-                style={{ transform: "translateX(-50%)" }}
-              >
-                {/* Top accent bar */}
-                <div className="h-[3px] w-full bg-black" />
-
-                <div className="p-6">
-                  <p className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 mb-4 border-b-2 border-black pb-3">
-                    AI-Powered Tools — GSSoC '26
-                  </p>
-                  <div className="grid grid-cols-2 gap-0">
-                    {MEGA_MENU_ITEMS.map((item, i) => {
-                      const Wrapper = item.to ? Link : "div";
-                      const hasSubmenu = item.submenu && item.submenu.length > 0;
-                      
-                      if (hasSubmenu) {
-                        return (
-                          <div
-                            key={item.label}
-                            className={`col-span-2 border-black ${
-                              i < MEGA_MENU_ITEMS.length - 1 ? "border-b-2" : ""
-                            }`}
-                          >
-                            <div className="group p-4 bg-black text-white cursor-default">
-                              <div className="flex items-center gap-2 mb-1">
-                                <span className="text-base font-black leading-none">{item.icon}</span>
-                                <span className="text-sm font-black uppercase tracking-widest">
-                                  {item.label}
-                                </span>
-                                {item.tag && (
-                                  <span className="text-[9px] font-black tracking-widest border-2 border-current px-[5px] py-[1px] leading-tight">
-                                    {item.tag}
-                                  </span>
-                                )}
-                              </div>
-                              <p className="text-xs font-bold tracking-wide leading-snug opacity-80 pl-6">
-                                {item.desc}
-                              </p>
-                            </div>
-                            <div className="grid grid-cols-2 gap-0 bg-gray-50">
-                              {item.submenu.map((subItem, subIdx) => (
-                                <Link
-                                  key={subItem.label}
-                                  to={subItem.to}
-                                  onClick={closeMenu}
-                                  className={`group text-left p-4 border-black transition-colors duration-150 hover:bg-black hover:text-white ${
-                                    subIdx % 2 === 0 ? "border-r-2" : ""
-                                  } ${subIdx < item.submenu.length - 2 ? "border-b-2" : ""}`}
-                                >
-                                  <div className="flex items-center gap-2 mb-1">
-                                    <span className="text-base font-black leading-none">{subItem.icon}</span>
-                                    <span className="text-xs font-black uppercase tracking-widest">
-                                      {subItem.label}
-                                    </span>
-                                  </div>
-                                  <p className="text-[11px] font-bold tracking-wide leading-snug opacity-60 group-hover:opacity-80 pl-6">
-                                    {subItem.desc}
-                                  </p>
-                                </Link>
-                              ))}
-                            </div>
-                          </div>
-                        );
-                      }
-                      
-                      return (
-                        <Wrapper
-                          key={item.label}
-                          to={item.to}
-                          onClick={closeMenu}
-                          className={`group text-left p-4 border-black transition-colors duration-150 hover:bg-black hover:text-white ${
-                            i % 2 === 0 ? "border-r-2" : ""
-                          } ${i < MEGA_MENU_ITEMS.length - 2 ? "border-b-2" : ""}`}
-                        >
-                          <div className="flex items-center gap-2 mb-1">
-                            <span className="text-base font-black leading-none">{item.icon}</span>
-                            <span className="text-sm font-black uppercase tracking-widest">
-                              {item.label}
-                            </span>
-                            {item.tag && (
-                              <span className="text-[9px] font-black tracking-widest border-2 border-current px-[5px] py-[1px] leading-tight">
-                                {item.tag}
-                              </span>
-                            )}
-                          </div>
-                          <p className="text-xs font-bold tracking-wide leading-snug opacity-60 group-hover:opacity-80 pl-6">
-                            {item.desc}
-                          </p>
-                        </Wrapper>
-                      );
-                    })}
-                  </div>
-
-                  {/* Footer strip */}
-                  <div className="mt-4 pt-3 border-t-2 border-black flex items-center justify-between">
-                    <span className="text-[10px] font-black uppercase tracking-[0.15em] text-gray-500">
-                      More tools shipping soon
-                    </span>
-                    <span className="text-[10px] font-black uppercase tracking-widest border-b-2 border-black hover:opacity-60 cursor-pointer">
-                      View All →
-                    </span>
-                  </div>
-                </div>
-              </div>
+                onClose={closeMenu}
+              />
             )}
           </div>
         </div>
 
-        {/* ── Desktop Right Controls ── */}
-        <div className="hidden lg:flex items-center gap-3 xl:gap-4 flex-shrink-0">
-          {/* APEX — AI Mentor */}
+        {/* ── Desktop Right Controls ────────────────────────────────────── */}
+        <div className="hidden lg:flex items-center gap-2.5 xl:gap-3 flex-shrink-0">
+
+          {/* APEX — sole primary CTA, inverted solid button */}
           <Link
             to="/apex-ai"
-            className="flex items-center gap-2 px-4 py-2 bg-black text-white text-sm font-black uppercase tracking-widest border-4 border-black hover:bg-white hover:text-black transition-colors duration-150"
             title="APEX — Advanced Performance Excellence eXecutive. Your AI-powered growth strategist."
+            className="flex items-center gap-1.5 px-3.5 py-2 bg-black text-white text-[12px] font-bold uppercase tracking-[0.1em] hover:bg-zinc-800 transition-colors duration-150 rounded-[2px]"
           >
-            <span className="text-base leading-none">◆</span>
+            <span className="text-[10px] leading-none opacity-70">◆</span>
             APEX
           </Link>
 
           {!isAuthenticated ? (
             <>
+              {/* Login — text-only, minimal weight */}
               <Link
                 to="/login"
-                className="text-sm font-black uppercase tracking-widest text-black hover:underline underline-offset-8 decoration-4 decoration-black"
+                className="px-2 text-[13px] font-semibold uppercase tracking-[0.09em] text-zinc-500 hover:text-black transition-colors duration-150"
               >
                 Login
               </Link>
+
+              {/* Sign Up — outlined, secondary CTA */}
               <Link
                 to="/signup"
-                className="px-5 py-2 bg-black text-white text-sm font-black uppercase tracking-widest border-4 border-black hover:bg-white hover:text-black transition-colors duration-150"
+                className="px-4 py-2 text-[12px] font-bold uppercase tracking-[0.1em] text-black border border-zinc-800 hover:bg-black hover:text-white transition-colors duration-150 rounded-[2px]"
               >
                 Sign Up
               </Link>
             </>
           ) : (
             <>
-              <div className="flex items-center gap-2 border-l-4 border-black pl-4">
-                <span className="w-7 h-7 flex items-center justify-center bg-black text-white font-black text-xs flex-shrink-0">
+              {/* User identity chip */}
+              <div className="flex items-center gap-2 pl-3 border-l border-zinc-200">
+                <span className="w-7 h-7 flex items-center justify-center bg-black text-white font-bold text-xs rounded-[2px] flex-shrink-0">
                   {getUserInitial()}
                 </span>
-                <span className="text-xs font-black uppercase tracking-wide text-black max-w-[90px] truncate">
+                <span className="text-[11px] font-semibold uppercase tracking-wide text-zinc-600 max-w-[90px] truncate">
                   {getUserDisplayName()}
                 </span>
               </div>
+
+              {/* GitHub Data — ghost/outline button */}
+              <Link
+                to="/github-intelligence"
+                className="px-3.5 py-2 text-[11px] font-semibold uppercase tracking-[0.09em] text-zinc-500 border border-zinc-200 hover:border-zinc-700 hover:text-black transition-colors duration-150 rounded-[2px]"
+              >
+                GitHub
+              </Link>
+
+              {/* Logout — lowest visual weight, plain text */}
               <button
                 onClick={handleLogout}
-                className="px-4 py-2 bg-white text-black text-sm font-black uppercase tracking-widest border-4 border-black hover:bg-black hover:text-white transition-colors duration-150"
+                className="px-2 text-[11px] font-semibold uppercase tracking-[0.09em] text-zinc-400 hover:text-black transition-colors duration-150"
               >
                 Logout
               </button>
@@ -367,61 +496,56 @@ export default function Navbar() {
           )}
         </div>
 
-        {/* ── Mobile Right: VELA + Hamburger ── */}
-        <div className="lg:hidden flex items-center gap-3">
+        {/* ── Mobile Right: APEX + Hamburger ───────────────────────────── */}
+        <div className="lg:hidden flex items-center gap-2.5">
           <Link
-            to="/vela-ai"
-            className="flex items-center gap-1 px-3 py-2 bg-black text-white text-xs font-black uppercase tracking-widest border-2 border-black hover:bg-white hover:text-black transition-colors duration-150"
-            title="VELA AI"
+            to="/apex-ai"
+            className="flex items-center gap-1 px-3 py-1.5 bg-black text-white text-[11px] font-bold uppercase tracking-[0.1em] hover:bg-zinc-800 transition-colors duration-150 rounded-[2px]"
           >
-            <span>✦</span>
-            VELA
+            <span className="text-[9px] opacity-70">◆</span>
+            APEX
           </Link>
+
+          {/* Animated hamburger — thinner, softer border */}
           <button
             onClick={toggleMenu}
-            className="flex flex-col justify-center items-center w-10 h-10 gap-[6px] border-2 border-black focus:outline-none"
-            aria-label="Toggle menu"
+            className="flex flex-col justify-center items-center w-9 h-9 gap-[5px] border border-zinc-200 hover:border-zinc-400 transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2 rounded-[2px]"
+            aria-label={isMenuOpen ? "Close menu" : "Open menu"}
             aria-expanded={isMenuOpen}
           >
             <span
-              className={`w-6 h-0.5 bg-black transition-transform duration-200 origin-center ${
-                isMenuOpen ? "rotate-45 translate-y-2" : ""
+              className={`w-5 h-px bg-zinc-800 transition-all duration-200 origin-center ${
+                isMenuOpen ? "rotate-45 translate-y-[5px]" : ""
               }`}
             />
             <span
-              className={`w-6 h-0.5 bg-black transition-opacity duration-200 ${
+              className={`w-5 h-px bg-zinc-800 transition-opacity duration-200 ${
                 isMenuOpen ? "opacity-0" : ""
               }`}
             />
             <span
-              className={`w-6 h-0.5 bg-black transition-transform duration-200 origin-center ${
-                isMenuOpen ? "-rotate-45 -translate-y-2" : ""
+              className={`w-5 h-px bg-zinc-800 transition-all duration-200 origin-center ${
+                isMenuOpen ? "-rotate-45 -translate-y-[5px]" : ""
               }`}
             />
           </button>
         </div>
       </div>
 
-      {/* ── Mobile Menu ── */}
+      {/* ── Mobile Menu ──────────────────────────────────────────────────── */}
       {isMenuOpen && (
-        <div className="lg:hidden w-full bg-white border-t-4 border-black">
+        <div className="lg:hidden w-full bg-white border-t border-zinc-100">
           <div className="flex flex-col">
+
             {/* Nav links */}
             {isAuthenticated && (
-              <Link
-                to="/dashboard"
-                onClick={closeMenu}
-                className="px-5 py-4 text-sm font-black uppercase tracking-widest text-black border-b-2 border-black hover:bg-black hover:text-white transition-colors duration-150 flex items-center justify-between"
-              >
-                Dashboard <span className="opacity-40">→</span>
+              <Link to="/dashboard" onClick={closeMenu} className={mobileLinkCls}>
+                Dashboard <span className="text-zinc-300 text-sm">→</span>
               </Link>
             )}
-            <Link
-              to="/explore"
-              onClick={closeMenu}
-              className="px-5 py-4 text-sm font-black uppercase tracking-widest text-black border-b-2 border-black hover:bg-black hover:text-white transition-colors duration-150 flex items-center justify-between"
-            >
-              Explore <span className="opacity-40">→</span>
+
+            <Link to="/explore" onClick={closeMenu} className={mobileLinkCls}>
+              Explore <span className="text-zinc-300 text-sm">→</span>
             </Link>
             <Link
               to="/faq"
@@ -430,78 +554,78 @@ export default function Navbar() {
             >
               FAQ <span className="opacity-40">→</span>
             </Link>
+
             {isAuthenticated && (
-              <Link
-                to="/codeforces"
-                onClick={closeMenu}
-                className="px-5 py-4 text-sm font-black uppercase tracking-widest text-black border-b-2 border-black hover:bg-black hover:text-white transition-colors duration-150 flex items-center justify-between"
-              >
-                Codeforces <span className="opacity-40">→</span>
+              <Link to="/codeforces" onClick={closeMenu} className={mobileLinkCls}>
+                Codeforces <span className="text-zinc-300 text-sm">→</span>
               </Link>
             )}
 
-            {/* Tools accordion */}
+            {isAuthenticated && (
+              <Link to="/account-center" onClick={closeMenu} className={mobileLinkCls}>
+                Account Center <span className="text-zinc-300 text-sm">→</span>
+              </Link>
+            )}
+
+            {/* ── Tools accordion ──────────────────────────────────────── */}
             <button
+              aria-expanded={mobileMegaOpen}
+              aria-haspopup="true"
               onClick={() => setMobileMegaOpen((v) => !v)}
-              className="px-5 py-4 text-sm font-black uppercase tracking-widest text-black border-b-2 border-black hover:bg-gray-50 transition-colors duration-150 flex items-center justify-between w-full text-left"
+              className="px-5 py-3.5 text-[13px] font-semibold uppercase tracking-[0.09em] text-zinc-600 border-b border-zinc-100 hover:bg-zinc-50 hover:text-black transition-colors duration-150 flex items-center justify-between w-full text-left"
             >
               <span>Tools</span>
-              <span
-                className="transition-transform duration-200 text-xs"
-                style={{ transform: mobileMegaOpen ? "rotate(180deg)" : "rotate(0deg)" }}
-              >
-                ▾
-              </span>
+              <Chevron open={mobileMegaOpen} className="text-zinc-400" />
             </button>
 
             {mobileMegaOpen && (
-              <div className="border-b-2 border-black bg-gray-50">
+              <div className="bg-zinc-50/60 border-b border-zinc-100">
                 {MEGA_MENU_ITEMS.map((item) => {
                   const hasSubmenu = item.submenu && item.submenu.length > 0;
-                  
+
                   if (hasSubmenu) {
                     const isExpanded = expandedSubmenu === item.label;
                     return (
-                      <div key={item.label} className="border-b border-black/10">
+                      <div key={item.label} className="border-b border-zinc-100 last:border-0">
+                        {/* Accordion toggle */}
                         <button
-                          onClick={() => setExpandedSubmenu(isExpanded ? null : item.label)}
-                          className="w-full text-left px-8 py-3 bg-black text-white transition-colors duration-150 group flex items-center justify-between"
+                          aria-expanded={isExpanded}
+                          onClick={() =>
+                            setExpandedSubmenu(isExpanded ? null : item.label)
+                          }
+                          className="w-full text-left px-7 py-3 bg-zinc-900 text-white flex items-center justify-between"
                         >
                           <div className="flex-1">
                             <div className="flex items-center gap-2">
-                              <span className="text-sm font-black">{item.icon}</span>
-                              <span className="text-xs font-black uppercase tracking-widest">{item.label}</span>
-                              {item.tag && (
-                                <span className="text-[9px] font-black tracking-widest border border-current px-1 leading-tight">
-                                  {item.tag}
-                                </span>
-                              )}
+                              <span className="text-sm opacity-70">{item.icon}</span>
+                              <span className="text-[11px] font-semibold uppercase tracking-[0.09em]">
+                                {item.label}
+                              </span>
+                              <Tag label={item.tag} />
                             </div>
-                            <p className="text-[11px] font-bold tracking-wide text-gray-300 mt-0.5 pl-6 leading-snug">
+                            <p className="text-[11px] text-zinc-400 mt-0.5 pl-5 leading-snug font-normal">
                               {item.desc}
                             </p>
                           </div>
-                          <span
-                            className="text-white transition-transform duration-200 text-xs ml-2"
-                            style={{ transform: isExpanded ? "rotate(180deg)" : "rotate(0deg)" }}
-                          >
-                            ▾
-                          </span>
+                          <Chevron open={isExpanded} className="text-zinc-400 ml-2 shrink-0" />
                         </button>
+
                         {isExpanded && (
                           <div className="bg-white">
-                            {item.submenu.map((subItem) => (
+                            {item.submenu.map((sub) => (
                               <Link
-                                key={subItem.label}
-                                to={subItem.to}
+                                key={sub.label}
+                                to={sub.to}
                                 onClick={closeMenu}
-                                className="w-full text-left px-12 py-3 border-b border-black/5 hover:bg-black hover:text-white transition-colors duration-150 group flex items-start gap-2"
+                                className="flex items-start gap-2.5 px-10 py-3 border-b border-zinc-50 last:border-0 hover:bg-zinc-50 hover:text-black transition-colors duration-150"
                               >
-                                <span className="text-sm font-black mt-0.5">{subItem.icon}</span>
-                                <div className="flex-1">
-                                  <div className="text-xs font-black uppercase tracking-widest">{subItem.label}</div>
-                                  <p className="text-[11px] font-bold tracking-wide text-gray-500 group-hover:text-white mt-0.5 leading-snug">
-                                    {subItem.desc}
+                                <span className="text-sm mt-0.5">{sub.icon}</span>
+                                <div>
+                                  <p className="text-[11px] font-semibold uppercase tracking-[0.09em] text-zinc-800">
+                                    {sub.label}
+                                  </p>
+                                  <p className="text-[11px] text-zinc-400 leading-snug mt-0.5">
+                                    {sub.desc}
                                   </p>
                                 </div>
                               </Link>
@@ -511,68 +635,76 @@ export default function Navbar() {
                       </div>
                     );
                   }
-                  
-                  const Wrapper = item.to ? Link : "button";
+
+                  // Standard tool item
+                  const Wrapper     = item.to ? Link : "div";
+                  const wrapperProps = item.to ? { to: item.to, onClick: closeMenu } : {};
+
                   return (
                     <Wrapper
                       key={item.label}
-                      to={item.to}
-                      onClick={closeMenu}
-                      className="w-full text-left px-8 py-3 border-b border-black/10 hover:bg-black hover:text-white transition-colors duration-150 group"
+                      {...wrapperProps}
+                      className={`flex items-start gap-2.5 px-7 py-3 border-b border-zinc-100 last:border-0 transition-colors duration-150 ${
+                        item.to
+                          ? "cursor-pointer hover:bg-zinc-50 hover:text-black"
+                          : "opacity-40 cursor-default"
+                      }`}
                     >
-                      <div className="flex items-center gap-2">
-                        <span className="text-sm font-black">{item.icon}</span>
-                        <span className="text-xs font-black uppercase tracking-widest">{item.label}</span>
-                        {item.tag && (
-                          <span className="text-[9px] font-black tracking-widest border border-current px-1 leading-tight">
-                            {item.tag}
+                      <span className="text-sm mt-0.5 opacity-60">{item.icon}</span>
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2">
+                          <span className="text-[11px] font-semibold uppercase tracking-[0.09em] text-zinc-800">
+                            {item.label}
                           </span>
-                        )}
+                          <Tag label={item.tag} />
+                        </div>
+                        <p className="text-[11px] text-zinc-400 leading-snug mt-0.5">{item.desc}</p>
                       </div>
-                      <p className="text-[11px] font-bold tracking-wide text-gray-500 group-hover:text-white mt-0.5 pl-6 leading-snug">
-                        {item.desc}
-                      </p>
                     </Wrapper>
                   );
                 })}
               </div>
             )}
 
-            {/* Auth section */}
+            {/* ── Auth section ──────────────────────────────────────────── */}
             {!isAuthenticated ? (
-              <div className="flex flex-col gap-0">
-                <Link
-                  to="/login"
-                  onClick={closeMenu}
-                  className="px-5 py-4 text-sm font-black uppercase tracking-widest text-black border-b-2 border-black hover:bg-black hover:text-white transition-colors duration-150 flex items-center justify-between"
-                >
-                  Login <span className="opacity-40">→</span>
+              <>
+                <Link to="/login" onClick={closeMenu} className={mobileLinkCls}>
+                  Login <span className="text-zinc-300 text-sm">→</span>
                 </Link>
-                <Link
-                  to="/signup"
-                  onClick={closeMenu}
-                  className="px-5 py-4 bg-black text-white text-sm font-black uppercase tracking-widest border-b-2 border-black hover:bg-gray-900 transition-colors duration-150 text-center"
-                >
-                  Sign Up
-                </Link>
-              </div>
+                <div className="px-4 py-3">
+                  <Link
+                    to="/signup"
+                    onClick={closeMenu}
+                    className="block w-full py-3 text-center text-[12px] font-bold uppercase tracking-[0.1em] bg-black text-white hover:bg-zinc-800 transition-colors duration-150 rounded-[2px]"
+                  >
+                    Sign Up
+                  </Link>
+                </div>
+              </>
             ) : (
-              <div className="flex flex-col gap-0">
-                <div className="px-5 py-4 border-b-2 border-black flex items-center gap-3 bg-gray-50">
-                  <span className="w-9 h-9 flex items-center justify-center bg-black text-white font-black text-base flex-shrink-0">
+              <>
+                {/* User identity row */}
+                <div className="px-5 py-3.5 border-b border-zinc-100 flex items-center gap-3 bg-zinc-50/80">
+                  <span className="w-8 h-8 flex items-center justify-center bg-black text-white font-bold text-sm rounded-[2px] flex-shrink-0">
                     {getUserInitial()}
                   </span>
-                  <span className="text-sm font-black uppercase tracking-wide text-black">
+                  <span className="text-[12px] font-semibold uppercase tracking-wide text-zinc-600">
                     {getUserDisplayName()}
                   </span>
                 </div>
+
+                <Link to="/github-intelligence" onClick={closeMenu} className={mobileLinkCls}>
+                  GitHub Data <span className="text-zinc-300 text-sm">→</span>
+                </Link>
+
                 <button
                   onClick={handleLogout}
-                  className="px-5 py-4 text-sm font-black uppercase tracking-widest text-black border-b-2 border-black hover:bg-black hover:text-white transition-colors duration-150 text-left"
+                  className="px-5 py-3.5 text-[13px] font-semibold uppercase tracking-[0.09em] text-zinc-400 hover:text-black border-b border-zinc-100 hover:bg-zinc-50 transition-colors duration-150 text-left"
                 >
                   Logout
                 </button>
-              </div>
+              </>
             )}
           </div>
         </div>

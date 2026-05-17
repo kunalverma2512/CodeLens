@@ -383,7 +383,7 @@ class CodeforcesService {
   static async getRatingHistory(userId) {
     const profile = await CodeforcesRepository.findProfileByUserId(userId);
     if (!profile || !profile.isVerified) {
-      throw new ApiError(404, "Codeforces account not connected.");
+      return [];
     }
     const history = await CodeforcesRepository.getRatingHistory(userId);
     return history;
@@ -395,7 +395,7 @@ class CodeforcesService {
   static async getRecentSubmissions(userId, count = 20) {
     const profile = await CodeforcesRepository.findProfileByUserId(userId);
     if (!profile || !profile.isVerified) {
-      throw new ApiError(404, "Codeforces account not connected.");
+      return [];
     }
     return CodeforcesRepository.getRecentSubmissions(userId, count);
   }

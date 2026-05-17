@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 
 const faqs = [
   {
@@ -30,9 +31,11 @@ export default function FAQSection() {
         <h2 className="text-4xl sm:text-6xl lg:text-7xl font-black uppercase tracking-tighter text-black mb-12 sm:mb-20 text-center leading-none">
           Frequently Asked Questions
         </h2>
+
         <div className="space-y-6 sm:space-y-8 w-full">
           {faqs.map((item, index) => {
             const isOpen = openIdx === index;
+
             return (
               <div
                 key={index}
@@ -45,6 +48,7 @@ export default function FAQSection() {
                   <h3 className="text-xl sm:text-2xl font-black uppercase tracking-tighter text-black leading-tight">
                     Q: {item.q}
                   </h3>
+
                   <span
                     className="text-2xl font-black shrink-0 transition-transform duration-200"
                     style={{
@@ -54,6 +58,7 @@ export default function FAQSection() {
                     +
                   </span>
                 </button>
+
                 <div
                   className="overflow-hidden transition-all duration-300 ease-in-out"
                   style={{ maxHeight: isOpen ? "500px" : "0px" }}
@@ -65,6 +70,16 @@ export default function FAQSection() {
               </div>
             );
           })}
+        </div>
+
+        {/* CTA Button */}
+        <div className="mt-12 flex justify-center">
+          <Link
+            to="/faq"
+            className="border-3 border-black px-5 py-2 text-sm sm:text-base font-black uppercase bg-white tracking-widest shadow-[5px_5px_0_0_rgba(0,0,0,1)] text-black transition-all duration-200 hover:bg-black hover:text-white hover:translate-x-1 hover:translate-y-1"
+          >
+            View All FAQs
+          </Link>
         </div>
       </div>
     </div>

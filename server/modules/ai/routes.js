@@ -12,5 +12,10 @@ router.use(authMiddleware);
  * Returns a Server-Sent Events stream of personalized AI growth insight.
  */
 router.get("/insight/stream", AiController.streamInsight);
+/**
+ * GET /api/ai/dashboard-summary
+ * Fetches the cached dashboard summary or generates a new one.
+ */
+router.get("/dashboard-summary", AiController.getDashboardSummary);
 
 export default router;
