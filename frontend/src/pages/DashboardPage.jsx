@@ -1,16 +1,17 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import { useNavigate, Link } from "react-router-dom";
 import { useCodeforces } from "../hooks/useCodeforces";
 import ConnectBanner from "../components/codeforces/ConnectBanner";
 import VerifyModal from "../components/codeforces/VerifyModal";
 import DashboardExecutiveSummary from "../components/dashboard/DashboardExecutiveSummary";
-import LoaderSwitcher from "../components/shared/loaders/LoaderSwitcher";
+import { DashboardPageSkeleton } from "../components/shared/skeletons/PageSkeletons";
 
 export default function DashboardPage() {
   const { user, loading, logout } = useAuth();
   const navigate = useNavigate();
   const [modalOpen, setModalOpen] = useState(false);
+  const [pageReady, setPageReady] = useState(false);
 
   const {
     dashboardSummary: cfData,
@@ -28,8 +29,13 @@ export default function DashboardPage() {
     navigate("/");
   };
 
-  if (loading) {
-    return <LoaderSwitcher />;
+  useEffect(() => {
+    const timer = setTimeout(() => setPageReady(true), 320);
+    return () => clearTimeout(timer);
+  }, []);
+
+  if (loading || !pageReady) {
+    return <DashboardPageSkeleton />;
   }
 
   return (
@@ -74,8 +80,11 @@ export default function DashboardPage() {
 
           {/* Codeforces Widget */}
           {cfLoading ? (
-            <div className="border-4 border-black p-6 sm:p-8 bg-white flex items-center justify-center shadow-[8px_8px_0_0_rgba(0,0,0,1)]">
-              <div className="w-10 h-10 border-[4px] border-black border-t-transparent animate-spin" />
+            <div className="border-4 border-black p-6 sm:p-8 bg-white shadow-[8px_8px_0_0_rgba(0,0,0,1)] flex flex-col gap-5 animate-pulse">
+              <div className="h-8 border-2 border-black bg-gray-200 w-40" />
+              <div className="h-6 border-2 border-black bg-gray-200 w-full" />
+              <div className="h-6 border-2 border-black bg-gray-200 w-3/4" />
+              <div className="h-6 border-2 border-black bg-gray-200 w-2/3" />
             </div>
           ) : cfConnected && cfData ? (
             <Link

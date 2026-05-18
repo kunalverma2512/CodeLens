@@ -2,6 +2,7 @@ import { useAuth } from "../context/AuthContext";
 import { useState, useEffect } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { getProfile, deleteAccount } from "../services/userService";
+import { AccountCenterSkeleton } from "../components/shared/skeletons/PageSkeletons";
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL;
 
@@ -327,9 +328,10 @@ function DangerZone({ onLogout }) {
 // ── Main Page ─────────────────────────────────────────────────────────────────
 
 export default function AccountCenterPage() {
-  const { user, setUser, logout } = useAuth();
+  const { user, setUser, logout, loading: authLoading } = useAuth();
   const [searchParams]    = useSearchParams();
   const [banner, setBanner] = useState("");
+  const [pageReady, setPageReady] = useState(false);
 
   // Backend redirects here after GitHub connect: /account-center?githubStatus=connected
   useEffect(() => {
@@ -346,6 +348,15 @@ export default function AccountCenterPage() {
       window.history.replaceState({}, "", "/account-center");
     }
   }, [searchParams]);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setPageReady(true), 320);
+    return () => clearTimeout(timer);
+  }, []);
+
+  if (authLoading || !user || !pageReady) {
+    return <AccountCenterSkeleton />;
+  }
 
   return (
     <div className="w-full flex-1 bg-white px-4 sm:px-6 md:px-8 py-12 sm:py-16">

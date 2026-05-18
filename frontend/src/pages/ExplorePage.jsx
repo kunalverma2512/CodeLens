@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import ExploreHero from "../components/explore/ExploreHero";
 import AIExplanation from "../components/explore/AIExplanation";
 import FeatureGrid from "../components/explore/FeatureGrid";
@@ -12,7 +13,19 @@ import OpenSourceVision from "../components/explore/OpenSourceVision";
 import FAQSection from "../components/explore/FAQSection";
 import SubscribeNewsletter from "../components/explore/SubscribeNewsletter";
 import FinalCTA from "../components/explore/FinalCTA";
+import { ExplorePageSkeleton } from "../components/shared/skeletons/PageSkeletons";
 export default function ExplorePage() {
+  const [isBootLoading, setIsBootLoading] = useState(true);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setIsBootLoading(false), 360);
+    return () => clearTimeout(timer);
+  }, []);
+
+  if (isBootLoading) {
+    return <ExplorePageSkeleton />;
+  }
+
   return (
     <div className="w-full bg-white flex flex-col">
       <ExploreHero />
@@ -29,7 +42,6 @@ export default function ExplorePage() {
       <FAQSection />
       <SubscribeNewsletter />
       <FinalCTA />
-       
     </div>
   );
 }

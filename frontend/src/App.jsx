@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "./context/AuthContext";
+import { LoadingProvider } from "./context/LoadingContext";
 import MainLayout from "./layouts/MainLayout";
 import LandingPage from "./pages/LandingPage";
 import LoginPage from "./pages/LoginPage";
@@ -24,88 +25,91 @@ import GitHubIntelligencePage from "./pages/GitHubIntelligencePage";
 import GitHubCallbackPage from "./pages/GitHubCallbackPage";
 import ProtectedRoute from "./components/shared/ProtectedRoute";
 import PublicRoute from "./components/shared/PublicRoute";
-import FAQSection from "./components/explore/FAQSection";
+import RouteFrame from "./components/shared/RouteFrame";
 export default function App() {
   return (
     <AuthProvider>
-      <BrowserRouter>
-        <MainLayout>
-          <Routes>
-            <Route path="/" element={<LandingPage />} />
-            <Route 
-              path="/login" 
-              element={
-                <PublicRoute>
-                  <LoginPage />
-                </PublicRoute>
-              } 
-            />
-            <Route 
-              path="/signup" 
-              element={
-                <PublicRoute>
-                  <SignupPage />
-                </PublicRoute>
-              } 
-            />
-            <Route 
-              path="/dashboard" 
-              element={
-                <ProtectedRoute>
-                  <DashboardPage />
-                </ProtectedRoute>
-              } 
-            />
-            <Route
-              path="/account-center"
-              element={
-                <ProtectedRoute>
-                  <AccountCenterPage />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/github-intelligence"
-              element={
-                <ProtectedRoute>
-                  <GitHubIntelligencePage />
-                </ProtectedRoute>
-              }
-            />
-            <Route 
-              path="/forgot-password" 
-              element={
-                <PublicRoute>
-                  <ForgotPassword />
-                </PublicRoute>
-              } 
-            />
-            <Route path="/explore" element={<ExplorePage />} />
-            {/* GitHub OAuth callback — must be public, no auth required */}
-            <Route path="/auth/github/callback" element={<GitHubCallbackPage />} />
-            <Route path="/practice" element={<PracticePage />} />
+      <LoadingProvider>
+        <BrowserRouter>
+          <MainLayout>
+            <RouteFrame>
+              <Routes>
+                <Route path="/" element={<LandingPage />} />
+                <Route
+                  path="/login"
+                  element={
+                    <PublicRoute>
+                      <LoginPage />
+                    </PublicRoute>
+                  }
+                />
+                <Route
+                  path="/signup"
+                  element={
+                    <PublicRoute>
+                      <SignupPage />
+                    </PublicRoute>
+                  }
+                />
+                <Route
+                  path="/dashboard"
+                  element={
+                    <ProtectedRoute>
+                      <DashboardPage />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/account-center"
+                  element={
+                    <ProtectedRoute>
+                      <AccountCenterPage />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/github-intelligence"
+                  element={
+                    <ProtectedRoute>
+                      <GitHubIntelligencePage />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/forgot-password"
+                  element={
+                    <PublicRoute>
+                      <ForgotPassword />
+                    </PublicRoute>
+                  }
+                />
+                <Route path="/explore" element={<ExplorePage />} />
+                {/* GitHub OAuth callback — must be public, no auth required */}
+                <Route path="/auth/github/callback" element={<GitHubCallbackPage />} />
+                <Route path="/practice" element={<PracticePage />} />
 
-            <Route path="/apex-ai" element={<ApexAIPage />} />
-            <Route path="/algoverse" element={<AlgoVersePage />} />
-            <Route path="/contests/codeforces" element={<ContestCodeforcesPage />} />
-            <Route path="/contests/codechef" element={<ContestCodeChefPage />} />
-            <Route path="/contests/leetcode" element={<ContestLeetCodePage />} />
-            <Route path="/contests/atcoder" element={<ContestAtCoderPage />} />
-            <Route 
-              path="/codeforces"
-              element={
-                <ProtectedRoute>
-                  <CodeforcesPage />
-                </ProtectedRoute>
-              }
-            />
-            <Route path="/terms" element={<TermsPage/>} />
-            <Route path="/privacy" element={<PrivacyPage/>} />
-            <Route path="*" element={<NotFoundPage />} />
-          </Routes>
-        </MainLayout>
-      </BrowserRouter>
+                <Route path="/apex-ai" element={<ApexAIPage />} />
+                <Route path="/algoverse" element={<AlgoVersePage />} />
+                <Route path="/contests/codeforces" element={<ContestCodeforcesPage />} />
+                <Route path="/contests/codechef" element={<ContestCodeChefPage />} />
+                <Route path="/contests/leetcode" element={<ContestLeetCodePage />} />
+                <Route path="/contests/atcoder" element={<ContestAtCoderPage />} />
+                <Route
+                  path="/codeforces"
+                  element={
+                    <ProtectedRoute>
+                      <CodeforcesPage />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route path="/terms" element={<TermsPage />} />
+                <Route path="/privacy" element={<PrivacyPage />} />
+                <Route path="*" element={<NotFoundPage />} />
+              </Routes>
+            </RouteFrame>
+          </MainLayout>
+        </BrowserRouter>
+      </LoadingProvider>
     </AuthProvider>
-    
   );
 }
