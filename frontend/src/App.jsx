@@ -22,6 +22,8 @@ import ForgotPassword from "./components/auth/ForgotPassword";
 import ProtectedRoute from "./components/shared/ProtectedRoute";
 import PublicRoute from "./components/shared/PublicRoute";
 
+import FAQ from "./pages/FAQ";
+
 export default function App() {
   return (
     <AuthProvider>
@@ -61,6 +63,10 @@ export default function App() {
                 </PublicRoute>
               } 
             />
+
+            <Route
+               path="/faq" element={<FAQ />} />
+
             <Route path="/explore" element={<ExplorePage />} />
             <Route path="/practice" element={<PracticePage />} />
             <Route path="/vela-ai" element={<VelaAIPage />} />
