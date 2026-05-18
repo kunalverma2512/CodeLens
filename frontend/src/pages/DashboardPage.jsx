@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import { useNavigate, Link } from "react-router-dom";
 import { useCodeforces } from "../hooks/useCodeforces";
@@ -11,7 +11,6 @@ export default function DashboardPage() {
   const { user, loading, logout } = useAuth();
   const navigate = useNavigate();
   const [modalOpen, setModalOpen] = useState(false);
-  const [pageReady, setPageReady] = useState(false);
 
   const {
     dashboardSummary: cfData,
@@ -29,12 +28,7 @@ export default function DashboardPage() {
     navigate("/");
   };
 
-  useEffect(() => {
-    const timer = setTimeout(() => setPageReady(true), 320);
-    return () => clearTimeout(timer);
-  }, []);
-
-  if (loading || !pageReady) {
+  if (loading) {
     return <DashboardPageSkeleton />;
   }
 

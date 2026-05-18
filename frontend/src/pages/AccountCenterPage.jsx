@@ -331,7 +331,6 @@ export default function AccountCenterPage() {
   const { user, setUser, logout, loading: authLoading } = useAuth();
   const [searchParams]    = useSearchParams();
   const [banner, setBanner] = useState("");
-  const [pageReady, setPageReady] = useState(false);
 
   // Backend redirects here after GitHub connect: /account-center?githubStatus=connected
   useEffect(() => {
@@ -349,12 +348,7 @@ export default function AccountCenterPage() {
     }
   }, [searchParams]);
 
-  useEffect(() => {
-    const timer = setTimeout(() => setPageReady(true), 320);
-    return () => clearTimeout(timer);
-  }, []);
-
-  if (authLoading || !user || !pageReady) {
+  if (authLoading || !user) {
     return <AccountCenterSkeleton />;
   }
 

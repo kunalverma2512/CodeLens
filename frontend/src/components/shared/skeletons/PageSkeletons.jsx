@@ -32,10 +32,10 @@ export function AccountCenterSkeleton() {
         </div>
         <div className="mb-12 p-6 border-[4px] border-black bg-black">
           <div className="flex items-center gap-5">
-            <div className="w-16 h-16 border-[3px] border-white bg-gray-300 animate-pulse" />
+            <SkeletonBlock className="w-16 h-16 border-[3px] border-white bg-gray-300" />
             <div className="w-full">
-              <div className="h-7 w-60 bg-gray-300 border-[2px] border-white animate-pulse mb-2" />
-              <div className="h-4 w-72 bg-gray-300 border-[2px] border-white animate-pulse" />
+              <SkeletonBlock className="h-7 w-60 border-[2px] border-white mb-2 bg-gray-300" />
+              <SkeletonBlock className="h-4 w-72 border-[2px] border-white bg-gray-300" />
             </div>
           </div>
         </div>

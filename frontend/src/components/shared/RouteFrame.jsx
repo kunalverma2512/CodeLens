@@ -16,7 +16,7 @@ export default function RouteFrame({ children }) {
     }, timeoutMs);
 
     return () => clearTimeout(timer);
-  }, [location.pathname, setLoading]);
+  }, [location.key, setLoading]);
 
   return (
     <div key={location.key || location.pathname} className="page-fade-in w-full flex-1 flex flex-col">
