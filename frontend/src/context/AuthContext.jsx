@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components */
 import { createContext, useContext, useState, useEffect } from "react";
 import { getProfile } from "../services/userService";
 
@@ -10,9 +11,20 @@ export const useAuth = () => {
 };
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
+  const readCachedUser = () => {
+    try {
+      const cachedUser = localStorage.getItem("user");
+      return cachedUser ? JSON.parse(cachedUser) : null;
+    } catch {
+      localStorage.removeItem("user");
+      return null;
+    }
+  };
+
+  const [user, setUser] = useState(readCachedUser);
   const [token, setToken] = useState(localStorage.getItem("token"));
   const [loading, setLoading] = useState(true);
+  const [authError, setAuthError] = useState("");
 
   const isAuthenticated = !!token && !!user;
 
@@ -24,12 +36,19 @@ export const AuthProvider = ({ children }) => {
           setToken(storedToken);
           const response = await getProfile();
           setUser(response.data);
+          localStorage.setItem("user", JSON.stringify(response.data));
+          setAuthError("");
         } catch (error) {
-          // Token expired or invalid
-          localStorage.removeItem("token");
-          localStorage.removeItem("user");
-          setToken(null);
-          setUser(null);
+          if ([401, 403].includes(error?.response?.status)) {
+            localStorage.removeItem("token");
+            localStorage.removeItem("user");
+            setToken(null);
+            setUser(null);
+            setAuthError("");
+          } else {
+            setUser((currentUser) => currentUser || readCachedUser());
+            setAuthError("We could not refresh your profile. Your session is preserved and will retry when the connection is stable.");
+          }
         }
       }
       setLoading(false);
@@ -39,8 +58,10 @@ export const AuthProvider = ({ children }) => {
 
   const login = (newToken, userData) => {
     localStorage.setItem("token", newToken);
+    localStorage.setItem("user", JSON.stringify(userData));
     setToken(newToken);
     setUser(userData);
+    setAuthError("");
   };
 
   const logout = () => {
@@ -50,7 +71,7 @@ export const AuthProvider = ({ children }) => {
     setUser(null);
   };
 
-  const value = { user, setUser, token, isAuthenticated, loading, login, logout };
+  const value = { user, setUser, token, isAuthenticated, loading, authError, login, logout };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
