@@ -12,7 +12,6 @@ import OpenSourceVision from "../components/explore/OpenSourceVision";
 import FAQSection from "../components/explore/FAQSection";
 import SubscribeNewsletter from "../components/explore/SubscribeNewsletter";
 import FinalCTA from "../components/explore/FinalCTA";
-
 export default function ExplorePage() {
   return (
     <div className="w-full bg-white flex flex-col">
@@ -30,6 +29,7 @@ export default function ExplorePage() {
       <FAQSection />
       <SubscribeNewsletter />
       <FinalCTA />
+       
     </div>
   );
 }

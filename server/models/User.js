@@ -21,6 +21,16 @@ const userSchema = new mongoose.Schema({
   // Platform Usernames
   handles: { codeforces: String, leetcode: String, github: String },
 
+  // OAuth Identities
+  oauth: {
+    github: {
+      id:               { type: String, unique: true, sparse: true, index: true },
+      username:         String,
+      profileUrl:       String,
+      accessToken:      { type: String, select: false }, // stored for GitHub API calls
+    }
+  },
+
   // Stats References (decoupled)
   stats: {
     cpStats: { type: mongoose.Schema.Types.ObjectId, ref: "CPStats" },
@@ -59,6 +69,12 @@ const userSchema = new mongoose.Schema({
   metadata: {
     onboardingCompleted: { type: Boolean, default: false },
     tags: [String]
+  },
+
+  // Dashboard AI Summary Cache
+  dashboardSummary: {
+    content: { type: String, default: null },
+    lastGeneratedAt: { type: Date, default: null }
   }
 }, { timestamps: true });
 

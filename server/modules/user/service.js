@@ -1,3 +1,4 @@
+import CodeforcesRepository from "../codeforces/repository.js";
 import UserRepository from "./repository.js";
 import ApiError from "../../utils/ApiError.js";
 
@@ -34,6 +35,11 @@ class UserService {
   }
 
   static async deleteAccount(userId) {
+    // Cascade delete related records
+    await CodeforcesRepository.deleteProfileByUserId(userId);
+    await CodeforcesRepository.deleteSubmissionsByUserId(userId);
+    await CodeforcesRepository.deleteRatingHistoryByUserId(userId);
+
     const user = await UserRepository.deleteUser(userId);
     if (!user) {
       throw new ApiError(404, "User not found");

@@ -1,21 +1,33 @@
-import { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
-import * as authService from '../services/authService';
+import { useState, useEffect } from "react";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
+import * as authService from "../services/authService";
+
+const API_BASE = import.meta.env.VITE_API_BASE_URL;
 
 export default function SignupPage() {
   const [step, setStep] = useState(1);
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [otp, setOtp] = useState('');
-  const [error, setError] = useState('');
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [otp, setOtp] = useState("");
+  const [error, setError] = useState("");
+  const [githubMessage, setGithubMessage] = useState("");
   const [loading, setLoading] = useState(false);
   const [cooldown, setCooldown] = useState(0);
-  
+  const [isEmailValid, setIsEmailValid] = useState(true);
+
   const auth = useAuth();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const isPasswordValid = password.length >= 6;
+
+  // Pick up errors forwarded from OAuth callback
+  useEffect(() => {
+    const ghError =
+      searchParams.get("githubAuthError") || searchParams.get("error");
+    if (ghError) setError(decodeURIComponent(ghError));
+  }, [searchParams]);
 
   useEffect(() => {
     let timer;
@@ -27,9 +39,21 @@ export default function SignupPage() {
     return () => clearInterval(timer);
   }, [cooldown]);
 
+  const validateEmail = (value, validity) => {
+    return (
+      value.trim().length > 0 &&
+      validity.valid &&
+      value.split("@")[1]?.includes(".")
+    );
+  };
   const handleRegister = async (e) => {
     e.preventDefault();
     setError("");
+
+    if (!isEmailValid) {
+      setError("Please enter a valid email address");
+      return;
+    }
 
     if (!isPasswordValid) {
       setError("Password must be at least 6 characters");
@@ -43,7 +67,7 @@ export default function SignupPage() {
       setStep(2);
       setCooldown(60);
     } catch (err) {
-      setError(err.response?.data?.message || 'Registration failed');
+      setError(err.response?.data?.message || "Registration failed");
     } finally {
       setLoading(false);
     }
@@ -51,16 +75,16 @@ export default function SignupPage() {
 
   const handleVerifyOtp = async (e) => {
     e.preventDefault();
-    setError('');
+    setError("");
     setLoading(true);
 
     try {
       const response = await authService.verifyOtp(email, otp);
       const { token, user } = response.data;
       auth.login(token, user);
-      navigate('/dashboard');
+      navigate("/dashboard");
     } catch (err) {
-      setError(err.response?.data?.message || 'Invalid OTP');
+      setError(err.response?.data?.message || "Invalid OTP");
     } finally {
       setLoading(false);
     }
@@ -68,18 +92,23 @@ export default function SignupPage() {
 
   const handleResendOtp = async () => {
     if (cooldown > 0) return;
-    
-    setError('');
+
+    setError("");
     setLoading(true);
 
     try {
-      await authService.resendOtp(email, 'signup');
+      await authService.resendOtp(email, "signup");
       setCooldown(60);
     } catch (err) {
-      setError(err.response?.data?.message || 'Failed to resend OTP');
+      setError(err.response?.data?.message || "Failed to resend OTP");
     } finally {
       setLoading(false);
     }
+  };
+
+  /** Redirect to backend — full OAuth flow handled server-side */
+  const handleGitHubSignup = () => {
+    window.location.href = `${API_BASE}/auth/github/start`;
   };
 
   return (
@@ -98,7 +127,35 @@ export default function SignupPage() {
         )}
 
         {step === 1 ? (
-          <form className="flex flex-col space-y-8" onSubmit={handleRegister}>
+          <form
+            noValidate
+            className="flex flex-col space-y-8"
+            onSubmit={handleRegister}
+          >
+            <button
+              type="button"
+              onClick={handleGitHubSignup}
+              className="w-full py-5 border-4 border-black bg-black text-white text-sm font-black uppercase tracking-widest hover:bg-white hover:text-black transition-colors flex items-center justify-center gap-3"
+            >
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+                aria-hidden="true"
+              >
+                <path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.44 9.8 8.21 11.39.6.11.82-.26.82-.58v-2.03c-3.34.73-4.04-1.61-4.04-1.61-.55-1.39-1.34-1.76-1.34-1.76-1.09-.75.08-.73.08-.73 1.21.08 1.84 1.24 1.84 1.24 1.07 1.84 2.81 1.31 3.5 1 .11-.78.42-1.31.76-1.61-2.66-.3-5.47-1.33-5.47-5.93 0-1.31.47-2.38 1.24-3.22-.12-.3-.54-1.52.12-3.18 0 0 1.01-.32 3.3 1.23a11.5 11.5 0 0 1 3-.4c1.02 0 2.04.14 3 .4 2.29-1.55 3.3-1.23 3.3-1.23.66 1.66.24 2.88.12 3.18.77.84 1.24 1.91 1.24 3.22 0 4.61-2.81 5.63-5.48 5.92.43.37.82 1.1.82 2.22v3.29c0 .32.21.7.83.58C20.56 21.8 24 17.3 24 12c0-6.63-5.37-12-12-12z" />
+              </svg>
+              Sign up with GitHub
+            </button>
+
+            <div className="relative py-1">
+              <div className="border-t-4 border-black" />
+              <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-white px-3 text-[10px] font-black uppercase tracking-[0.22em]">
+                or register with email
+              </span>
+            </div>
+
             <div className="flex flex-col space-y-3">
               <label className="text-sm font-black uppercase tracking-widest text-black">
                 Full Name
@@ -119,11 +176,31 @@ export default function SignupPage() {
               <input
                 type="email"
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                onChange={(e) => {
+                  setEmail(e.target.value);
+                  setIsEmailValid(
+                    validateEmail(e.target.value, e.target.validity),
+                  );
+                }}
+                aria-describedby={
+                  email && !isEmailValid ? "email-error" : undefined
+                }
+                aria-invalid={email.length > 0 && !isEmailValid}
                 className="w-full p-5 border-4 border-black rounded-none text-black font-bold focus:outline-none focus:ring-0 focus:border-gray-500"
                 placeholder="YOUR@EMAIL.COM"
                 required
               />
+              <div className="min-h-[16px]">
+                {email && !isEmailValid && (
+                  <p
+                    id="email-error"
+                    role="alert"
+                    className="text-xs font-black uppercase tracking-widest text-red-600"
+                  >
+                    Please enter a valid email address
+                  </p>
+                )}
+              </div>
             </div>
             <div className="flex flex-col space-y-3">
               <label className="text-sm font-black uppercase tracking-widest text-black">
@@ -153,7 +230,11 @@ export default function SignupPage() {
             <button
               type="submit"
               disabled={
-                loading || !name.trim() || !email.trim() || !isPasswordValid
+                loading ||
+                !name.trim() ||
+                !email.trim() ||
+                !isEmailValid ||
+                !isPasswordValid
               }
               className="w-full mt-1 py-6 bg-white text-black text-xl font-black uppercase tracking-widest hover:bg-gray-100 transition-colors border-4 border-black rounded-none disabled:opacity-50 disabled:cursor-not-allowed"
             >
