@@ -172,6 +172,51 @@ class AiService {
       res.end();
     }
   }
+
+  /**
+   * Fetches the cached dashboard summary or generates a new one.
+   */
+  static async getDashboardSummary(userId) {
+    // 1. Fetch user to check cache
+    const user = await User.findById(userId).select("name email dashboardSummary").lean();
+    if (!user) throw new ApiError(401, "User not found.");
+
+    // 2. Return cached summary if it exists
+    if (user.dashboardSummary && user.dashboardSummary.content) {
+      return user.dashboardSummary.content;
+    }
+
+    console.log(`[AI] ▶ No cached summary found for ${user.name}. Generating new summary...`);
+
+    // 3. Fetch data for generation
+    const [cfProfile, recentContests] = await Promise.all([
+      CodeforcesProfile.findOne({ user: userId, isVerified: true }).lean(),
+      CodeforcesRatingHistory.find({ user: userId })
+        .sort({ ratingUpdateTimeSeconds: -1 })
+        .limit(5)
+        .lean(),
+    ]);
+
+    const prompt = buildPrompt({ profile: cfProfile, recentContests, name: user.name });
+
+    // 4. Generate new summary
+    const result = await ai.models.generateContent({
+      model: "gemini-2.5-flash",
+      contents: prompt,
+    });
+
+    const text = result.text?.trim();
+    if (!text) throw new ApiError(500, "Failed to generate AI summary.");
+
+    // 5. Cache it in DB
+    await User.findByIdAndUpdate(userId, {
+      "dashboardSummary.content": text,
+      "dashboardSummary.lastGeneratedAt": new Date()
+    });
+
+    console.log(`[AI] ✓ Summary generated and cached for ${user.name}.`);
+    return text;
+  }
 }
 
 export default AiService;

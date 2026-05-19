@@ -31,6 +31,15 @@ export const resendOtpSchema = z.object({
   purpose: z.enum(["signup", "forgot-password"])
 });
 
+export const githubStartSchema = z.object({
+  redirectPath: z.string().optional()
+});
+
+export const githubCallbackSchema = z.object({
+  code: z.string().min(1, "GitHub authorization code is required"),
+  state: z.string().min(1, "GitHub state is required")
+});
+
 export const validate = (schema) => {
   return (req, res, next) => {
     const result = schema.safeParse(req.body);
@@ -49,6 +58,28 @@ export const validate = (schema) => {
     }
     
     req.validatedData = result.data;
+    next();
+  };
+};
+
+export const validateQuery = (schema) => {
+  return (req, res, next) => {
+    const result = schema.safeParse(req.query);
+
+    if (!result.success) {
+      const errors = result.error.errors.map(err => ({
+        field: err.path.join("."),
+        message: err.message
+      }));
+
+      return res.status(400).json({
+        success: false,
+        message: "Validation failed",
+        errors
+      });
+    }
+
+    req.validatedQuery = result.data;
     next();
   };
 };
