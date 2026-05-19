@@ -92,6 +92,23 @@ class AuthController {
     }
   }
 
+  static async createGithubConnectUrl(req, res, next) {
+    try {
+      const { redirectPath } = req.validatedQuery || req.query;
+      const authUrl = AuthService.getGithubAuthorizationUrl({
+        mode: "connect",
+        userId: req.user?._id,
+        redirectPath
+      });
+
+      return res.status(200).json(
+        ApiResponse.success("GitHub connect URL generated", { authUrl })
+      );
+    } catch (error) {
+      next(error instanceof ApiError ? error : new ApiError(500, error.message));
+    }
+  }
+
   static async githubCallback(req, res, next) {
     try {
       const { code, state } = req.validatedQuery || req.query;

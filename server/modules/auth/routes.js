@@ -41,6 +41,13 @@ router.get(
   validateQuery(githubStartSchema),
   AuthController.startGithubConnect
 );
+router.post(
+  "/github/connect/start",
+  githubConnectRateLimit,
+  authMiddleware,
+  validateQuery(githubStartSchema),
+  AuthController.createGithubConnectUrl
+);
 router.get("/github/callback", validateQuery(githubCallbackSchema), AuthController.githubCallback);
 
 export default router;
