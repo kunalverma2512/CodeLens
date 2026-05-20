@@ -4,7 +4,7 @@ import { useAuth } from "../context/AuthContext";
 import * as authService from "../services/authService";
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL;
-console.log("backend url",API_BASE)
+
 
 export default function SignupPage() {
   const [step, setStep] = useState(1);
