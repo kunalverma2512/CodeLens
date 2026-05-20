@@ -2,6 +2,7 @@ import { useAuth } from "../context/AuthContext";
 import { useState, useEffect } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { getProfile, deleteAccount } from "../services/userService";
+import { getGithubConnectUrl } from "../services/authService";
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL;
 
@@ -104,10 +105,24 @@ function GitHubCard({ user }) {
   const ghAvatar     = user?.profile?.avatar;
   const [msg, setMsg] = useState("");
 
-  const handleConnect = () => {
-    // Encode current path so backend redirects back here after connect
-    const redirectPath = encodeURIComponent("/account-center");
-    window.location.href = `${API_BASE}/auth/github/connect?redirectPath=${redirectPath}`;
+  const handleConnect = async () => {
+    setMsg("");
+    try {
+      const response = await getGithubConnectUrl("/account-center");
+      const authUrl = response?.data?.authUrl;
+
+      if (!authUrl) {
+        throw new Error("Failed to initiate GitHub connect flow");
+      }
+
+      window.location.href = authUrl;
+    } catch (error) {
+      setMsg(
+        error?.response?.data?.message ||
+          error?.message ||
+          "Unable to connect GitHub right now. Please try again."
+      );
+    }
   };
 
   const handleDisconnect = () => {

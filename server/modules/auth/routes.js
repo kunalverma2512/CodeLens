@@ -35,6 +35,13 @@ router.post("/reset-password", validate(resetPasswordSchema), AuthController.res
 router.post("/resend-otp", validate(resendOtpSchema), AuthController.resendOtp);
 router.get("/github/start", validateQuery(githubStartSchema), AuthController.startGithubAuth);
 router.get(
+  "/github/connect-url",
+  githubConnectRateLimit,
+  authMiddleware,
+  validateQuery(githubStartSchema),
+  AuthController.getGithubConnectUrl
+);
+router.get(
   "/github/connect",
   githubConnectRateLimit,
   authMiddleware,

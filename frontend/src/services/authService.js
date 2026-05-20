@@ -29,3 +29,10 @@ export const resendOtp = async (email, purpose) => {
   const response = await api.post("/auth/resend-otp", { email, purpose });
   return response.data;
 };
+
+export const getGithubConnectUrl = async (redirectPath = "/account-center") => {
+  const response = await api.get("/auth/github/connect-url", {
+    params: { redirectPath }
+  });
+  return response.data;
+};
