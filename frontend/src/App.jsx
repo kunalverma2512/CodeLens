@@ -35,7 +35,7 @@ function AppRoutes() {
 
   return (
     <MainLayout>
-      <div key={location.key} className="page-fade-in w-full flex-1 flex flex-col">
+      <div key={location.pathname} className="page-fade-in w-full flex-1 flex flex-col">
         <Routes>
           <Route path="/" element={<LandingPage />} />
           <Route
