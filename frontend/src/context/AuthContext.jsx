@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components */
 import { createContext, useContext, useState, useEffect } from "react";
 import { getProfile } from "../services/userService";
 
@@ -24,7 +25,7 @@ export const AuthProvider = ({ children }) => {
           setToken(storedToken);
           const response = await getProfile();
           setUser(response.data);
-        } catch (error) {
+        } catch {
           // Token expired or invalid
           localStorage.removeItem("token");
           localStorage.removeItem("user");

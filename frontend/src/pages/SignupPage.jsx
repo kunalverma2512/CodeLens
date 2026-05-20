@@ -12,7 +12,6 @@ export default function SignupPage() {
   const [password, setPassword] = useState("");
   const [otp, setOtp] = useState("");
   const [error, setError] = useState("");
-  const [githubMessage, setGithubMessage] = useState("");
   const [loading, setLoading] = useState(false);
   const [cooldown, setCooldown] = useState(0);
   const [isEmailValid, setIsEmailValid] = useState(true);

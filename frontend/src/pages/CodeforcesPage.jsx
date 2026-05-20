@@ -57,8 +57,6 @@ function ActivityHeatmap({ dailyActivity = {} }) {
     return "bg-black border-black";
   };
 
-  const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
-
   return (
     <div>
       <div className="overflow-x-auto pb-2">
@@ -106,16 +104,7 @@ function RatingChart({ history = [] }) {
 
   const points = history.map((h, i) => `${toX(i)},${toY(h.newRating)}`).join(" ");
 
-  // Draw coloured band zones
-  const zones = [
-    { maxR: 1200, color: "#e5e5e5", label: "Newbie" },
-    { maxR: 1400, color: "#d4edda", label: "Pupil" },
-    { maxR: 1600, color: "#cce5ff", label: "Specialist" },
-    { maxR: 1900, color: "#d6d6ff", label: "Expert" },
-    { maxR: 2100, color: "#ffe8cc", label: "CM" },
-    { maxR: 2400, color: "#ffd6d6", label: "Master" },
-    { maxR: Infinity, color: "#ffb3b3", label: "GM+" },
-  ];
+  // Rating history chart configuration
 
   return (
     <div className="w-full overflow-x-auto">
@@ -304,7 +293,6 @@ export default function CodeforcesPage() {
     ratingHistory,
     submissions,
     isConnected,
-    isPending,
     loading,
     syncing,
     error,

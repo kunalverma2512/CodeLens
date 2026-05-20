@@ -23,8 +23,10 @@ export default function GitHubCallbackPage() {
   useEffect(() => {
     const error = searchParams.get("githubAuthError");
     if (error) {
-      setStatus("error");
-      setErrorMsg(decodeURIComponent(error));
+      setTimeout(() => {
+        setStatus("error");
+        setErrorMsg(decodeURIComponent(error));
+      }, 0);
       setTimeout(() => navigate(`/login?error=${encodeURIComponent(error)}`), 2000);
       return;
     }
@@ -35,8 +37,10 @@ export default function GitHubCallbackPage() {
     const token = params.get("token");
 
     if (!token) {
-      setStatus("error");
-      setErrorMsg("No token received. Please try again.");
+      setTimeout(() => {
+        setStatus("error");
+        setErrorMsg("No token received. Please try again.");
+      }, 0);
       setTimeout(() => navigate("/login"), 2500);
       return;
     }
@@ -54,7 +58,7 @@ export default function GitHubCallbackPage() {
     }
 
     navigate("/dashboard", { replace: true });
-  }, []);
+  }, [login, navigate, searchParams]);
 
   return (
     <div className="min-h-screen bg-white flex items-center justify-center px-6">

@@ -4,8 +4,9 @@ import { getGitHubDashboard } from "../services/githubService";
 import {
   StatCard, ScoreMeter, LangBytesChart, ActivityChart,
   ContribHeatmap, TopReposTable, ActivityFeed,
-  GistsPanel, StarredInsights, OrgsPanel, PRFootprint, fmt,
+  GistsPanel, StarredInsights, OrgsPanel, PRFootprint,
 } from "../components/github/GitHubComponents";
+import { fmt } from "../utils/githubHelpers";
 
 // ── Loading ───────────────────────────────────────────────────────────────────
 function Skeleton() {
@@ -42,7 +43,7 @@ function NotConnected() {
 }
 
 // ── Profile Hero ──────────────────────────────────────────────────────────────
-function ProfileHero({ profile, orgs, totalStars, totalForks, ownedRepos, forkedRepos }) {
+function ProfileHero({ profile, totalStars, totalForks, ownedRepos, forkedRepos }) {
   return (
     <div className="border-[4px] border-black bg-black text-white shadow-[12px_12px_0_0_rgba(0,0,0,0.25)]">
       <div className="p-6 sm:p-10 flex flex-col sm:flex-row gap-6 sm:items-start">
@@ -175,7 +176,7 @@ export default function GitHubIntelligencePage() {
   if (!data) return <NotConnected />;
 
   const {
-    profile, orgs, repos, ownedRepos, forkedRepos, topByStars,
+    profile, orgs, ownedRepos, forkedRepos, topByStars,
     totalStars, totalForks, langByBytes, contributions, events,
     gists, starred, starredTopics, starredLangs,
     prs, issues, metrics,
@@ -186,7 +187,7 @@ export default function GitHubIntelligencePage() {
       <div className="max-w-7xl mx-auto space-y-8">
 
         {/* Hero */}
-        <ProfileHero profile={profile} orgs={orgs}
+        <ProfileHero profile={profile}
           totalStars={totalStars} totalForks={totalForks}
           ownedRepos={ownedRepos} forkedRepos={forkedRepos} />
 

@@ -265,8 +265,10 @@ export default function Navbar() {
 
   // ── Close mobile menu on route change ───────────────────────────────────
   useEffect(() => {
-    setIsMenuOpen(false);
-    setMobileMegaOpen(false);
+    setTimeout(() => {
+      setIsMenuOpen(false);
+      setMobileMegaOpen(false);
+    }, 0);
   }, [location.pathname]);
 
   useEffect(() => {

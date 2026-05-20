@@ -3,16 +3,7 @@ import {
   RadarChart, Radar, PolarGrid, PolarAngleAxis, Cell,
   PieChart, Pie, Legend,
 } from "recharts";
-
-export const COLORS = ["#000","#222","#444","#666","#888","#aaa","#ccc"];
-export const fmt = (n) => n >= 1000 ? `${(n/1000).toFixed(1)}k` : String(n ?? 0);
-export const timeAgo = (d) => {
-  const s = (Date.now() - new Date(d)) / 1000;
-  if (s < 60)    return `${Math.floor(s)}s ago`;
-  if (s < 3600)  return `${Math.floor(s/60)}m ago`;
-  if (s < 86400) return `${Math.floor(s/3600)}h ago`;
-  return `${Math.floor(s/86400)}d ago`;
-};
+import { COLORS, fmt, timeAgo } from "../../utils/githubHelpers";
 
 const TT = ({ contentStyle = {}, ...props }) => (
   <Tooltip
@@ -285,7 +276,7 @@ export function StarredInsights({ starredTopics, starredLangs, starred }) {
         <div>
           <p className="text-xs font-black uppercase tracking-widest text-gray-500 mb-3">Favorite Languages in Starred</p>
           <div className="space-y-2">
-            {starredLangs?.slice(0, 6).map((l, i) => {
+            {starredLangs?.slice(0, 6).map((l) => {
               const max = starredLangs[0]?.count || 1;
               return (
                 <div key={l.name} className="flex items-center gap-3">

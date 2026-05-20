@@ -15,7 +15,7 @@ export default function DashboardExecutiveSummary() {
           setSummary(data.data.summary);
           setLoading(false);
         }
-      } catch (err) {
+      } catch {
         if (isMounted) {
           setError("Failed to fetch AI summary. Please try again later.");
           setLoading(false);

@@ -42,7 +42,7 @@ export default function LoginPage() {
         navigate('/dashboard', { replace: true });
       }
     }
-  }, [searchParams]);
+  }, [searchParams, auth, navigate]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();

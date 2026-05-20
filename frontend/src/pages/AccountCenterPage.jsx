@@ -8,23 +8,6 @@ const API_BASE = import.meta.env.VITE_API_BASE_URL;
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
-const RANK_COLORS = {
-  "legendary grandmaster": "text-red-600",
-  "international grandmaster": "text-red-500",
-  grandmaster: "text-red-400",
-  "international master": "text-orange-500",
-  master: "text-orange-400",
-  "candidate master": "text-purple-600",
-  expert: "text-blue-600",
-  specialist: "text-cyan-600",
-  pupil: "text-green-600",
-  newbie: "text-gray-500",
-  unrated: "text-gray-400",
-};
-
-const rankColor = (rank = "") =>
-  RANK_COLORS[(rank || "").toLowerCase()] || "text-black";
-
 // ── Sub-components ────────────────────────────────────────────────────────────
 
 function SectionLabel({ text }) {
@@ -274,7 +257,7 @@ function DangerZone({ onLogout }) {
     try {
       await deleteAccount();
       onLogout(); // Logs the user out and redirects to login
-    } catch (err) {
+    } catch {
       alert("Failed to delete account. Please try again later.");
       setLoading(false);
       setConfirm(false);
@@ -338,15 +321,17 @@ export default function AccountCenterPage() {
     const username = searchParams.get("githubUsername");
 
     if (status === "connected") {
-      setBanner(`GitHub account @${username || "connected"} linked successfully!`);
-      // Refresh user profile so the card shows the new GitHub identity
-      getProfile()
-        .then((res) => setUser(res.data))
-        .catch(() => {});
+      setTimeout(() => {
+        setBanner(`GitHub account @${username || "connected"} linked successfully!`);
+        // Refresh user profile so the card shows the new GitHub identity
+        getProfile()
+          .then((res) => setUser(res.data))
+          .catch(() => {});
+      }, 0);
       // Clean URL
       window.history.replaceState({}, "", "/account-center");
     }
-  }, [searchParams]);
+  }, [searchParams, setUser]);
 
   if (authLoading || !user) {
     return <AccountCenterSkeleton />;
