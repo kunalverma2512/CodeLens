@@ -27,15 +27,15 @@ import PublicRoute from "./components/shared/PublicRoute";
 
 /**
  * Inner router shell — lives inside BrowserRouter so it can call useLocation.
- * Keys a lightweight animation wrapper on location.key so the page-fade-in
- * CSS keyframe re-runs on every navigation without remounting <Routes> itself.
+ * Keys the animation wrapper on location.pathname so the page-fade-in CSS
+ * keyframe re-runs on actual page changes only (not same-path re-navigations).
  */
 function AppRoutes() {
   const location = useLocation();
 
   return (
     <MainLayout>
-      <div key={location.key} className="page-fade-in w-full flex-1 flex flex-col">
+      <div key={location.pathname} className="page-fade-in w-full flex-1 flex flex-col">
         <Routes>
           <Route path="/" element={<LandingPage />} />
           <Route

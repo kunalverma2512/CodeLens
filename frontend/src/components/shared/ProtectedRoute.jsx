@@ -1,11 +1,11 @@
 import { Navigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
+import { GuardSkeleton } from "./skeletons/PageSkeletons";
 
 const ProtectedRoute = ({ children }) => {
   const { isAuthenticated, loading } = useAuth();
   
-  // Return null while auth resolves — each protected page renders its own skeleton
-  if (loading) return null;
+  if (loading) return <GuardSkeleton />;
   if (!isAuthenticated) return <Navigate to="/login" replace />;
   
   return children;

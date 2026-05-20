@@ -2,6 +2,28 @@ function SkeletonBlock({ className = "" }) {
   return <div className={`bg-gray-200 border-[2px] border-black animate-pulse ${className}`} />;
 }
 
+/**
+ * Generic auth-guard loading placeholder — shown by ProtectedRoute / PublicRoute
+ * while authentication state is being resolved. Page-agnostic by design.
+ */
+export function GuardSkeleton() {
+  return (
+    <div className="w-full flex-1 flex flex-col px-4 sm:px-6 md:px-8 py-12 sm:py-16 bg-white">
+      <div className="max-w-7xl mx-auto w-full">
+        <div className="mb-10 border-b-4 border-black pb-6">
+          <SkeletonBlock className="h-12 sm:h-16 w-56 sm:w-80 mb-4" />
+          <SkeletonBlock className="h-5 w-40 sm:w-64" />
+        </div>
+        <div className="flex flex-col gap-4">
+          <SkeletonBlock className="h-[200px] w-full" />
+          <SkeletonBlock className="h-[140px] w-full" />
+          <SkeletonBlock className="h-[100px] w-3/4" />
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export function DashboardPageSkeleton() {
   return (
     <div className="w-full flex-1 flex flex-col px-4 sm:px-6 md:px-8 py-12 sm:py-16 bg-white overflow-hidden">
