@@ -49,16 +49,3 @@ export function AccountCenterSkeleton() {
     </div>
   );
 }
-
-export function ExplorePageSkeleton() {
-  return (
-    <div className="w-full bg-white flex flex-col px-4 sm:px-6 md:px-8 py-8 sm:py-12 gap-6">
-      <SkeletonBlock className="h-[220px] sm:h-[280px] w-full" />
-      <SkeletonBlock className="h-[160px] w-full" />
-      <SkeletonBlock className="h-[200px] w-full" />
-      <SkeletonBlock className="h-[180px] w-full" />
-      <SkeletonBlock className="h-[180px] w-full" />
-      <SkeletonBlock className="h-[220px] w-full" />
-    </div>
-  );
-}

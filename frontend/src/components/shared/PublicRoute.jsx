@@ -1,11 +1,11 @@
 import { Navigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
-import Loader from "./loaders/LoaderSwitcher";
 
 const PublicRoute = ({ children }) => {
   const { isAuthenticated, loading } = useAuth();
   
-  if (loading) return <Loader />;
+  // Return null while auth resolves — prevents spinner flash before page renders
+  if (loading) return null;
   if (isAuthenticated) return <Navigate to="/dashboard" replace />;
   
   return children;
