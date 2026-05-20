@@ -1,5 +1,15 @@
 import { z } from "zod";
 
+const safeRedirectPathSchema = z
+  .string()
+  .trim()
+  .max(200, "redirectPath is too long")
+  .regex(/^\/[^\\]*$/, "redirectPath must be a safe relative path")
+  .refine((value) => !value.startsWith("//"), {
+    message: "redirectPath cannot start with //"
+  })
+  .optional();
+
 export const registerSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
   email: z.string().email("Invalid email address"),
@@ -32,7 +42,11 @@ export const resendOtpSchema = z.object({
 });
 
 export const githubStartSchema = z.object({
-  redirectPath: z.string().optional()
+  redirectPath: safeRedirectPathSchema
+});
+
+export const githubConnectSchema = z.object({
+  redirectPath: safeRedirectPathSchema
 });
 
 export const githubCallbackSchema = z.object({

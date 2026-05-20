@@ -34,5 +34,5 @@ export const getGithubConnectUrl = async (redirectPath = "/account-center") => {
   const response = await api.get("/auth/github/connect-url", {
     params: { redirectPath }
   });
-  return response.data;
+  return response?.data?.data ?? response?.data;
 };

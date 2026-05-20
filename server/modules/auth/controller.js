@@ -77,27 +77,17 @@ class AuthController {
     }
   }
 
-  static async startGithubConnect(req, res, next) {
-    try {
-      const { redirectPath } = req.validatedQuery || req.query;
-      const authUrl = AuthService.getGithubAuthorizationUrl({
-        mode: "connect",
-        userId: req.user?._id,
-        redirectPath
-      });
-
-      return res.redirect(authUrl);
-    } catch (error) {
-      next(error instanceof ApiError ? error : new ApiError(500, error.message));
-    }
-  }
-
   static async getGithubConnectUrl(req, res, next) {
     try {
+      const authenticatedUserId = req.user?._id;
+      if (!authenticatedUserId) {
+        throw new ApiError(401, "Authentication required for GitHub connect");
+      }
+
       const { redirectPath } = req.validatedQuery || req.query;
       const authUrl = AuthService.getGithubAuthorizationUrl({
         mode: "connect",
-        userId: req.user?._id,
+        userId: authenticatedUserId,
         redirectPath
       });
 

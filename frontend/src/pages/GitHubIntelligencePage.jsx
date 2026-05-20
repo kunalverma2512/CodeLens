@@ -153,7 +153,7 @@ export default function GitHubIntelligencePage() {
 
   useEffect(() => {
     getGitHubDashboard()
-      .then(res => setData(res.data.data))
+      .then((res) => setData(res?.data?.data ?? res?.data ?? null))
       .catch(err => setError(err.response?.data?.message || err.message))
       .finally(() => setLoading(false));
   }, []);

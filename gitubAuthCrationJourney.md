@@ -82,7 +82,7 @@ Implemented end-to-end logic:
 Added controller methods:
 
 - `startGithubAuth`
-- `startGithubConnect`
+- `getGithubConnectUrl`
 - `githubCallback`
 
 Behavior:
@@ -99,10 +99,10 @@ Behavior:
 Added endpoints:
 
 - `GET /api/auth/github/start` (public login/signup via GitHub)
-- `GET /api/auth/github/connect` (protected account-link flow)
+- `GET /api/auth/github/connect-url` (protected account-link flow, returns OAuth URL)
 - `GET /api/auth/github/callback` (GitHub callback)
 
-`/github/connect` is protected using existing `authMiddleware`.
+`/github/connect-url` is protected using existing `authMiddleware`.
 
 ---
 
@@ -175,7 +175,7 @@ Added GitHub id-based lookup + sparse unique index + explicit connect mode flow.
 
 1. Frontend redirects user to:
    - `GET /api/auth/github/start` for GitHub signup/login
-   - `GET /api/auth/github/connect` for linking from signed-in account
+  - `GET /api/auth/github/connect-url` for linking from signed-in account (frontend then redirects to returned GitHub URL)
 2. Backend redirects user to GitHub OAuth consent.
 3. GitHub redirects back to:
    - `GET /api/auth/github/callback?code=...&state=...`

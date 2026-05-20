@@ -7,6 +7,7 @@ import {
   resetPasswordSchema,
   resendOtpSchema,
   githubStartSchema,
+  githubConnectSchema,
   githubCallbackSchema,
   validate,
   validateQuery
@@ -19,6 +20,7 @@ const router = Router();
 const githubConnectRateLimit = rateLimit({
   windowMs: 60 * 1000,
   max: 20,
+  keyGenerator: (req) => String(req.user?._id || req.ip),
   standardHeaders: true,
   legacyHeaders: false,
   message: {
@@ -36,17 +38,10 @@ router.post("/resend-otp", validate(resendOtpSchema), AuthController.resendOtp);
 router.get("/github/start", validateQuery(githubStartSchema), AuthController.startGithubAuth);
 router.get(
   "/github/connect-url",
-  githubConnectRateLimit,
   authMiddleware,
-  validateQuery(githubStartSchema),
+  githubConnectRateLimit,
+  validateQuery(githubConnectSchema),
   AuthController.getGithubConnectUrl
-);
-router.get(
-  "/github/connect",
-  githubConnectRateLimit,
-  authMiddleware,
-  validateQuery(githubStartSchema),
-  AuthController.startGithubConnect
 );
 router.get("/github/callback", validateQuery(githubCallbackSchema), AuthController.githubCallback);
 

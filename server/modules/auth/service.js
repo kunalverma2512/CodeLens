@@ -13,6 +13,17 @@ const GITHUB_ACCESS_TOKEN_URL = "https://github.com/login/oauth/access_token";
 const GITHUB_USER_URL = "https://api.github.com/user";
 const GITHUB_USER_EMAILS_URL = "https://api.github.com/user/emails";
 const GITHUB_SCOPE = "read:user user:email";
+const OAUTH_STATE_TTL_MS = 10 * 60 * 1000;
+const usedOAuthStateNonces = new Map();
+
+const cleanupExpiredNonces = () => {
+  const now = Date.now();
+  for (const [nonce, expiresAt] of usedOAuthStateNonces.entries()) {
+    if (expiresAt <= now) {
+      usedOAuthStateNonces.delete(nonce);
+    }
+  }
+};
 
 class AuthService {
   static async register({ name, email, password }) {
@@ -237,11 +248,11 @@ class AuthService {
     this.#assertGithubOAuthConfig();
 
     const safeMode = mode === "connect" ? "connect" : "login";
-    const defaultRedirectPath = safeMode === "connect" ? "/account-center" : "/login";
+    const sanitizedRedirectPath = this.#sanitizeRedirectPath(redirectPath, safeMode);
     const state = this.#buildGithubStateToken({
       mode: safeMode,
       userId,
-      redirectPath: redirectPath || defaultRedirectPath
+      redirectPath: sanitizedRedirectPath
     });
 
     const query = new URLSearchParams({
@@ -325,16 +336,43 @@ class AuthService {
 
   static #buildGithubStateToken(payload) {
     const secret = process.env.GITHUB_STATE_SECRET || process.env.JWT_SECRET;
-    return jwt.sign(payload, secret, { expiresIn: "10m" });
+    const nonce = crypto.randomUUID();
+    return jwt.sign({ ...payload, nonce }, secret, { expiresIn: "10m" });
   }
 
   static #verifyGithubStateToken(token) {
     try {
       const secret = process.env.GITHUB_STATE_SECRET || process.env.JWT_SECRET;
-      return jwt.verify(token, secret);
+      const decoded = jwt.verify(token, secret);
+
+      if (!decoded?.nonce) {
+        throw new ApiError(400, "Invalid GitHub OAuth state nonce");
+      }
+
+      cleanupExpiredNonces();
+      if (usedOAuthStateNonces.has(decoded.nonce)) {
+        throw new ApiError(400, "GitHub OAuth state was already used");
+      }
+
+      usedOAuthStateNonces.set(decoded.nonce, Date.now() + OAUTH_STATE_TTL_MS);
+      return decoded;
     } catch {
       throw new ApiError(400, "Invalid or expired GitHub OAuth state");
     }
+  }
+
+  static #sanitizeRedirectPath(path, mode) {
+    const defaultPath = mode === "connect" ? "/account-center" : "/login";
+    if (!path || typeof path !== "string") {
+      return defaultPath;
+    }
+
+    const trimmed = path.trim();
+    if (!trimmed || !trimmed.startsWith("/") || trimmed.startsWith("//") || trimmed.includes("://")) {
+      return defaultPath;
+    }
+
+    return trimmed;
   }
 
   static async #exchangeGithubCodeForToken(code) {
@@ -508,7 +546,7 @@ class AuthService {
 
   static #buildFrontendRedirectUrl(path, query = {}, fragment = {}) {
     const baseUrl = process.env.CLIENT_URL || "http://localhost:5173";
-    const redirect = new URL(path || "/login", baseUrl);
+    const redirect = new URL(this.#sanitizeRedirectPath(path, "login"), baseUrl);
 
     Object.entries(query).forEach(([key, value]) => {
       if (value !== undefined && value !== null && value !== "") {

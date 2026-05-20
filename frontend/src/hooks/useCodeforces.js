@@ -30,22 +30,24 @@ export const useCodeforces = (dashboardOnly = false) => {
   const [connectLoading, setConnectLoading] = useState(false);
   const [connectError, setConnectError] = useState(null);
 
+  const unwrapApiData = (response) => response?.data?.data ?? response?.data ?? null;
+
   const fetchAll = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
       if (dashboardOnly) {
-        const { data } = await cfGetDashboardSummary();
-        setDashboardSummary(data.data);
+        const response = await cfGetDashboardSummary();
+        setDashboardSummary(unwrapApiData(response));
       } else {
         const [profileRes, ratingRes, submissionsRes] = await Promise.all([
           cfGetProfile(),
           cfGetRatingHistory(),
           cfGetSubmissions(50),
         ]);
-        setProfile(profileRes.data.data);
-        setRatingHistory(ratingRes.data.data || []);
-        setSubmissions(submissionsRes.data.data || []);
+        setProfile(unwrapApiData(profileRes));
+        setRatingHistory(unwrapApiData(ratingRes) || []);
+        setSubmissions(unwrapApiData(submissionsRes) || []);
       }
     } catch (err) {
       setError(err.response?.data?.message || "Failed to load Codeforces data");
@@ -63,10 +65,11 @@ export const useCodeforces = (dashboardOnly = false) => {
     setConnectLoading(true);
     setConnectError(null);
     try {
-      const { data } = await cfInitiateConnection(handle);
-      setVerificationCode(data.data.verificationCode);
+      const response = await cfInitiateConnection(handle);
+      const payload = unwrapApiData(response);
+      setVerificationCode(payload?.verificationCode);
       setPendingHandle(handle);
-      return data.data;
+      return payload;
     } catch (err) {
       const msg = err.response?.data?.message || "Connection failed";
       setConnectError(msg);
@@ -82,11 +85,12 @@ export const useCodeforces = (dashboardOnly = false) => {
     setConnectLoading(true);
     setConnectError(null);
     try {
-      const { data } = await cfVerifyConnection(pendingHandle);
+      const response = await cfVerifyConnection(pendingHandle);
+      const payload = unwrapApiData(response);
       setVerificationCode(null);
       setPendingHandle(null);
       await fetchAll();
-      return data.data;
+      return payload;
     } catch (err) {
       const msg = err.response?.data?.message || "Verification failed";
       setConnectError(msg);
