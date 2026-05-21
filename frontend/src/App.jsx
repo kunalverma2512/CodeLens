@@ -26,7 +26,6 @@ import ProtectedRoute from "./components/shared/ProtectedRoute";
 import PublicRoute from "./components/shared/PublicRoute";
 import FAQpage from "./pages/FAQpage";
 
-import FAQSection from "./components/explore/FAQSection";
 export default function App() {
   return (
     <AuthProvider>
