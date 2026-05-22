@@ -1,39 +1,35 @@
 import dotenv from "dotenv";
 
-dotenv.config();
+// FORCE load .env from correct path
+dotenv.config({ path: "./.env" });
 
 const requiredEnvVars = [
   "PORT",
   "MONGO_URI",
   "JWT_SECRET",
   "JWT_EXPIRES_IN",
-  "GEMINI_API_KEY",
   "CLIENT_URL",
   "NODE_ENV",
   "SMTP_HOST",
   "SMTP_PORT",
   "SMTP_USER",
-  "SMTP_PASS"
+  "SMTP_PASS",
+  "GEMINI_API_KEY"
 ];
 
-const missingEnvVars = requiredEnvVars.filter(envVar => !process.env[envVar]);
+const missingEnvVars = requiredEnvVars.filter(
+  (key) => !process.env[key]
+);
+
+console.log("DEBUG ENV:", {
+  PORT: process.env.PORT,
+  MONGO_URI: process.env.MONGO_URI ? "OK" : "MISSING"
+});
 
 if (missingEnvVars.length > 0) {
-  throw new Error(`Missing required environment variables: ${missingEnvVars.join(", ")}`);
+  throw new Error(
+    `Missing required environment variables: ${missingEnvVars.join(", ")}`
+  );
 }
 
-export const env = {
-  PORT: process.env.PORT,
-  MONGO_URI: process.env.MONGO_URI,
-  JWT_SECRET: process.env.JWT_SECRET,
-  JWT_EXPIRES_IN: process.env.JWT_EXPIRES_IN,
-  GEMINI_API_KEY: process.env.GEMINI_API_KEY,
-  CLIENT_URL: process.env.CLIENT_URL,
-  NODE_ENV: process.env.NODE_ENV,
-  SMTP_HOST: process.env.SMTP_HOST,
-  SMTP_PORT: parseInt(process.env.SMTP_PORT, 10),
-  SMTP_USER: process.env.SMTP_USER,
-  SMTP_PASS: process.env.SMTP_PASS
-};
-
-export default env;
+export default process.env;

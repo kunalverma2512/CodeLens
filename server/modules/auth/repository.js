@@ -2,6 +2,10 @@ import User from "../../models/User.js";
 import Otp from "../../models/Otp.js";
 
 class AuthRepository {
+  // =========================
+  // USER METHODS
+  // =========================
+
   static async createUser(userData) {
     const user = new User(userData);
     return await user.save();
@@ -27,7 +31,7 @@ class AuthRepository {
     return await User.findOneAndUpdate(
       { email },
       { isVerified: true },
-      { new: true }
+      { returnDocument: "after" }
     );
   }
 
@@ -35,21 +39,22 @@ class AuthRepository {
     return await User.findOneAndUpdate(
       { email },
       { password: hashedPassword },
-      { new: true }
+      { returnDocument: "after" }
     );
   }
 
   static async updateUserGithubIdentity(userId, githubIdentity = {}) {
     const updateData = {
-      "oauth.github.id":          githubIdentity.id,
-      "oauth.github.username":    githubIdentity.username,
-      "oauth.github.profileUrl":  githubIdentity.profileUrl,
-      "handles.github":           githubIdentity.username,
+      "oauth.github.id": githubIdentity.id,
+      "oauth.github.username": githubIdentity.username,
+      "oauth.github.profileUrl": githubIdentity.profileUrl,
+      "handles.github": githubIdentity.username,
     };
 
     if (githubIdentity.avatarUrl) {
       updateData["profile.avatar"] = githubIdentity.avatarUrl;
     }
+
     if (githubIdentity.accessToken) {
       updateData["oauth.github.accessToken"] = githubIdentity.accessToken;
     }
@@ -57,20 +62,71 @@ class AuthRepository {
     return await User.findByIdAndUpdate(
       userId,
       updateData,
-      { new: true, runValidators: true }
+      {
+        returnDocument: "after",
+        runValidators: true
+      }
     );
   }
 
+  // =========================
+  // OTP METHODS
+  // =========================
+
   static async createOtp({ email, otp, purpose }) {
-    // Delete any existing OTPs for same email+purpose
+    // Remove old OTPs for same email + purpose
     await Otp.deleteMany({ email, purpose });
-    
-    const otpRecord = new Otp({ email, otp, purpose });
+
+    const otpRecord = new Otp({
+      email,
+      otp,
+      purpose,
+      failedAttempts: 0,
+      lockUntil: null,
+    });
+
     return await otpRecord.save();
   }
 
+  // =========================
+  // 🔥 FIXED OTP FETCH (IMPORTANT FIX)
+  // =========================
   static async findOtp(email, purpose) {
-    return await Otp.findOne({ email, purpose }).sort({ createdAt: -1 });
+    // ❌ removed .sort() because it breaks consistency
+    return await Otp.findOne({ email, purpose });
+  }
+
+  // =========================
+  // OTP SAFETY METHODS
+  // =========================
+
+  static async incrementOtpFailure(email, purpose) {
+    return await Otp.findOneAndUpdate(
+      { email, purpose },
+      { $inc: { failedAttempts: 1 } },
+      { returnDocument: "after" }
+    );
+  }
+
+  static async lockOtp(email, purpose, lockMinutes = 15) {
+    return await Otp.findOneAndUpdate(
+      { email, purpose },
+      {
+        lockUntil: new Date(Date.now() + lockMinutes * 60 * 1000)
+      },
+      { returnDocument: "after" }
+    );
+  }
+
+  static async resetOtp(email, purpose) {
+    return await Otp.findOneAndUpdate(
+      { email, purpose },
+      {
+        failedAttempts: 0,
+        lockUntil: null
+      },
+      { returnDocument: "after" }
+    );
   }
 
   static async deleteOtp(email, purpose) {
