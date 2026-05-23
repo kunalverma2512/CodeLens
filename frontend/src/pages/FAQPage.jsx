@@ -23,7 +23,10 @@ export default function FAQPage() {
   };
 
   return (
-    <main className="w-full bg-white text-black">
+    <main
+      className="overflow-x-hidden bg-white text-black"
+      style={{ width: "100vw", maxWidth: "100vw" }}
+    >
       <title>FAQ - CodeLens</title>
       <section className="border-b-4 border-black px-6 py-20 sm:px-10 lg:px-16 lg:py-28">
         <div className="mx-auto grid max-w-7xl gap-12 lg:grid-cols-[0.9fr_1.1fr] lg:items-end">
@@ -36,12 +39,12 @@ export default function FAQPage() {
             </h1>
           </div>
 
-          <div className="border-4 border-black bg-white p-6 shadow-[10px_10px_0_0_rgba(0,0,0,1)] sm:p-8">
+          <div className="border-4 border-black bg-white p-6 shadow-[6px_6px_0_0_rgba(0,0,0,1)] sm:p-8 sm:shadow-[10px_10px_0_0_rgba(0,0,0,1)]">
             <p className="text-base font-bold leading-relaxed text-black sm:text-lg">
               Quick answers for developers connecting coding platforms, reading analytics,
               protecting profile data, and contributing to CodeLens.
             </p>
-            <div className="mt-8 grid grid-cols-2 gap-3">
+            <div className="mt-8 grid grid-cols-1 gap-3 sm:grid-cols-2">
               {supportTopics.map((topic) => (
                 <span
                   key={topic}
@@ -67,7 +70,7 @@ export default function FAQPage() {
                   key={item.id}
                   type="button"
                   onClick={() => toggleFaq(index, true)}
-                  className={`border-2 px-4 py-3 text-left text-xs font-black uppercase tracking-widest transition-colors ${
+                  className={`break-words border-2 px-4 py-3 text-left text-xs font-black uppercase tracking-widest transition-colors ${
                     openIdx === index
                       ? "border-white bg-white text-black"
                       : "border-white text-white hover:bg-white hover:text-black"
@@ -91,7 +94,7 @@ export default function FAQPage() {
                   ref={(element) => {
                     itemRefs.current[index] = element;
                   }}
-                  className="border-4 border-black bg-white shadow-[8px_8px_0_0_rgba(0,0,0,1)]"
+                  className="border-4 border-black bg-white shadow-[6px_6px_0_0_rgba(0,0,0,1)] sm:shadow-[8px_8px_0_0_rgba(0,0,0,1)]"
                 >
                   <button
                     type="button"
