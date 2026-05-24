@@ -7,23 +7,24 @@ import AuthRepository from "./repository.js";
 import { generateAccessToken } from "../../utils/tokenHelper.js";
 import { generateOTP } from "../../utils/otpHelper.js";
 import { sendVerificationOTP, sendPasswordResetOTP } from "../../utils/emailService.js";
+import { getRedisClient } from "../../config/redis.js";
 
 const GITHUB_OAUTH_URL = "https://github.com/login/oauth/authorize";
 const GITHUB_ACCESS_TOKEN_URL = "https://github.com/login/oauth/access_token";
 const GITHUB_USER_URL = "https://api.github.com/user";
 const GITHUB_USER_EMAILS_URL = "https://api.github.com/user/emails";
 const GITHUB_SCOPE = "read:user user:email";
-const OAUTH_STATE_TTL_MS = 10 * 60 * 1000;
-const usedOAuthStateNonces = new Map();
+const OAUTH_STATE_TTL_SECONDS = 10 * 60;
+const GITHUB_OAUTH_STATE_NONCE_PREFIX = "oauth:github:state:";
+const GITHUB_OAUTH_STATE_CONSUME_SCRIPT = `
+  local value = redis.call("GET", KEYS[1])
+  if not value then
+    return nil
+  end
 
-const cleanupExpiredNonces = () => {
-  const now = Date.now();
-  for (const [nonce, expiresAt] of usedOAuthStateNonces.entries()) {
-    if (expiresAt <= now) {
-      usedOAuthStateNonces.delete(nonce);
-    }
-  }
-};
+  redis.call("DEL", KEYS[1])
+  return value
+`;
 
 class AuthService {
   static async register({ name, email, password }) {
@@ -244,12 +245,12 @@ class AuthService {
     };
   }
 
-  static getGithubAuthorizationUrl({ mode = "login", userId = null, redirectPath }) {
+  static async getGithubAuthorizationUrl({ mode = "login", userId = null, redirectPath }) {
     this.#assertGithubOAuthConfig();
 
     const safeMode = mode === "connect" ? "connect" : "login";
     const sanitizedRedirectPath = this.#sanitizeRedirectPath(redirectPath, safeMode);
-    const state = this.#buildGithubStateToken({
+    const state = await this.#buildGithubStateToken({
       mode: safeMode,
       userId,
       redirectPath: sanitizedRedirectPath
@@ -334,13 +335,16 @@ class AuthService {
     }
   }
 
-  static #buildGithubStateToken(payload) {
+  static async #buildGithubStateToken(payload) {
     const secret = process.env.GITHUB_STATE_SECRET || process.env.JWT_SECRET;
     const nonce = crypto.randomUUID();
-    return jwt.sign({ ...payload, nonce }, secret, { expiresIn: "10m" });
+    const token = jwt.sign({ ...payload, nonce }, secret, { expiresIn: "10m" });
+
+    await this.#storeGithubStateNonce(nonce);
+    return token;
   }
 
-  static #verifyGithubStateToken(token) {
+  static async #verifyGithubStateToken(token) {
     try {
       const secret = process.env.GITHUB_STATE_SECRET || process.env.JWT_SECRET;
       const decoded = jwt.verify(token, secret);
@@ -349,15 +353,60 @@ class AuthService {
         throw new ApiError(400, "Invalid GitHub OAuth state nonce");
       }
 
-      cleanupExpiredNonces();
-      if (usedOAuthStateNonces.has(decoded.nonce)) {
+      const consumedNonce = await this.#consumeGithubStateNonce(decoded.nonce);
+      if (!consumedNonce) {
         throw new ApiError(400, "GitHub OAuth state was already used");
       }
 
-      usedOAuthStateNonces.set(decoded.nonce, Date.now() + OAUTH_STATE_TTL_MS);
       return decoded;
-    } catch {
+    } catch (error) {
+      if (error instanceof ApiError) {
+        throw error;
+      }
+
       throw new ApiError(400, "Invalid or expired GitHub OAuth state");
+    }
+  }
+
+  static async #storeGithubStateNonce(nonce) {
+    try {
+      const client = await getRedisClient();
+      const key = `${GITHUB_OAUTH_STATE_NONCE_PREFIX}${nonce}`;
+      const result = await client.set(key, "1", {
+        NX: true,
+        EX: OAUTH_STATE_TTL_SECONDS
+      });
+
+      if (result !== "OK") {
+        throw new Error("Failed to reserve GitHub OAuth state nonce");
+      }
+    } catch (error) {
+      if (error instanceof ApiError) {
+        throw error;
+      }
+
+      throw new ApiError(503, "Unable to reserve GitHub OAuth state");
+    }
+  }
+
+  static async #consumeGithubStateNonce(nonce) {
+    try {
+      const client = await getRedisClient();
+      const key = `${GITHUB_OAUTH_STATE_NONCE_PREFIX}${nonce}`;
+
+      if (typeof client.getDel === "function") {
+        return await client.getDel(key);
+      }
+
+      return await client.eval(GITHUB_OAUTH_STATE_CONSUME_SCRIPT, {
+        keys: [key]
+      });
+    } catch (error) {
+      if (error instanceof ApiError) {
+        throw error;
+      }
+
+      throw new ApiError(503, "Unable to verify GitHub OAuth state");
     }
   }
 

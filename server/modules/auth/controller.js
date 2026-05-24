@@ -63,10 +63,10 @@ class AuthController {
     }
   }
 
-  static async startGithubAuth(req, res, next) {
+  static async  startGithubAuth(req, res, next) {
     try {
       const { redirectPath } = req.validatedQuery || req.query;
-      const authUrl = AuthService.getGithubAuthorizationUrl({
+      const authUrl = await AuthService.getGithubAuthorizationUrl({
         mode: "login",
         redirectPath
       });
@@ -85,7 +85,7 @@ class AuthController {
       }
 
       const { redirectPath } = req.validatedQuery || req.query;
-      const authUrl = AuthService.getGithubAuthorizationUrl({
+      const authUrl = await AuthService.getGithubAuthorizationUrl({
         mode: "connect",
         userId: authenticatedUserId,
         redirectPath

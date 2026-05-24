@@ -30,7 +30,25 @@ export const useCodeforces = (dashboardOnly = false) => {
   const [connectLoading, setConnectLoading] = useState(false);
   const [connectError, setConnectError] = useState(null);
 
-  const unwrapApiData = (response) => response?.data?.data ?? response?.data ?? null;
+  const unwrapApiData = (response) => {
+    if (!response) {
+      return null;
+    }
+
+    if (
+      response.data &&
+      typeof response.data === "object" &&
+      Object.prototype.hasOwnProperty.call(response.data, "data")
+    ) {
+      return response.data.data;
+    }
+
+    if (Object.prototype.hasOwnProperty.call(response, "data")) {
+      return response.data;
+    }
+
+    return null;
+  };
 
   const fetchAll = useCallback(async () => {
     setLoading(true);
