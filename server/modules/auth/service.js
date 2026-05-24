@@ -1,3 +1,4 @@
+
 import bcrypt from "bcryptjs";
 import axios from "axios";
 import jwt from "jsonwebtoken";
@@ -109,9 +110,6 @@ class AuthService {
       );
     }
 
-    // =========================
-    // CHECK LOCK FIRST
-    // =========================
     if (
       otpRecord.lockUntil &&
       otpRecord.lockUntil > new Date()
@@ -123,15 +121,9 @@ class AuthService {
       );
     }
 
-    // =========================
-    // VERIFY OTP
-    // =========================
     const isValidOtp =
       await bcrypt.compare(otp, otpRecord.otp);
 
-    // =========================
-    // WRONG OTP FLOW
-    // =========================
     if (!isValidOtp) {
 
       const updated =
@@ -143,19 +135,12 @@ class AuthService {
       const attempts =
         updated?.failedAttempts ?? 1;
 
-      // =========================
-      // LOCK ACCOUNT
-      // =========================
       if (attempts >= MAX_OTP_ATTEMPTS) {
 
         await AuthRepository.lockOtp(
           email,
           "signup",
           OTP_LOCK_MINUTES
-        );
-
-        console.warn(
-          `OTP locked for ${email} due to multiple failed attempts`
         );
 
         throw new ApiError(
@@ -173,9 +158,6 @@ class AuthService {
       );
     }
 
-    // =========================
-    // SUCCESS FLOW
-    // =========================
     await AuthRepository.resetOtp(
       email,
       "signup"
@@ -326,18 +308,66 @@ class AuthService {
       );
     }
 
+    // =========================
+    // CHECK LOCK
+    // =========================
+    if (
+      otpRecord.lockUntil &&
+      otpRecord.lockUntil > new Date()
+    ) {
+      throw new ApiError(
+        429,
+        `Too many failed attempts. Try again after ${OTP_LOCK_MINUTES} minutes`
+      );
+    }
+
     const isValidOtp =
       await bcrypt.compare(
         otp,
         otpRecord.otp
       );
 
+    // =========================
+    // WRONG OTP
+    // =========================
     if (!isValidOtp) {
+
+      const updated =
+        await AuthRepository.incrementOtpFailure(
+          email,
+          "forgot-password"
+        );
+
+      const attempts =
+        updated?.failedAttempts ?? 1;
+
+      if (attempts >= MAX_OTP_ATTEMPTS) {
+
+        await AuthRepository.lockOtp(
+          email,
+          "forgot-password",
+          OTP_LOCK_MINUTES
+        );
+
+        throw new ApiError(
+          429,
+          `Too many failed attempts. Try again after ${OTP_LOCK_MINUTES} minutes`
+        );
+      }
+
       throw new ApiError(
         400,
         "Invalid or expired OTP"
       );
     }
+
+    // =========================
+    // SUCCESS
+    // =========================
+    await AuthRepository.resetOtp(
+      email,
+      "forgot-password"
+    );
 
     const hashedPassword =
       await bcrypt.hash(newPassword, 10);
@@ -386,10 +416,21 @@ class AuthService {
       );
     }
 
-    await AuthRepository.deleteOtp(
-      email,
-      purpose
-    );
+    const existingOtp =
+      await AuthRepository.findOtp(
+        email,
+        purpose
+      );
+
+    if (
+      existingOtp?.lockUntil &&
+      existingOtp.lockUntil > new Date()
+    ) {
+      throw new ApiError(
+        429,
+        `Too many failed attempts. Try again after ${OTP_LOCK_MINUTES} minutes`
+      );
+    }
 
     const plainOtp = generateOTP();
 
@@ -463,10 +504,11 @@ class AuthService {
     state
   }) {
 
-    jwt.verify(
-      state,
-      process.env.JWT_SECRET
-    );
+    const decoded =
+      jwt.verify(
+        state,
+        process.env.JWT_SECRET
+      );
 
     const tokenRes =
       await axios.post(
@@ -509,16 +551,25 @@ class AuthService {
         githubProfile.id
       );
 
+    if (!user) {
+      throw new ApiError(
+        401,
+        "GitHub account not linked"
+      );
+    }
+
     const appToken =
       generateAccessToken({
-        userId: user?._id,
-        email: user?.email,
-        role: user?.role
+        userId: user._id,
+        email: user.email,
+        role: user.role
       });
 
     return {
       message:
-        "GitHub login successful",
+        decoded.mode === "connect"
+          ? "GitHub account connected successfully"
+          : "GitHub login successful",
 
       token: appToken,
       user
@@ -527,3 +578,4 @@ class AuthService {
 }
 
 export default AuthService;
+
