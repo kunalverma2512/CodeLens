@@ -19,9 +19,8 @@ export const getRedisClient = async () => {
 
   if (!redisClient.isOpen) {
     if (!connectPromise) {
-      connectPromise = redisClient.connect().catch((error) => {
+      connectPromise = redisClient.connect().finally(() => {
         connectPromise = null;
-        throw error;
       });
     }
 
