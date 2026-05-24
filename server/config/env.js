@@ -1,3 +1,4 @@
+
 import dotenv from "dotenv";
 
 // FORCE load .env from correct path
@@ -14,7 +15,10 @@ const requiredEnvVars = [
   "SMTP_PORT",
   "SMTP_USER",
   "SMTP_PASS",
-  "GEMINI_API_KEY"
+  "GEMINI_API_KEY",
+  "GITHUB_CLIENT_ID",
+  "GITHUB_CLIENT_SECRET",
+  "GITHUB_CALLBACK_URL"
 ];
 
 const missingEnvVars = requiredEnvVars.filter(
