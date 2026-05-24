@@ -1,3 +1,4 @@
+
 import User from "../../models/User.js";
 import Otp from "../../models/Otp.js";
 
@@ -56,7 +57,8 @@ class AuthRepository {
     }
 
     if (githubIdentity.accessToken) {
-      updateData["oauth.github.accessToken"] = githubIdentity.accessToken;
+      updateData["oauth.github.accessToken"] =
+        githubIdentity.accessToken;
     }
 
     return await User.findByIdAndUpdate(
@@ -64,7 +66,7 @@ class AuthRepository {
       updateData,
       {
         returnDocument: "after",
-        runValidators: true
+        runValidators: true,
       }
     );
   }
@@ -74,25 +76,29 @@ class AuthRepository {
   // =========================
 
   static async createOtp({ email, otp, purpose }) {
-    // Remove old OTPs for same email + purpose
-    await Otp.deleteMany({ email, purpose });
-
-    const otpRecord = new Otp({
-      email,
-      otp,
-      purpose,
-      failedAttempts: 0,
-      lockUntil: null,
-    });
-
-    return await otpRecord.save();
+    return await Otp.findOneAndUpdate(
+      { email, purpose },
+      {
+        $set: {
+          otp,
+          failedAttempts: 0,
+          lockUntil: null,
+          createdAt: new Date(),
+        },
+      },
+      {
+        upsert: true,
+        new: true,
+        setDefaultsOnInsert: true,
+      }
+    );
   }
 
   // =========================
-  // 🔥 FIXED OTP FETCH (IMPORTANT FIX)
+  // OTP FETCH
   // =========================
+
   static async findOtp(email, purpose) {
-    // ❌ removed .sort() because it breaks consistency
     return await Otp.findOne({ email, purpose });
   }
 
@@ -112,7 +118,9 @@ class AuthRepository {
     return await Otp.findOneAndUpdate(
       { email, purpose },
       {
-        lockUntil: new Date(Date.now() + lockMinutes * 60 * 1000)
+        lockUntil: new Date(
+          Date.now() + lockMinutes * 60 * 1000
+        ),
       },
       { returnDocument: "after" }
     );
@@ -123,7 +131,7 @@ class AuthRepository {
       { email, purpose },
       {
         failedAttempts: 0,
-        lockUntil: null
+        lockUntil: null,
       },
       { returnDocument: "after" }
     );
@@ -135,3 +143,4 @@ class AuthRepository {
 }
 
 export default AuthRepository;
+
