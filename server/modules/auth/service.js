@@ -1,3 +1,4 @@
+
 import bcrypt from "bcryptjs";
 import axios from "axios";
 import jwt from "jsonwebtoken";
@@ -66,12 +67,28 @@ class AuthService {
     const existingUser =
       await AuthRepository.findUserByEmailWithoutPassword(email);
 
-    if (existingUser) {
-      if (!existingUser.isVerified) {
-        await AuthRepository.deleteOtp(email, "signup");
-      } else {
-        throw new ApiError(409, "User already exists with this email");
-      }
+    // VERIFIED USER EXISTS
+    if (existingUser && existingUser.isVerified) {
+      throw new ApiError(409, "User already exists with this email");
+    }
+
+    // UNVERIFIED USER EXISTS → RESEND OTP
+    if (existingUser && !existingUser.isVerified) {
+      const plainOtp = generateOTP();
+      const hashedOtp = await bcrypt.hash(plainOtp, 6);
+
+      await AuthRepository.createOtp({
+        email,
+        otp: hashedOtp,
+        purpose: "signup",
+      });
+
+      await sendVerificationOTP(email, plainOtp);
+
+      return {
+        message: "Verification OTP resent successfully",
+        user: sanitizeUser(existingUser),
+      };
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -84,7 +101,7 @@ class AuthService {
     });
 
     const plainOtp = generateOTP();
-    const hashedOtp = await bcrypt.hash(plainOtp, 4);
+    const hashedOtp = await bcrypt.hash(plainOtp, 6);
 
     await AuthRepository.createOtp({
       email,
@@ -208,7 +225,6 @@ class AuthService {
   // FORGOT PASSWORD
   // =========================
   static async forgotPassword({ email }) {
-    // RATE LIMIT
     const key = `${email}-forgot-password`;
     const last = otpRequestMap.get(key);
 
@@ -226,7 +242,7 @@ class AuthService {
     }
 
     const plainOtp = generateOTP();
-    const hashedOtp = await bcrypt.hash(plainOtp, 4);
+    const hashedOtp = await bcrypt.hash(plainOtp, 6);
 
     await AuthRepository.createOtp({
       email,
@@ -304,7 +320,6 @@ class AuthService {
   // RESEND OTP
   // =========================
   static async resendOtp({ email, purpose }) {
-    // RATE LIMIT
     const key = `${email}-${purpose}`;
     const last = otpRequestMap.get(key);
 
@@ -338,7 +353,7 @@ class AuthService {
     }
 
     const plainOtp = generateOTP();
-    const hashedOtp = await bcrypt.hash(plainOtp, 4);
+    const hashedOtp = await bcrypt.hash(plainOtp, 6);
 
     await AuthRepository.createOtp({
       email,
@@ -367,9 +382,12 @@ class AuthService {
   }) {
     const safeMode = mode === "connect" ? "connect" : "login";
 
+    const stateSecret =
+      process.env.GITHUB_STATE_SECRET || process.env.JWT_SECRET;
+
     const state = jwt.sign(
       { mode: safeMode, userId, redirectPath },
-      process.env.JWT_SECRET,
+      stateSecret,
       { expiresIn: "10m" }
     );
 
@@ -390,7 +408,10 @@ class AuthService {
     let decoded;
 
     try {
-      decoded = jwt.verify(state, process.env.JWT_SECRET);
+      decoded = jwt.verify(
+        state,
+        process.env.GITHUB_STATE_SECRET || process.env.JWT_SECRET
+      );
     } catch {
       throw new ApiError(400, "Invalid or expired GitHub state");
     }
@@ -471,3 +492,4 @@ class AuthService {
 }
 
 export default AuthService;
+
