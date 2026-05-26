@@ -1,4 +1,3 @@
-
 import User from "../../models/User.js";
 import Otp from "../../models/Otp.js";
 
@@ -31,16 +30,24 @@ class AuthRepository {
   static async updateUserVerification(email) {
     return await User.findOneAndUpdate(
       { email },
-      { isVerified: true },
-      { returnDocument: "after" }
+      {
+        $set: {
+          isVerified: true,
+        },
+      },
+      { new: true, runValidators: true }
     );
   }
 
   static async updateUserPassword(email, hashedPassword) {
     return await User.findOneAndUpdate(
       { email },
-      { password: hashedPassword },
-      { returnDocument: "after" }
+      {
+        $set: {
+          password: hashedPassword,
+        },
+      },
+      { new: true, runValidators: true }
     );
   }
 
@@ -63,9 +70,11 @@ class AuthRepository {
 
     return await User.findByIdAndUpdate(
       userId,
-      updateData,
       {
-        returnDocument: "after",
+        $set: updateData,
+      },
+      {
+        new: true,
         runValidators: true,
       }
     );
@@ -109,8 +118,10 @@ class AuthRepository {
   static async incrementOtpFailure(email, purpose) {
     return await Otp.findOneAndUpdate(
       { email, purpose },
-      { $inc: { failedAttempts: 1 } },
-      { returnDocument: "after" }
+      {
+        $inc: { failedAttempts: 1 },
+      },
+      { new: true }
     );
   }
 
@@ -118,11 +129,11 @@ class AuthRepository {
     return await Otp.findOneAndUpdate(
       { email, purpose },
       {
-        lockUntil: new Date(
-          Date.now() + lockMinutes * 60 * 1000
-        ),
+        $set: {
+          lockUntil: new Date(Date.now() + lockMinutes * 60 * 1000),
+        },
       },
-      { returnDocument: "after" }
+      { new: true }
     );
   }
 
@@ -130,10 +141,12 @@ class AuthRepository {
     return await Otp.findOneAndUpdate(
       { email, purpose },
       {
-        failedAttempts: 0,
-        lockUntil: null,
+        $set: {
+          failedAttempts: 0,
+          lockUntil: null,
+        },
       },
-      { returnDocument: "after" }
+      { new: true }
     );
   }
 
@@ -143,4 +156,3 @@ class AuthRepository {
 }
 
 export default AuthRepository;
-
