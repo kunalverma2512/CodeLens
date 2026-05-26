@@ -1,17 +1,21 @@
 import { useState, useRef, useEffect } from "react";
+import HeroSection from "../components/apexai/HeroSection";
+import FeatureGrid from "../components/apexai/FeatureGrid";
+import ChatWindow from "../components/apexai/ChatWindow";
+import BottomCTA from "../components/apexai/BottomCTA";
 
 export default function ApexAIPage() {
   const [messages, setMessages] = useState([
     {
       id: 1,
       type: "assistant",
-      content: "I'm APEX — your Advanced Performance Excellence eXecutive. I synthesize your complete developer profile across GitHub, LeetCode, Codeforces, and development projects to architect personalized growth strategies. I don't just advise—I strategize your path to mastery.",
+      content:
+        "I'm APEX — your Advanced Performance Excellence eXecutive. I synthesize your complete developer profile across GitHub, LeetCode, Codeforces, and development projects to architect personalized growth strategies. I don't just advise—I strategize your path to mastery.",
       timestamp: new Date(),
     },
   ]);
   const [inputValue, setInputValue] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const messagesEndRef = useRef(null);
   const messagesContainerRef = useRef(null);
 
   const scrollChatToBottom = (behavior = "auto") => {
@@ -30,7 +34,8 @@ export default function ApexAIPage() {
     scrollChatToBottom(messages.length > 1 ? "smooth" : "auto");
   }, [messages]);
 
-  const handleSendMessage = async (e) => {
+  // TODO: replace the setTimeout mock with an actual async API call once the backend is ready
+  const handleSendMessage = (e) => {
     e.preventDefault();
     if (!inputValue.trim() || isLoading) return;
 
@@ -45,7 +50,6 @@ export default function ApexAIPage() {
     setInputValue("");
     setIsLoading(true);
 
-    // Simulate AI response (replace with actual API call)
     setTimeout(() => {
       const aiResponse = {
         id: Date.now() + 1,
@@ -58,268 +62,33 @@ export default function ApexAIPage() {
     }, 1500);
   };
 
-  const quickPrompts = [
-    "Audit my complete profile",
-    "Build custom roadmap",
-    "Identify skill gaps",
-    "Project improvement plan",
-  ];
-
-  const handleQuickPrompt = (prompt) => {
-    setInputValue(prompt);
-  };
-
   return (
-    <div className="w-full min-h-screen bg-white flex flex-col">
-      {/* Hero Section */}
-      <section className="w-full border-b-4 border-black px-4 sm:px-6 md:px-8 py-16 sm:py-24 md:py-32">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
-            {/* Left: Text Content */}
-            <div className="space-y-8 sm:space-y-12">
-              <div className="border-4 border-black bg-black text-white px-6 py-3 inline-block">
-                <span className="font-black text-sm sm:text-base uppercase tracking-widest">
-                  AI-POWERED EXCELLENCE
-                </span>
-              </div>
-              <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-black uppercase tracking-tighter leading-none text-black">
-                APEX AI
-              </h1>
-              <div className="space-y-4 sm:space-y-6">
-                <p className="text-lg sm:text-xl md:text-2xl font-bold uppercase tracking-wide text-black leading-relaxed border-l-4 border-black pl-6">
-                  Advanced Performance Excellence eXecutive
-                </p>
-                <p className="text-base sm:text-lg font-bold text-black leading-relaxed">
-                  Your personal AI strategist that cross-references CP rankings, DSA proficiency, development velocity, and project architecture to deliver precision-targeted growth blueprints. APEX doesn't give generic advice—it engineers your trajectory from current state to elite performance.
-                </p>
-              </div>
-              <div className="flex flex-wrap gap-4 pt-4">
-                <div className="border-4 border-black px-6 py-4 bg-white">
-                  <div className="text-3xl sm:text-4xl font-black text-black">99.2%</div>
-                  <div className="text-xs sm:text-sm font-black uppercase tracking-widest text-black mt-1">
-                    Precision Rate
-                  </div>
-                </div>
-                <div className="border-4 border-black px-6 py-4 bg-white">
-                  <div className="text-3xl sm:text-4xl font-black text-black">24/7</div>
-                  <div className="text-xs sm:text-sm font-black uppercase tracking-widest text-black mt-1">
-                    Available
-                  </div>
-                </div>
-                <div className="border-4 border-black px-6 py-4 bg-white">
-                  <div className="text-3xl sm:text-4xl font-black text-black">&lt;1.5s</div>
-                  <div className="text-xs sm:text-sm font-black uppercase tracking-widest text-black mt-1">
-                    Response Time
-                  </div>
-                </div>
-              </div>
-            </div>
+    <div className="w-full flex-1 flex flex-col bg-white">
+      {/* Above-fold: Hero sidebar + Chat split — fills remaining viewport height */}
+      <section className="flex-1 flex flex-col lg:flex-row border-b-4 border-black min-h-[600px]">
+        {/* Left: Compact hero sidebar */}
+        <div className="lg:w-[360px] xl:w-[400px] flex-shrink-0 border-b-4 lg:border-b-0 lg:border-r-4 border-black flex flex-col p-6 sm:p-8">
+          <HeroSection />
+        </div>
 
-            {/* Right: Feature Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
-              <div className="border-4 border-black p-6 bg-white shadow-[12px_12px_0_0_rgba(0,0,0,1)] hover:-translate-x-2 hover:-translate-y-2 transition-transform">
-                <div className="text-4xl font-black mb-4">01</div>
-                <h3 className="text-xl font-black uppercase tracking-tight mb-3">Unified Analytics</h3>
-                <p className="text-sm font-bold leading-relaxed">
-                  Complete metric synthesis from CP platforms, DSA progress, and dev projects
-                </p>
-              </div>
-              <div className="border-4 border-black p-6 bg-black text-white shadow-[12px_12px_0_0_rgba(0,0,0,1)] hover:-translate-x-2 hover:-translate-y-2 transition-transform">
-                <div className="text-4xl font-black mb-4">02</div>
-                <h3 className="text-xl font-black uppercase tracking-tight mb-3">Strategic Roadmaps</h3>
-                <p className="text-sm font-bold leading-relaxed">
-                  AI-architected learning paths targeting your specific performance gaps
-                </p>
-              </div>
-              <div className="border-4 border-black p-6 bg-black text-white shadow-[12px_12px_0_0_rgba(0,0,0,1)] hover:-translate-x-2 hover:-translate-y-2 transition-transform">
-                <div className="text-4xl font-black mb-4">03</div>
-                <h3 className="text-xl font-black uppercase tracking-tight mb-3">Real-Time Guidance</h3>
-                <p className="text-sm font-bold leading-relaxed">
-                  Instant insights on code patterns, algorithmic choices, and architecture
-                </p>
-              </div>
-              <div className="border-4 border-black p-6 bg-white shadow-[12px_12px_0_0_rgba(0,0,0,1)] hover:-translate-x-2 hover:-translate-y-2 transition-transform">
-                <div className="text-4xl font-black mb-4">04</div>
-                <h3 className="text-xl font-black uppercase tracking-tight mb-3">Elite Benchmarks</h3>
-                <p className="text-sm font-bold leading-relaxed">
-                  Performance comparison against top-tier developers and industry standards
-                </p>
-              </div>
-            </div>
-          </div>
+        {/* Right: Chat interface — fills remaining width and height */}
+        <div className="flex-1 flex flex-col min-h-[500px] lg:min-h-0">
+          <ChatWindow
+            messages={messages}
+            isLoading={isLoading}
+            inputValue={inputValue}
+            onInputChange={setInputValue}
+            onSendMessage={handleSendMessage}
+            messagesContainerRef={messagesContainerRef}
+          />
         </div>
       </section>
 
-      {/* Chat Interface Section */}
-      <section className="flex-1 w-full px-4 sm:px-6 md:px-8 py-10 sm:py-14 md:py-16">
-        <div className="max-w-[1800px] mx-auto h-full">
-          <div className="mb-8 sm:mb-10">
-            <h2 className="text-3xl sm:text-4xl md:text-5xl font-black uppercase tracking-tighter text-black mb-3">
-              Command Interface
-            </h2>
-            <p className="text-sm sm:text-base font-bold uppercase tracking-wide text-black">
-              Direct connection to your comprehensive performance analytics
-            </p>
-          </div>
+      {/* Below fold: Capabilities */}
+      <FeatureGrid />
 
-          <div className="grid grid-cols-1 xl:grid-cols-[320px_minmax(0,1fr)] gap-6 lg:gap-8 items-start">
-            <aside className="space-y-4">
-              <div className="border-4 border-black bg-white p-5">
-                <h3 className="text-sm font-black uppercase tracking-[0.12em] mb-4 border-b-4 border-black pb-3">
-                  Quick Commands
-                </h3>
-                <div className="space-y-2.5">
-                  {quickPrompts.map((prompt, idx) => (
-                    <button
-                      key={idx}
-                      onClick={() => handleQuickPrompt(prompt)}
-                      className="w-full text-left px-3.5 py-2.5 border-2 border-black bg-white hover:bg-black hover:text-white transition-colors font-black text-[11px] uppercase tracking-[0.08em]"
-                    >
-                      {prompt}
-                    </button>
-                  ))}
-                </div>
-              </div>
-              <div className="border-4 border-black bg-black text-white p-5">
-                <h3 className="text-sm font-black uppercase tracking-[0.12em] mb-4">
-                  Session Stats
-                </h3>
-                <div className="space-y-2.5 text-xs font-bold">
-                  <div className="flex justify-between border-b-2 border-white pb-2">
-                    <span className="uppercase tracking-wide">Queries</span>
-                    <span className="font-black">{messages.filter(m => m.type === 'user').length}</span>
-                  </div>
-                  <div className="flex justify-between border-b-2 border-white pb-2">
-                    <span className="uppercase tracking-wide">Insights</span>
-                    <span className="font-black">{messages.filter(m => m.type === 'assistant').length}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="uppercase tracking-wide">Status</span>
-                    <span className="font-black text-white">{isLoading ? 'ANALYZING' : 'READY'}</span>
-                  </div>
-                </div>
-              </div>
-            </aside>
-
-            <div className="border-4 border-black bg-white shadow-[16px_16px_0_0_rgba(0,0,0,1)] flex flex-col h-[620px] lg:h-[72vh] lg:max-h-[860px] lg:min-h-[620px] min-h-0">
-              <div className="border-b-4 border-black px-4 sm:px-5 py-3 bg-gray-50 flex items-center justify-between">
-                <span className="text-[11px] sm:text-xs font-black uppercase tracking-[0.14em]">APEX Live Session</span>
-                <span className="text-[10px] sm:text-[11px] font-black uppercase tracking-[0.14em] opacity-70">
-                  {isLoading ? "Analyzing" : "Ready"}
-                </span>
-              </div>
-              {/* Messages Container */}
-              <div
-                ref={messagesContainerRef}
-                className="flex-1 min-h-0 overflow-y-auto p-4 sm:p-5 lg:p-6 space-y-4 custom-scrollbar"
-              >
-                {messages.map((message) => (
-                  <div
-                    key={message.id}
-                    className={`flex ${
-                      message.type === "user" ? "justify-end" : "justify-start"
-                    }`}
-                  >
-                    <div
-                      className={`max-w-[94%] sm:max-w-[88%] lg:max-w-[78%] ${
-                        message.type === "user"
-                          ? "border-2 border-black bg-black text-white"
-                          : "border-2 border-black bg-white text-black"
-                      } p-3.5 sm:p-4.5 lg:p-5 shadow-[4px_4px_0_0_rgba(0,0,0,1)]`}
-                    >
-                      <div className="text-[10px] font-black uppercase tracking-[0.12em] mb-2 opacity-70">
-                        {message.type === "user" ? "You" : "APEX"}
-                      </div>
-                      <div className="text-xs sm:text-sm font-bold leading-relaxed break-words">
-                        {message.content}
-                      </div>
-                      <div className="text-[10px] font-bold mt-2.5 opacity-50">
-                        {message.timestamp.toLocaleTimeString()}
-                      </div>
-                    </div>
-                  </div>
-                ))}
-                {isLoading && (
-                  <div className="flex justify-start">
-                    <div className="border-4 border-black bg-white p-6 shadow-[6px_6px_0_0_rgba(0,0,0,1)]">
-                      <div className="flex items-center gap-2">
-                        <div className="w-3 h-3 bg-black animate-pulse"></div>
-                        <div className="w-3 h-3 bg-black animate-pulse delay-75"></div>
-                        <div className="w-3 h-3 bg-black animate-pulse delay-150"></div>
-                      </div>
-                    </div>
-                  </div>
-                )}
-                <div ref={messagesEndRef} />
-              </div>
-
-              {/* Input Area */}
-               <div className="border-t-4 border-black bg-white p-3 sm:p-4 lg:p-5">
-                <form onSubmit={handleSendMessage} className="flex gap-2.5 sm:gap-3">
-                  <input
-                    type="text"
-                    value={inputValue}
-                    onChange={(e) => setInputValue(e.target.value)}
-                    placeholder="Ask APEX anything..."
-                    disabled={isLoading}
-                    className="flex-1 border-2 border-black px-3.5 sm:px-4 py-2.5 sm:py-3 font-bold text-xs sm:text-sm uppercase tracking-[0.08em] placeholder:text-black placeholder:opacity-35 focus:outline-none focus:shadow-[4px_4px_0_0_rgba(0,0,0,1)] transition-shadow disabled:opacity-50"
-                  />
-                  <button
-                    type="submit"
-                    disabled={isLoading || !inputValue.trim()}
-                    className="px-4 sm:px-6 lg:px-7 py-2.5 sm:py-3 border-2 border-black bg-black text-white font-black text-xs uppercase tracking-[0.12em] hover:bg-white hover:text-black transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    Send
-                  </button>
-                </form>
-                <div className="mt-3 text-[10px] sm:text-[11px] font-bold uppercase tracking-[0.12em] text-black opacity-60">
-                  Powered by Advanced AI • Multi-source performance synthesis
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Bottom CTA Section */}
-      <section className="w-full border-t-4 border-black px-4 sm:px-6 md:px-8 py-16 sm:py-20 bg-black text-white">
-        <div className="max-w-5xl mx-auto text-center space-y-8">
-          <h2 className="text-3xl sm:text-4xl md:text-6xl font-black uppercase tracking-tighter">
-            Stop Guessing. Start Executing.
-          </h2>
-          <p className="text-base sm:text-lg font-bold uppercase tracking-wide max-w-3xl mx-auto">
-            APEX analyzes your complete developer footprint to engineer precision growth strategies. No generic advice—only actionable intelligence.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 justify-center items-center pt-6">
-            <button className="w-full sm:w-auto px-10 py-5 border-4 border-white bg-white text-black font-black uppercase tracking-widest hover:bg-transparent hover:text-white transition-colors">
-              Activate APEX Free
-            </button>
-            <button className="w-full sm:w-auto px-10 py-5 border-4 border-white bg-transparent text-white font-black uppercase tracking-widest hover:bg-white hover:text-black transition-colors">
-              View Capabilities
-            </button>
-          </div>
-        </div>
-      </section>
-
-      <style jsx>{`
-        .custom-scrollbar::-webkit-scrollbar {
-          width: 12px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-track {
-          background: white;
-          border-left: 4px solid black;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb {
-          background: black;
-          border: 2px solid white;
-        }
-        .delay-75 {
-          animation-delay: 0.15s;
-        }
-        .delay-150 {
-          animation-delay: 0.3s;
-        }
-      `}</style>
+      {/* Bottom CTA */}
+      <BottomCTA />
     </div>
   );
 }

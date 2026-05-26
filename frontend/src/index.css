@@ -1,1 +1,13 @@
 @import "tailwindcss";
+
+/* APEX AI chat scrollbar */
+.apex-scrollbar::-webkit-scrollbar {
+  width: 8px;
+}
+.apex-scrollbar::-webkit-scrollbar-track {
+  background: white;
+  border-left: 3px solid black;
+}
+.apex-scrollbar::-webkit-scrollbar-thumb {
+  background: black;
+}
