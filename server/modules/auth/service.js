@@ -1,4 +1,3 @@
-
 import bcrypt from "bcryptjs";
 import axios from "axios";
 import jwt from "jsonwebtoken";
@@ -73,23 +72,39 @@ class AuthService {
     }
 
     // UNVERIFIED USER EXISTS → RESEND OTP
-    if (existingUser && !existingUser.isVerified) {
-      const plainOtp = generateOTP();
-      const hashedOtp = await bcrypt.hash(plainOtp, 6);
+   
+if (existingUser && !existingUser.isVerified) {
+const existingOtp = await AuthRepository.findOtp(
+email,
+"signup"
+);
 
-      await AuthRepository.createOtp({
-        email,
-        otp: hashedOtp,
-        purpose: "signup",
-      });
+if (
+existingOtp?.lockUntil &&
+existingOtp.lockUntil > new Date()
+) {
+throw new ApiError(
+429,
+`Too many failed attempts. Try again after ${OTP_LOCK_MINUTES} minutes`
+);
+}
 
-      await sendVerificationOTP(email, plainOtp);
+const plainOtp = generateOTP();
+const hashedOtp = await bcrypt.hash(plainOtp, 6);
 
-      return {
-        message: "Verification OTP resent successfully",
-        user: sanitizeUser(existingUser),
-      };
-    }
+await AuthRepository.createOtp({
+email,
+otp: hashedOtp,
+purpose: "signup",
+});
+
+await sendVerificationOTP(email, plainOtp);
+
+return {
+message: "Verification OTP resent successfully",
+user: sanitizeUser(existingUser),
+};
+}
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
@@ -144,14 +159,7 @@ class AuthService {
       );
 
       const attempts = updated?.failedAttempts ?? 1;
-
       if (attempts >= MAX_OTP_ATTEMPTS) {
-        await AuthRepository.lockOtp(
-          email,
-          "signup",
-          OTP_LOCK_MINUTES
-        );
-
         throw new ApiError(
           429,
           `Too many failed attempts. Try again after ${OTP_LOCK_MINUTES} minutes`
@@ -236,10 +244,13 @@ class AuthService {
 
     const user =
       await AuthRepository.findUserByEmailWithoutPassword(email);
-
     if (!user) {
-      throw new ApiError(404, "User not found");
-    }
+    const dummyOtp = generateOTP();
+    await bcrypt.hash(dummyOtp, 6);
+    return {
+      message: "Password reset OTP sent to your email",
+    };
+  }
 
     const plainOtp = generateOTP();
     const hashedOtp = await bcrypt.hash(plainOtp, 6);
@@ -288,12 +299,6 @@ class AuthService {
       const attempts = updated?.failedAttempts ?? 1;
 
       if (attempts >= MAX_OTP_ATTEMPTS) {
-        await AuthRepository.lockOtp(
-          email,
-          "forgot-password",
-          OTP_LOCK_MINUTES
-        );
-
         throw new ApiError(
           429,
           `Too many failed attempts. Try again after ${OTP_LOCK_MINUTES} minutes`
@@ -457,12 +462,13 @@ class AuthService {
         email: user.email,
         role: user.role,
       });
+      const redirectUrl = `${decoded.redirectPath}?token=${appToken}`;
 
       return {
-        message: "GitHub account connected successfully",
-        token: appToken,
-        user: sanitizeUser(user),
+      redirectUrl,
       };
+
+
     }
 
     // LOGIN FLOW
@@ -482,14 +488,12 @@ class AuthService {
       email: user.email,
       role: user.role,
     });
+    const redirectUrl = `${decoded.redirectPath}?token=${appToken}`;
 
     return {
-      message: "GitHub login successful",
-      token: appToken,
-      user: sanitizeUser(user),
+    redirectUrl,
     };
   }
 }
 
 export default AuthService;
-

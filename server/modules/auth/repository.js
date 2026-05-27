@@ -1,3 +1,4 @@
+
 import User from "../../models/User.js";
 import Otp from "../../models/Otp.js";
 
@@ -103,10 +104,6 @@ class AuthRepository {
     );
   }
 
-  // =========================
-  // OTP FETCH
-  // =========================
-
   static async findOtp(email, purpose) {
     return await Otp.findOne({ email, purpose });
   }
@@ -115,26 +112,30 @@ class AuthRepository {
   // OTP SAFETY METHODS
   // =========================
 
-  static async incrementOtpFailure(email, purpose) {
-    return await Otp.findOneAndUpdate(
-      { email, purpose },
-      {
-        $inc: { failedAttempts: 1 },
-      },
-      { new: true }
-    );
-  }
+  static async incrementOtpFailure(
+    email,
+    purpose,
+    threshold = 5,
+    lockMinutes = 15
+  ) {
+    const otpDoc = await Otp.findOne({ email, purpose });
 
-  static async lockOtp(email, purpose, lockMinutes = 15) {
-    return await Otp.findOneAndUpdate(
-      { email, purpose },
-      {
-        $set: {
-          lockUntil: new Date(Date.now() + lockMinutes * 60 * 1000),
-        },
-      },
-      { new: true }
-    );
+    if (!otpDoc) {
+      return null;
+    }
+
+    otpDoc.failedAttempts =
+      (otpDoc.failedAttempts || 0) + 1;
+
+    if (otpDoc.failedAttempts >= threshold) {
+      otpDoc.lockUntil = new Date(
+        Date.now() + lockMinutes * 60 * 1000
+      );
+    }
+
+    await otpDoc.save();
+
+    return otpDoc;
   }
 
   static async resetOtp(email, purpose) {
