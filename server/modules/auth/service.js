@@ -11,7 +11,7 @@ import { generateOTP } from "../../utils/otpHelper.js";
 import {
   sendVerificationOTP,
   sendPasswordResetOTP,
-} from "../../utils/emailService.js";
+} from "../../utils/resendEmailService.js";
 
 // =========================
 // CONSTANTS
@@ -19,9 +19,8 @@ import {
 const MAX_OTP_ATTEMPTS = 5;
 const OTP_LOCK_MINUTES = 15;
 
-// simple in-memory rate limiter (DEV LEVEL)
 const otpRequestMap = new Map();
-const RATE_LIMIT_WINDOW = 60 * 1000; // 1 min
+const RATE_LIMIT_WINDOW = 60 * 1000;
 
 // =========================
 // GITHUB CONFIG
@@ -53,7 +52,6 @@ class AuthService {
   // REGISTER
   // =========================
   static async register({ name, email, password }) {
-    // RATE LIMIT
     const regKey = `${email}-register`;
     const regLast = otpRequestMap.get(regKey);
 
@@ -66,45 +64,27 @@ class AuthService {
     const existingUser =
       await AuthRepository.findUserByEmailWithoutPassword(email);
 
-    // VERIFIED USER EXISTS
     if (existingUser && existingUser.isVerified) {
       throw new ApiError(409, "User already exists with this email");
     }
 
-    // UNVERIFIED USER EXISTS → RESEND OTP
-   
-if (existingUser && !existingUser.isVerified) {
-const existingOtp = await AuthRepository.findOtp(
-email,
-"signup"
-);
+    if (existingUser && !existingUser.isVerified) {
+      const plainOtp = generateOTP();
+      const hashedOtp = await bcrypt.hash(plainOtp, 6);
 
-if (
-existingOtp?.lockUntil &&
-existingOtp.lockUntil > new Date()
-) {
-throw new ApiError(
-429,
-`Too many failed attempts. Try again after ${OTP_LOCK_MINUTES} minutes`
-);
-}
+      await AuthRepository.createOtp({
+        email,
+        otp: hashedOtp,
+        purpose: "signup",
+      });
 
-const plainOtp = generateOTP();
-const hashedOtp = await bcrypt.hash(plainOtp, 6);
+      await sendVerificationOTP(email, plainOtp);
 
-await AuthRepository.createOtp({
-email,
-otp: hashedOtp,
-purpose: "signup",
-});
-
-await sendVerificationOTP(email, plainOtp);
-
-return {
-message: "Verification OTP resent successfully",
-user: sanitizeUser(existingUser),
-};
-}
+      return {
+        message: "Verification OTP resent successfully",
+        user: sanitizeUser(existingUser),
+      };
+    }
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
@@ -127,8 +107,7 @@ user: sanitizeUser(existingUser),
     await sendVerificationOTP(email, plainOtp);
 
     return {
-      message:
-        "Registration successful. Please check your email for OTP verification.",
+      message: "Registration successful",
       user: sanitizeUser(user),
     };
   }
@@ -146,27 +125,27 @@ user: sanitizeUser(existingUser),
     if (otpRecord.lockUntil && otpRecord.lockUntil > new Date()) {
       throw new ApiError(
         429,
-        `Too many failed attempts. Try again after ${OTP_LOCK_MINUTES} minutes`
+        `Too many attempts. Try again after ${OTP_LOCK_MINUTES} minutes`
       );
     }
 
-    const isValidOtp = await bcrypt.compare(otp, otpRecord.otp);
+    const isValid = await bcrypt.compare(otp, otpRecord.otp);
 
-    if (!isValidOtp) {
+    if (!isValid) {
       const updated = await AuthRepository.incrementOtpFailure(
         email,
         "signup"
       );
 
-      const attempts = updated?.failedAttempts ?? 1;
+      const attempts = updated?.failedAttempts || 1;
+      const remaining = MAX_OTP_ATTEMPTS - attempts;
+
       if (attempts >= MAX_OTP_ATTEMPTS) {
         throw new ApiError(
           429,
           `Too many failed attempts. Try again after ${OTP_LOCK_MINUTES} minutes`
         );
       }
-
-      const remaining = MAX_OTP_ATTEMPTS - attempts;
 
       throw new ApiError(
         400,
@@ -199,28 +178,19 @@ user: sanitizeUser(existingUser),
   static async login({ email, password }) {
     const user = await AuthRepository.findUserByEmail(email);
 
-    if (!user) {
-      throw new ApiError(401, "Invalid credentials");
-    }
+    if (!user) throw new ApiError(401, "Invalid credentials");
 
     const isValid = await bcrypt.compare(password, user.password);
 
-    if (!isValid) {
-      throw new ApiError(401, "Invalid credentials");
-    }
+    if (!isValid) throw new ApiError(401, "Invalid credentials");
 
-    if (!user.isVerified) {
-      throw new ApiError(403, "Please verify your email first");
-    }
+    if (!user.isVerified) throw new ApiError(403, "Verify email first");
 
     const token = generateAccessToken({
       userId: user._id,
       email: user.email,
       role: user.role,
     });
-
-    user.activity.lastActive = new Date();
-    await user.save();
 
     return {
       message: "Login successful",
@@ -233,25 +203,6 @@ user: sanitizeUser(existingUser),
   // FORGOT PASSWORD
   // =========================
   static async forgotPassword({ email }) {
-    const key = `${email}-forgot-password`;
-    const last = otpRequestMap.get(key);
-
-    if (last && Date.now() - last < RATE_LIMIT_WINDOW) {
-      throw new ApiError(429, "Please wait before requesting OTP");
-    }
-
-    otpRequestMap.set(key, Date.now());
-
-    const user =
-      await AuthRepository.findUserByEmailWithoutPassword(email);
-    if (!user) {
-    const dummyOtp = generateOTP();
-    await bcrypt.hash(dummyOtp, 6);
-    return {
-      message: "Password reset OTP sent to your email",
-    };
-  }
-
     const plainOtp = generateOTP();
     const hashedOtp = await bcrypt.hash(plainOtp, 6);
 
@@ -264,7 +215,7 @@ user: sanitizeUser(existingUser),
     await sendPasswordResetOTP(email, plainOtp);
 
     return {
-      message: "Password reset OTP sent to your email",
+      message: "Password reset OTP sent",
     };
   }
 
@@ -272,41 +223,13 @@ user: sanitizeUser(existingUser),
   // RESET PASSWORD
   // =========================
   static async resetPassword({ email, otp, newPassword }) {
-    const otpRecord = await AuthRepository.findOtp(
-      email,
-      "forgot-password"
-    );
+    const otpRecord = await AuthRepository.findOtp(email, "forgot-password");
 
-    if (!otpRecord) {
-      throw new ApiError(400, "Invalid or expired OTP");
-    }
+    if (!otpRecord) throw new ApiError(400, "Invalid OTP");
 
-    if (otpRecord.lockUntil && otpRecord.lockUntil > new Date()) {
-      throw new ApiError(
-        429,
-        `Too many failed attempts. Try again after ${OTP_LOCK_MINUTES} minutes`
-      );
-    }
+    const isValid = await bcrypt.compare(otp, otpRecord.otp);
 
-    const isValidOtp = await bcrypt.compare(otp, otpRecord.otp);
-
-    if (!isValidOtp) {
-      const updated = await AuthRepository.incrementOtpFailure(
-        email,
-        "forgot-password"
-      );
-
-      const attempts = updated?.failedAttempts ?? 1;
-
-      if (attempts >= MAX_OTP_ATTEMPTS) {
-        throw new ApiError(
-          429,
-          `Too many failed attempts. Try again after ${OTP_LOCK_MINUTES} minutes`
-        );
-      }
-
-      throw new ApiError(400, "Invalid or expired OTP");
-    }
+    if (!isValid) throw new ApiError(400, "Invalid OTP");
 
     await AuthRepository.resetOtp(email, "forgot-password");
 
@@ -325,38 +248,6 @@ user: sanitizeUser(existingUser),
   // RESEND OTP
   // =========================
   static async resendOtp({ email, purpose }) {
-    const key = `${email}-${purpose}`;
-    const last = otpRequestMap.get(key);
-
-    if (last && Date.now() - last < RATE_LIMIT_WINDOW) {
-      throw new ApiError(429, "Please wait before requesting another OTP");
-    }
-
-    otpRequestMap.set(key, Date.now());
-
-    const user =
-      await AuthRepository.findUserByEmailWithoutPassword(email);
-
-    if (!user) {
-      throw new ApiError(404, "User not found");
-    }
-
-    if (purpose === "signup" && user.isVerified) {
-      throw new ApiError(400, "Already verified");
-    }
-
-    const existingOtp = await AuthRepository.findOtp(email, purpose);
-
-    if (
-      existingOtp?.lockUntil &&
-      existingOtp.lockUntil > new Date()
-    ) {
-      throw new ApiError(
-        429,
-        `Too many failed attempts. Try again after ${OTP_LOCK_MINUTES} minutes`
-      );
-    }
-
     const plainOtp = generateOTP();
     const hashedOtp = await bcrypt.hash(plainOtp, 6);
 
@@ -385,14 +276,9 @@ user: sanitizeUser(existingUser),
     userId = null,
     redirectPath,
   }) {
-    const safeMode = mode === "connect" ? "connect" : "login";
-
-    const stateSecret =
-      process.env.GITHUB_STATE_SECRET || process.env.JWT_SECRET;
-
     const state = jwt.sign(
-      { mode: safeMode, userId, redirectPath },
-      stateSecret,
+      { mode, userId, redirectPath },
+      process.env.GITHUB_STATE_SECRET || process.env.JWT_SECRET,
       { expiresIn: "10m" }
     );
 
@@ -403,7 +289,7 @@ user: sanitizeUser(existingUser),
       state,
     });
 
-    return `${GITHUB_OAUTH_URL}?${query}`;
+    return `${GITHUB_OAUTH_URL}?${query.toString()}`;
   }
 
   // =========================
@@ -418,7 +304,7 @@ user: sanitizeUser(existingUser),
         process.env.GITHUB_STATE_SECRET || process.env.JWT_SECRET
       );
     } catch {
-      throw new ApiError(400, "Invalid or expired GitHub state");
+      throw new ApiError(400, "Invalid GitHub state");
     }
 
     const tokenRes = await axios.post(
@@ -428,7 +314,11 @@ user: sanitizeUser(existingUser),
         client_secret: process.env.GITHUB_CLIENT_SECRET,
         code,
       },
-      { headers: { Accept: "application/json" } }
+      {
+        headers: {
+          Accept: "application/json",
+        },
+      }
     );
 
     const accessToken = tokenRes.data.access_token;
@@ -441,57 +331,72 @@ user: sanitizeUser(existingUser),
 
     const githubProfile = profileRes.data;
 
-    // CONNECT FLOW
-    if (decoded.mode === "connect") {
-      const user = await AuthRepository.findUserById(decoded.userId);
-
-      if (!user) {
-        throw new ApiError(404, "User not found for GitHub connect");
-      }
-
-      await AuthRepository.updateUserGithubIdentity(user._id, {
-        id: githubProfile.id,
-        username: githubProfile.login,
-        profileUrl: githubProfile.html_url,
-        avatarUrl: githubProfile.avatar_url,
-        accessToken,
-      });
-
-      const appToken = generateAccessToken({
-        userId: user._id,
-        email: user.email,
-        role: user.role,
-      });
-      const redirectUrl = `${decoded.redirectPath}?token=${appToken}`;
-
-      return {
-      redirectUrl,
-      };
-
-
-    }
-
-    // LOGIN FLOW
-    const user = await AuthRepository.findUserByGithubId(
+    // =========================
+    // FIND OR CREATE USER
+    // =========================
+    let user = await AuthRepository.findUserByGithubId(
       githubProfile.id
     );
 
     if (!user) {
-      throw new ApiError(
-        401,
-        "GitHub account not linked. Please sign up first or connect account."
+      let email = githubProfile.email;
+
+      // Fetch hidden GitHub email
+      if (!email) {
+        const emailsRes = await axios.get(
+          "https://api.github.com/user/emails",
+          {
+            headers: {
+              Authorization: `Bearer ${accessToken}`,
+            },
+          }
+        );
+
+        const primaryEmail = emailsRes.data.find(
+          (e) => e.primary
+        );
+
+        email = primaryEmail?.email;
+      }
+
+      if (!email) {
+        throw new ApiError(
+          400,
+          "GitHub email not available"
+        );
+      }
+
+      // Check existing email user
+      user = await AuthRepository.findUserByEmailWithoutPassword(
+        email
       );
+
+      // Create new user
+      if (!user) {
+        user = await AuthRepository.createUser({
+          name: githubProfile.name || githubProfile.login,
+          email,
+          password: "",
+          isVerified: true,
+          githubId: githubProfile.id,
+          profile: {
+            avatar: githubProfile.avatar_url,
+          },
+        });
+      }
     }
 
+    // =========================
+    // GENERATE TOKEN
+    // =========================
     const appToken = generateAccessToken({
       userId: user._id,
       email: user.email,
       role: user.role,
     });
-    const redirectUrl = `${decoded.redirectPath}?token=${appToken}`;
 
     return {
-    redirectUrl,
+      redirectUrl: `${process.env.CLIENT_URL}/login?authStatus=success#token=${appToken}`,
     };
   }
 }
