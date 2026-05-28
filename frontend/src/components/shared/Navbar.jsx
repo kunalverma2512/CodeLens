@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 
@@ -68,6 +68,7 @@ const MEGA_MENU_ITEMS = [
 ];
 
 // ─── Tag Badge ─────────────────────────────────────────────────────────────────
+// Refined: thinner border, tighter tracking, color-coded per type
 const TAG_COLORS = {
   HOT: "border-orange-400 text-orange-500",
   NEW: "border-emerald-400 text-emerald-600",
@@ -224,20 +225,21 @@ function MegaMenuPanel({ megaRef, onMouseEnter, onMouseLeave, onClose, megaTrigg
 
 // ─── Main Navbar ───────────────────────────────────────────────────────────────
 export default function Navbar() {
-  const [isMenuOpen, setIsMenuOpen]       = useState(false);
-  const [megaOpen, setMegaOpen]           = useState(false);
-  const [mobileMegaOpen, setMobileMegaOpen] = useState(false);
+  const [isMenuOpen, setIsMenuOpen]           = useState(false);
+  const [megaOpen, setMegaOpen]               = useState(false);
+  const [mobileMegaOpen, setMobileMegaOpen]   = useState(false);
   const [expandedSubmenu, setExpandedSubmenu] = useState(null);
-  const [scrolled, setScrolled]           = useState(false);
+  const [scrolled, setScrolled]               = useState(false);
 
-  const megaRef        = useRef(null);
+  const megaRef          = useRef(null);
   const firstMenuItemRef = useRef(null);
-  const megaTriggerRef = useRef(null);
-  const megaLeaveTimer = useRef(null);
+  const megaTriggerRef   = useRef(null);
+  const hamburgerRef     = useRef(null);
+  const megaLeaveTimer   = useRef(null);
 
   const { isAuthenticated, user, logout } = useAuth();
-  const navigate  = useNavigate();
-  const location  = useLocation();
+  const navigate = useNavigate();
+  const location = useLocation();
 
   // ── Scroll elevation shadow ──────────────────────────────────────────────
   useEffect(() => {
@@ -284,21 +286,23 @@ export default function Navbar() {
     }
   }, [isMenuOpen]);
 
-  // ── Close menu on Escape key ─────────────────────────────────────────────
+  // ── Close menu on Escape key, restore focus to hamburger ────────────────
   useEffect(() => {
     const handleKeyDown = (e) => {
-      if (e.key === "Escape" && isMenuOpen) closeMenu();
+      if (e.key === "Escape" && isMenuOpen) {
+        closeMenu();
+        setTimeout(() => hamburgerRef.current?.focus(), 0);
+      }
     };
     document.addEventListener("keydown", handleKeyDown);
     return () => document.removeEventListener("keydown", handleKeyDown);
   }, [isMenuOpen]);
 
   useEffect(() => {
-  return () => {
-    clearTimeout(megaLeaveTimer.current);
-  };
-}, []);
-
+    return () => {
+      clearTimeout(megaLeaveTimer.current);
+    };
+  }, []);
 
   // ── Handlers ────────────────────────────────────────────────────────────
   const handleLogout = () => {
@@ -307,19 +311,19 @@ export default function Navbar() {
     setIsMenuOpen(false);
   };
   const toggleMenu = () => setIsMenuOpen((v) => !v);
-  const closeMenu  = () => {
+  const closeMenu  = useCallback(() => {
     setIsMenuOpen(false);
     setMobileMegaOpen(false);
     setMegaOpen(false);
-  };
+  }, []);
 
   const handleMegaMouseEnter = () => {
-  clearTimeout(megaLeaveTimer.current);
-  setMegaOpen(true);
+    clearTimeout(megaLeaveTimer.current);
+    setMegaOpen(true);
 
-  setTimeout(() => {
-    firstMenuItemRef.current?.focus();
-  }, 0);
+    setTimeout(() => {
+      firstMenuItemRef.current?.focus();
+    }, 0);
   };
 
   const handleMegaMouseLeave = () => {
@@ -344,8 +348,8 @@ export default function Navbar() {
 
   // ── Active link style ────────────────────────────────────────────────────
   // font-semibold + thin underline instead of font-black + decoration-4
-  const isActive    = (path) => location.pathname === path;
-  const navLinkCls  = (path) =>
+  const isActive   = (path) => location.pathname === path;
+  const navLinkCls = (path) =>
     `text-[13px] font-semibold uppercase tracking-[0.09em] transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2 ${
       isActive(path)
         ? "text-black underline underline-offset-4 decoration-[1.5px] decoration-black"
@@ -529,6 +533,7 @@ export default function Navbar() {
 
           {/* Animated hamburger — thinner, softer border */}
           <button
+            ref={hamburgerRef}
             onClick={toggleMenu}
             className="flex flex-col justify-center items-center w-9 h-9 gap-[5px] border border-zinc-200 hover:border-zinc-400 transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2 rounded-[2px]"
             aria-label={isMenuOpen ? "Close menu" : "Open menu"}
@@ -720,7 +725,7 @@ export default function Navbar() {
 
                 <button
                   onClick={handleLogout}
-                  className="px-5 py-3.5 text-[13px] font-semibold uppercase tracking-[0.09em] text-zinc-400 hover:text-black border-b border-zinc-100 hover:bg-zinc-50 transition-colors duration-150 text-left"
+                  className="w-full px-5 py-3.5 text-[13px] font-semibold uppercase tracking-[0.09em] text-zinc-400 hover:text-black border-b border-zinc-100 hover:bg-zinc-50 transition-colors duration-150 text-left"
                 >
                   Logout
                 </button>
