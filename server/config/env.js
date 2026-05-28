@@ -15,6 +15,7 @@ const requiredEnvVars = [
   "GITHUB_CLIENT_SECRET",
   "GITHUB_CALLBACK_URL",
   "RESEND_API_KEY",
+  "GITHUB_STATE_SECRET",
 ];
 
 const missingEnvVars = requiredEnvVars.filter(
