@@ -1,42 +1,48 @@
-import { useState, useEffect } from 'react';
-import { Link, useNavigate, useSearchParams } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
-import * as authService from '../services/authService';
+import { useState, useEffect } from "react";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
+import * as authService from "../services/authService";
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL;
 
 export default function LoginPage() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
   const auth = useAuth();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
 
-  // Handle GitHub OAuth callback redirect
+  // =========================
+  // HANDLE GITHUB CALLBACK
+  // =========================
   useEffect(() => {
     const ghError =
-      searchParams.get('githubAuthError') || searchParams.get('error');
+      searchParams.get("githubAuthError") ||
+      searchParams.get("error");
 
     if (ghError) {
       setError(decodeURIComponent(ghError));
       return;
     }
 
-    const authStatus = searchParams.get('authStatus');
+    const authStatus = searchParams.get("authStatus");
 
-    if (authStatus === 'success') {
+    if (authStatus === "success") {
       const hash = window.location.hash.slice(1);
       const hashParams = new URLSearchParams(hash);
-      const token = hashParams.get('token');
+
+      const token = hashParams.get("token");
 
       if (token) {
-        localStorage.setItem('token', token);
+        localStorage.setItem("token", token);
 
         try {
-          const payload = JSON.parse(atob(token.split('.')[1]));
+          const payload = JSON.parse(
+            atob(token.split(".")[1])
+          );
 
           auth.login(token, {
             id: payload.userId,
@@ -47,33 +53,45 @@ export default function LoginPage() {
           auth.login(token, {});
         }
 
-        navigate('/dashboard', { replace: true });
+        navigate("/dashboard", {
+          replace: true,
+        });
       }
     }
   }, [searchParams, auth, navigate]);
 
+  // =========================
+  // LOGIN SUBMIT
+  // =========================
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    setError('');
+    setError("");
     setLoading(true);
 
     try {
-      const response = await authService.login(email, password);
+      const response = await authService.login(
+        email,
+        password
+      );
 
       const { token, user } = response.data;
 
       auth.login(token, user);
 
-      navigate('/dashboard');
+      navigate("/dashboard");
     } catch (err) {
-      setError(err.response?.data?.message || 'Login failed');
+      setError(
+        err.response?.data?.message || "Login failed"
+      );
     } finally {
       setLoading(false);
     }
   };
 
-  // GitHub Login
+  // =========================
+  // GITHUB LOGIN
+  // =========================
   const handleGitHubLogin = () => {
     window.location.href = `${API_BASE}/api/auth/github/start`;
   };
@@ -94,19 +112,29 @@ export default function LoginPage() {
           </div>
         )}
 
-        {/* GitHub Login */}
+        {/* =========================
+            GITHUB LOGIN
+        ========================= */}
         <button
           type="button"
           onClick={handleGitHubLogin}
           className="w-full mb-8 py-5 border-4 border-black bg-black text-white text-sm font-black uppercase tracking-widest hover:bg-white hover:text-black transition-colors flex items-center justify-center gap-3"
         >
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.44 9.8 8.21 11.39.6.11.82-.26.82-.58v-2.03c-3.34.73-4.04-1.61-4.04-1.61-.55-1.39-1.34-1.76-1.34-1.76-1.09-.75.08-.73.08-.73 1.21.08 1.84 1.24 1.84 1.24 1.07 1.84 2.81 1.31 3.5 1 .11-.78.42-1.31.76-1.61-2.66-.3-5.47-1.33-5.47-5.93 0-1.31.47-2.38 1.24-3.22-.12-.3-.54-1.52.12-3.18 0 0 1.01-.32 3.3 1.23a11.5 11.5 0 0 1 3-.4c1.02 0 2.04.14 3 .4 2.29-1.55 3.3-1.23 3.3-1.23.66 1.66.24 2.88.12 3.18.77.84 1.24 1.91 1.24 3.22 0 4.61-2.81 5.63-5.48 5.92.43.37.82 1.1.82 2.22v3.29c0 .32.21.7.83.58C20.56 21.8 24 17.3 24 12c0-6.63-5.37-12-12-12z"/>
+          <svg
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="currentColor"
+          >
+            <path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.44 9.8 8.21 11.39.6.11.82-.26.82-.58v-2.03c-3.34.73-4.04-1.61-4.04-1.61-.55-1.39-1.34-1.76-1.34-1.76-1.09-.75.08-.73.08-.73 1.21.08 1.84 1.24 1.84 1.24 1.07 1.84 2.81 1.31 3.5 1 .11-.78.42-1.31.76-1.61-2.66-.3-5.47-1.33-5.47-5.93 0-1.31.47-2.38 1.24-3.22-.12-.3-.54-1.52.12-3.18 0 0 1.01-.32 3.3 1.23a11.5 11.5 0 0 1 3-.4c1.02 0 2.04.14 3 .4 2.29-1.55 3.3-1.23 3.3-1.23.66 1.66.24 2.88.12 3.18.77.84 1.24 1.91 1.24 3.22 0 4.61-2.81 5.63-5.48 5.92.43.37.82 1.1.82 2.22v3.29c0 .32.21.7.83.58C20.56 21.8 24 17.3 24 12c0-6.63-5.37-12-12-12z" />
           </svg>
 
           Continue with GitHub
         </button>
 
+        {/* =========================
+            DIVIDER
+        ========================= */}
         <div className="relative py-1 mb-8">
           <div className="border-t-4 border-black" />
 
@@ -115,59 +143,89 @@ export default function LoginPage() {
           </span>
         </div>
 
-        <form onSubmit={handleSubmit} className="flex flex-col space-y-8">
+        {/* =========================
+            LOGIN FORM
+        ========================= */}
+        <form
+          onSubmit={handleSubmit}
+          className="flex flex-col space-y-8"
+        >
+          {/* EMAIL */}
+          <div>
+            <label
+              htmlFor="login-email"
+              className="sr-only"
+            >
+              Email
+            </label>
 
-          {/* Email Field */}
-          <label
-            htmlFor="login-email"
-            className="sr-only"
-          >
-            Email
-          </label>
+            <input
+              id="login-email"
+              type="email"
+              value={email}
+              onChange={(e) =>
+                setEmail(e.target.value)
+              }
+              placeholder="EMAIL"
+              aria-label="Email"
+              className="w-full p-5 border-4 border-black font-bold"
+              required
+            />
+          </div>
 
-          <input
-            id="login-email"
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="EMAIL"
-            aria-label="Email"
-            className="w-full p-5 border-4 border-black font-bold"
-            required
-          />
+          {/* PASSWORD */}
+          <div>
+            <label
+              htmlFor="login-password"
+              className="sr-only"
+            >
+              Password
+            </label>
 
-          {/* Password Field */}
-          <label
-            htmlFor="login-password"
-            className="sr-only"
-          >
-            Password
-          </label>
+            <input
+              id="login-password"
+              type="password"
+              value={password}
+              onChange={(e) =>
+                setPassword(e.target.value)
+              }
+              placeholder="PASSWORD"
+              aria-label="Password"
+              className="w-full p-5 border-4 border-black font-bold"
+              required
+            />
+          </div>
 
-          <input
-            id="login-password"
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            placeholder="PASSWORD"
-            aria-label="Password"
-            className="w-full p-5 border-4 border-black font-bold"
-            required
-          />
+          {/* FORGOT PASSWORD */}
+          <div className="text-right">
+            <Link
+              to="/forgot-password"
+              className="text-xs font-black uppercase underline"
+            >
+              Forgot Password?
+            </Link>
+          </div>
 
+          {/* SUBMIT */}
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-6 bg-black text-white font-black uppercase"
+            className="w-full py-6 bg-black text-white font-black uppercase disabled:opacity-50"
           >
-            {loading ? 'AUTHENTICATING...' : 'SIGN IN'}
+            {loading
+              ? "AUTHENTICATING..."
+              : "SIGN IN"}
           </button>
         </form>
 
+        {/* SIGNUP */}
         <div className="mt-10 text-center border-t-4 border-black pt-8">
           <p className="text-sm font-black uppercase">
-            Don&apos;t have an account?{' '}
-            <Link to="/signup" className="underline">
+            Don&apos;t have an account?{" "}
+            <Link
+              to="/signup"
+              className="underline"
+            >
               Sign Up
             </Link>
           </p>
