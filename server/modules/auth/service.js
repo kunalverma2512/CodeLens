@@ -67,24 +67,33 @@ class AuthService {
     if (existingUser && existingUser.isVerified) {
       throw new ApiError(409, "User already exists with this email");
     }
-
     if (existingUser && !existingUser.isVerified) {
-      const plainOtp = generateOTP();
-      const hashedOtp = await bcrypt.hash(plainOtp, 6);
+  const existingOtp = await AuthRepository.findOtp(email, "signup");
 
-      await AuthRepository.createOtp({
-        email,
-        otp: hashedOtp,
-        purpose: "signup",
-      });
+  if (existingOtp?.lockUntil && existingOtp.lockUntil > new Date()) {
+    throw new ApiError(
+      429,
+      `Too many failed attempts. Try again after ${OTP_LOCK_MINUTES} minutes`
+    );
+  }
 
-      await sendVerificationOTP(email, plainOtp);
+  const plainOtp = generateOTP();
+  const hashedOtp = await bcrypt.hash(plainOtp, 6);
 
-      return {
-        message: "Verification OTP resent successfully",
-        user: sanitizeUser(existingUser),
-      };
-    }
+  await AuthRepository.createOtp({
+    email,
+    otp: hashedOtp,
+    purpose: "signup",
+  });
+
+  await sendVerificationOTP(email, plainOtp);
+
+  return {
+    message: "Verification OTP resent successfully",
+    user: sanitizeUser(existingUser),
+    };
+  }
+   
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
@@ -223,7 +232,10 @@ class AuthService {
   // RESET PASSWORD
   // =========================
   static async resetPassword({ email, otp, newPassword }) {
-    const otpRecord = await AuthRepository.findOtp(email, "forgot-password");
+    const otpRecord = await AuthRepository.findOtp(
+      email,
+      "forgot-password"
+    );
 
     if (!otpRecord) throw new ApiError(400, "Invalid OTP");
 
@@ -235,9 +247,15 @@ class AuthService {
 
     const hashedPassword = await bcrypt.hash(newPassword, 10);
 
-    await AuthRepository.updateUserPassword(email, hashedPassword);
+    await AuthRepository.updateUserPassword(
+      email,
+      hashedPassword
+    );
 
-    await AuthRepository.deleteOtp(email, "forgot-password");
+    await AuthRepository.deleteOtp(
+      email,
+      "forgot-password"
+    );
 
     return {
       message: "Password reset successful",
@@ -278,7 +296,8 @@ class AuthService {
   }) {
     const state = jwt.sign(
       { mode, userId, redirectPath },
-      process.env.GITHUB_STATE_SECRET || process.env.JWT_SECRET,
+      process.env.GITHUB_STATE_SECRET ||
+        process.env.JWT_SECRET,
       { expiresIn: "10m" }
     );
 
@@ -301,7 +320,8 @@ class AuthService {
     try {
       decoded = jwt.verify(
         state,
-        process.env.GITHUB_STATE_SECRET || process.env.JWT_SECRET
+        process.env.GITHUB_STATE_SECRET ||
+          process.env.JWT_SECRET
       );
     } catch {
       throw new ApiError(400, "Invalid GitHub state");
@@ -367,14 +387,16 @@ class AuthService {
       }
 
       // Check existing email user
-      user = await AuthRepository.findUserByEmailWithoutPassword(
-        email
-      );
+      user =
+        await AuthRepository.findUserByEmailWithoutPassword(
+          email
+        );
 
       // Create new user
       if (!user) {
         user = await AuthRepository.createUser({
-          name: githubProfile.name || githubProfile.login,
+          name:
+            githubProfile.name || githubProfile.login,
           email,
           password: "",
           isVerified: true,
@@ -395,8 +417,21 @@ class AuthService {
       role: user.role,
     });
 
+    // =========================
+    // FIXED REDIRECT
+    // =========================
+    const basePath =
+      decoded?.redirectPath ||
+      `${process.env.CLIENT_URL}/login?authStatus=success`;
+
+    const separator = basePath.includes("#")
+      ? "&"
+      : "#";
+
     return {
-      redirectUrl: `${process.env.CLIENT_URL}/login?authStatus=success#token=${appToken}`,
+      redirectUrl: `${basePath}${separator}token=${encodeURIComponent(
+        appToken
+      )}`,
     };
   }
 }
