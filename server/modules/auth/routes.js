@@ -46,6 +46,7 @@ const githubConnectRateLimit = rateLimit({
 // Register
 router.post(
   "/register",
+  otpLimiter,
   validate(registerSchema),
   AuthController.register
 );
@@ -68,6 +69,7 @@ router.post(
 // Forgot Password
 router.post(
   "/forgot-password",
+  otpLimiter,
   validate(forgotPasswordSchema),
   AuthController.forgotPassword
 );
@@ -82,6 +84,7 @@ router.post(
 // Resend OTP
 router.post(
   "/resend-otp",
+  otpLimiter,
   validate(resendOtpSchema),
   AuthController.resendOtp
 );
