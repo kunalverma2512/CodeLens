@@ -11,16 +11,13 @@ import { generateOTP } from "../../utils/otpHelper.js";
 import {
   sendVerificationOTP,
   sendPasswordResetOTP,
-} from "../../utils/resendEmailService.js";
+} from "../../utils/emailService.js";
 
 // =========================
 // CONSTANTS
 // =========================
 const MAX_OTP_ATTEMPTS = 5;
 const OTP_LOCK_MINUTES = 15;
-
-const otpRequestMap = new Map();
-const RATE_LIMIT_WINDOW = 60 * 1000;
 
 // =========================
 // GITHUB CONFIG
@@ -52,15 +49,6 @@ class AuthService {
   // REGISTER
   // =========================
   static async register({ name, email, password }) {
-    const regKey = `${email}-register`;
-    const regLast = otpRequestMap.get(regKey);
-
-    if (regLast && Date.now() - regLast < RATE_LIMIT_WINDOW) {
-      throw new ApiError(429, "Please wait before trying again");
-    }
-
-    otpRequestMap.set(regKey, Date.now());
-
     const existingUser =
       await AuthRepository.findUserByEmailWithoutPassword(email);
 
@@ -436,9 +424,6 @@ class AuthService {
 
     const githubProfile = profileRes.data;
 
-    // =========================
-    // FIND OR CREATE USER
-    // =========================
     let user =
       await AuthRepository.findUserByGithubId(
         githubProfile.id
@@ -447,7 +432,6 @@ class AuthService {
     if (!user) {
       let email = githubProfile.email;
 
-      // Fetch hidden GitHub email
       if (!email) {
         const emailsRes = await axios.get(
           "https://api.github.com/user/emails",
@@ -473,13 +457,11 @@ class AuthService {
         );
       }
 
-      // Check existing email user
       user =
         await AuthRepository.findUserByEmailWithoutPassword(
           email
         );
 
-      // Create new user
       if (!user) {
         user =
           await AuthRepository.createUser({
@@ -498,18 +480,12 @@ class AuthService {
       }
     }
 
-    // =========================
-    // GENERATE TOKEN
-    // =========================
     const appToken = generateAccessToken({
       userId: user._id,
       email: user.email,
       role: user.role,
     });
 
-    // =========================
-    // FIXED REDIRECT
-    // =========================
     const basePath =
       decoded?.redirectPath ||
       `${process.env.CLIENT_URL}/login?authStatus=success`;

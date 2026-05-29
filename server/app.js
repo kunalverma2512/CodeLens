@@ -12,7 +12,12 @@ const app = express();
 const allowedOrigins = [
   process.env.CLIENT_URL,
   process.env.CLIENT_URI,
-  "http://localhost:5173"
+  "http://localhost:5173",
+  "http://localhost:5182",
+  "http://localhost:5183",
+   "http://localhost:5184",
+   "http://localhost:5185",
+    "http://localhost:5186"
 ].filter(Boolean);
 
 const corsOptions ={
