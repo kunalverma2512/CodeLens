@@ -35,6 +35,7 @@ export default function Footer() {
               {[
                 { to: "/dashboard", label: "Dashboard" },
                 { to: "/explore", label: "Explore" },
+                { to: "/faq", label: "FAQ" },
                 { to: "/codeforces", label: "Codeforces" },
               ].map((l) => (
                 <Link
@@ -51,14 +52,21 @@ export default function Footer() {
               Resources
             </h3>
             <div className="flex flex-col gap-4">
-              {["Documentation", "Changelog", "Bug Reports"].map((l) => (
-                <a
-                  key={l}
-                  href="#"
-                  className="text-sm font-black uppercase tracking-widest text-black hover:underline underline-offset-8 decoration-[3px] hover:opacity-60 transition-opacity"
+              {[
+                { label: "Documentation", to: "#" },
+                { label: "Changelog", to: "#" },
+                { label: "Bug Reports", to: "/bug-reports" }
+              ].map((l) => (
+                <Link
+                  key={l.label}
+                  to={l.to}
+                  onClick={l.to === "#" ? (e) => e.preventDefault() : undefined}
+                  className={`text-sm font-black uppercase tracking-widest text-black hover:underline underline-offset-8 decoration-[3px] hover:opacity-60 transition-opacity ${
+                    l.to === "#" ? "opacity-50 cursor-not-allowed hover:no-underline" : ""
+                  }`}
                 >
-                  {l}
-                </a>
+                  {l.label}
+                </Link>
               ))}
             </div>
           </div>
