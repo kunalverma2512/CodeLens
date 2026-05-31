@@ -4,7 +4,7 @@ import axios from "axios";
 import jwt from "jsonwebtoken";
 import ApiError from "../../utils/ApiError.js";
 import AuthRepository from "./repository.js";
-import { generateAccessToken } from "../../utils/tokenHelper.js";
+import { generateAccessToken, generateRefreshToken } from "../../utils/tokenHelper.js";
 import { generateOTP } from "../../utils/otpHelper.js";
 import { sendVerificationOTP, sendPasswordResetOTP } from "../../utils/emailService.js";
 
@@ -15,17 +15,16 @@ const GITHUB_USER_EMAILS_URL = "https://api.github.com/user/emails";
 const GITHUB_SCOPE = "read:user user:email";
 
 class AuthService {
+  // ── Registration ────────────────────────────────────────────────────────────
+
   static async register({ name, email, password }) {
-    // Check if user already exists
     const existingUser = await AuthRepository.findUserByEmailWithoutPassword(email);
     if (existingUser) {
       throw new ApiError(409, "User already exists with this email");
     }
 
-    // Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Create user
     const user = await AuthRepository.createUser({
       name,
       email,
@@ -33,211 +32,157 @@ class AuthService {
       isVerified: false
     });
 
-    // Generate OTP
     const plainOtp = generateOTP();
     const hashedOtp = await bcrypt.hash(plainOtp, 4);
 
-    // Store hashed OTP
-    await AuthRepository.createOtp({
-      email,
-      otp: hashedOtp,
-      purpose: "signup"
-    });
-
-    // Send verification email with plain OTP
+    await AuthRepository.createOtp({ email, otp: hashedOtp, purpose: "signup" });
     await sendVerificationOTP(email, plainOtp);
 
     return {
       message: "Registration successful. Please check your email for OTP verification.",
-      user: {
-        id: user._id,
-        name: user.name,
-        email: user.email,
-        isVerified: user.isVerified
-      }
+      user: { id: user._id, name: user.name, email: user.email, isVerified: user.isVerified }
     };
   }
 
+  // ── OTP Verification ────────────────────────────────────────────────────────
+
   static async verifyOtp({ email, otp }) {
-    // Find OTP record
     const otpRecord = await AuthRepository.findOtp(email, "signup");
     if (!otpRecord) {
       throw new ApiError(400, "OTP expired or not found");
     }
 
-    // Compare OTP
     const isValidOtp = await bcrypt.compare(otp, otpRecord.otp);
     if (!isValidOtp) {
       throw new ApiError(400, "Invalid OTP");
     }
 
-    // Mark user as verified
     await AuthRepository.updateUserVerification(email);
-
-    // Delete OTP record
     await AuthRepository.deleteOtp(email, "signup");
 
-    // Get user and generate token
     const user = await AuthRepository.findUserByEmailWithoutPassword(email);
-    const token = generateAccessToken({
-      userId: user._id,
-      email: user.email,
-      role: user.role
-    });
+    const { accessToken, refreshToken } = this.#generateTokenPair(user);
 
     return {
       message: "Email verified successfully",
-      token,
-      user: {
-        id: user._id,
-        name: user.name,
-        email: user.email,
-        role: user.role,
-        isVerified: true
-      }
+      accessToken,
+      refreshToken,
+      user: this.#sanitizeUser(user)
     };
   }
 
+  // ── Login ────────────────────────────────────────────────────────────────────
+
   static async login({ email, password }) {
-    // Find user with password
     const user = await AuthRepository.findUserByEmail(email);
     if (!user) {
       throw new ApiError(401, "Invalid credentials");
     }
 
-    // Compare password
+    // GitHub-only accounts have a random password the user doesn't know.
+    // Checking authProvider alone is correct — they always have a hashed password,
+    // so !user.password would always be false and the guard would never fire.
+    if (user.authProvider === "github") {
+      throw new ApiError(401, "This account was created with GitHub. Please use 'Continue with GitHub' to sign in.");
+    }
+
     const isValidPassword = await bcrypt.compare(password, user.password);
     if (!isValidPassword) {
       throw new ApiError(401, "Invalid credentials");
     }
 
-    // Check if verified
     if (!user.isVerified) {
       throw new ApiError(403, "Please verify your email first");
     }
 
-    // Generate token
-    const token = generateAccessToken({
-      userId: user._id,
-      email: user.email,
-      role: user.role
-    });
+    const { accessToken, refreshToken } = this.#generateTokenPair(user);
 
-    // Update last active
     user.activity.lastActive = new Date();
     await user.save();
 
     return {
       message: "Login successful",
-      token,
-      user: {
-        id: user._id,
-        name: user.name,
-        email: user.email,
-        role: user.role,
-        isVerified: user.isVerified,
-        profile: user.profile,
-        handles: user.handles
-      }
+      accessToken,
+      refreshToken,
+      user: this.#sanitizeUser(user)
     };
   }
 
+  // ── Forgot / Reset Password ──────────────────────────────────────────────────
+
   static async forgotPassword({ email }) {
-    // Find user
     const user = await AuthRepository.findUserByEmailWithoutPassword(email);
     if (!user) {
       throw new ApiError(404, "User not found");
     }
 
-    // Generate OTP
     const plainOtp = generateOTP();
     const hashedOtp = await bcrypt.hash(plainOtp, 4);
 
-    // Store hashed OTP
-    await AuthRepository.createOtp({
-      email,
-      otp: hashedOtp,
-      purpose: "forgot-password"
-    });
-
-    // Send password reset email
+    await AuthRepository.createOtp({ email, otp: hashedOtp, purpose: "forgot-password" });
     await sendPasswordResetOTP(email, plainOtp);
 
-    return {
-      message: "Password reset OTP sent to your email"
-    };
+    return { message: "Password reset OTP sent to your email" };
   }
 
   static async resetPassword({ email, otp, newPassword }) {
-    // Find OTP record
     const otpRecord = await AuthRepository.findOtp(email, "forgot-password");
     if (!otpRecord) {
       throw new ApiError(400, "Invalid or expired OTP");
     }
 
-    // Verify OTP
     const isValidOtp = await bcrypt.compare(otp, otpRecord.otp);
     if (!isValidOtp) {
       throw new ApiError(400, "Invalid or expired OTP");
     }
 
-    // Hash new password
     const hashedPassword = await bcrypt.hash(newPassword, 10);
-
-    // Update user password
     await AuthRepository.updateUserPassword(email, hashedPassword);
-
-    // Delete OTP record
     await AuthRepository.deleteOtp(email, "forgot-password");
 
-    return {
-      message: "Password reset successful"
-    };
+    return { message: "Password reset successful" };
   }
 
+  // ── Resend OTP ───────────────────────────────────────────────────────────────
+
   static async resendOtp({ email, purpose }) {
-    // Find user
     const user = await AuthRepository.findUserByEmailWithoutPassword(email);
     if (!user) {
       throw new ApiError(404, "User not found");
     }
 
-    // Check if already verified for signup
     if (purpose === "signup" && user.isVerified) {
       throw new ApiError(400, "Already verified");
     }
 
-    // Delete existing OTPs
     await AuthRepository.deleteOtp(email, purpose);
 
-    // Generate new OTP
     const plainOtp = generateOTP();
     const hashedOtp = await bcrypt.hash(plainOtp, 4);
 
-    // Store hashed OTP
-    await AuthRepository.createOtp({
-      email,
-      otp: hashedOtp,
-      purpose
-    });
+    await AuthRepository.createOtp({ email, otp: hashedOtp, purpose });
 
-    // Send appropriate email
     if (purpose === "signup") {
       await sendVerificationOTP(email, plainOtp);
     } else {
       await sendPasswordResetOTP(email, plainOtp);
     }
 
-    return {
-      message: "OTP resent successfully"
-    };
+    return { message: "OTP resent successfully" };
   }
 
+  // ── GitHub OAuth — Start ─────────────────────────────────────────────────────
+
+  /**
+   * Builds the GitHub authorization URL for login/signup flows.
+   * mode = "login" | "connect"
+   * userId is required for "connect" mode (embedded in state JWT).
+   */
   static getGithubAuthorizationUrl({ mode = "login", userId = null, redirectPath }) {
     this.#assertGithubOAuthConfig();
 
     const safeMode = mode === "connect" ? "connect" : "login";
-    const defaultRedirectPath = safeMode === "connect" ? "/account-center" : "/login";
+    const defaultRedirectPath = safeMode === "connect" ? "/account-center" : "/dashboard";
     const state = this.#buildGithubStateToken({
       mode: safeMode,
       userId,
@@ -255,6 +200,24 @@ class AuthService {
     return `${GITHUB_OAUTH_URL}?${query.toString()}`;
   }
 
+  /**
+   * Used by the /github/connect-init API endpoint.
+   * Requires an authenticated user (via cookie middleware) to build the connect URL.
+   * Returns just the URL string — the frontend navigates to it.
+   */
+  static getGithubConnectUrl({ userId, redirectPath }) {
+    if (!userId) {
+      throw new ApiError(401, "You must be logged in to connect a GitHub account.");
+    }
+    return this.getGithubAuthorizationUrl({
+      mode: "connect",
+      userId: String(userId),
+      redirectPath: redirectPath || "/account-center"
+    });
+  }
+
+  // ── GitHub OAuth — Callback ──────────────────────────────────────────────────
+
   static async handleGithubCallback({ code, state }) {
     this.#assertGithubOAuthConfig();
 
@@ -263,6 +226,7 @@ class AuthService {
     const githubProfile = await this.#fetchGithubUserProfile(githubToken);
     const githubEmail = await this.#resolveGithubEmail(githubToken, githubProfile?.email);
 
+    // ── Connect mode: link GitHub to an existing authenticated user ───────
     if (decodedState.mode === "connect") {
       const connectedUser = await this.#connectGithubForAuthenticatedUser({
         userId: decodedState.userId,
@@ -270,8 +234,10 @@ class AuthService {
         githubToken
       });
 
+      // No token needed — user is already logged in via cookie.
+      // Just redirect back with a success query param.
       return {
-        message: "GitHub account connected successfully",
+        mode: "connect",
         redirectUrl: this.#buildFrontendRedirectUrl(
           decodedState.redirectPath || "/account-center",
           {
@@ -282,44 +248,50 @@ class AuthService {
       };
     }
 
+    // ── Login/Signup mode: find or create user ─────────────────────────────
     const user = await this.#findOrCreateGithubUser({
       githubProfile,
       githubEmail,
       githubToken
     });
 
-    const token = generateAccessToken({
+    const { accessToken, refreshToken } = this.#generateTokenPair(user);
+
+    return {
+      mode: "login",
+      accessToken,
+      refreshToken,
+      user: this.#sanitizeUser(user),
+      // Redirect to the GitHubCallbackPage which will fetch the profile and navigate
+      redirectUrl: this.#buildFrontendRedirectUrl(
+        "/auth/github/callback",
+        {
+          authStatus: "success",
+          redirectTo: decodedState.redirectPath || "/dashboard"
+        }
+      )
+    };
+  }
+
+  // ── Private helpers ──────────────────────────────────────────────────────────
+
+  static #generateTokenPair(user) {
+    const payload = {
       userId: user._id,
       email: user.email,
       role: user.role
-    });
-
+    };
     return {
-      message: "GitHub authentication successful",
-      token,
-      user: this.#sanitizeUser(user),
-      redirectUrl: this.#buildFrontendRedirectUrl(
-        decodedState.redirectPath || "/login",
-        {
-          authProvider: "github",
-          authStatus: "success"
-        },
-        {
-          token
-        }
-      )
+      accessToken: generateAccessToken(payload),
+      refreshToken: generateRefreshToken(payload)
     };
   }
 
   static #assertGithubOAuthConfig() {
     const required = ["GITHUB_CLIENT_ID", "GITHUB_CLIENT_SECRET", "GITHUB_CALLBACK_URL", "CLIENT_URL"];
     const missing = required.filter((key) => !process.env[key]);
-
     if (missing.length > 0) {
-      throw new ApiError(
-        500,
-        `Missing GitHub OAuth environment variables: ${missing.join(", ")}`
-      );
+      throw new ApiError(500, `Missing GitHub OAuth environment variables: ${missing.join(", ")}`);
     }
   }
 
@@ -347,11 +319,7 @@ class AuthService {
           code,
           redirect_uri: process.env.GITHUB_CALLBACK_URL
         },
-        {
-          headers: {
-            Accept: "application/json"
-          }
-        }
+        { headers: { Accept: "application/json" } }
       );
 
       const accessToken = response?.data?.access_token;
@@ -374,7 +342,6 @@ class AuthService {
           "User-Agent": "CodeLens-App"
         }
       });
-
       return response.data;
     } catch {
       throw new ApiError(400, "Failed to fetch GitHub profile");
@@ -437,6 +404,7 @@ class AuthService {
     const githubProfileUrl = githubProfile.html_url;
     const githubAvatar = githubProfile.avatar_url;
 
+    // ── Case 1: GitHub ID already in DB (returning user) ──────────────────
     let user = await AuthRepository.findUserByGithubId(githubId);
     if (user) {
       user.activity.lastActive = new Date();
@@ -444,6 +412,7 @@ class AuthService {
       return user;
     }
 
+    // ── Case 2: Email exists (local account) — merge GitHub into it ────────
     if (githubEmail) {
       const existingByEmail = await AuthRepository.findUserByEmailWithoutPassword(githubEmail);
       if (existingByEmail) {
@@ -454,19 +423,25 @@ class AuthService {
           avatarUrl:   githubAvatar,
           accessToken: githubToken,
         });
+        // Mark as verified if not already (GitHub emails are verified)
+        if (!existingByEmail.isVerified) {
+          await AuthRepository.updateUserVerification(githubEmail);
+        }
         linked.activity.lastActive = new Date();
         await linked.save();
         return linked;
       }
     }
 
+    // ── Case 3: No email from GitHub ───────────────────────────────────────
     if (!githubEmail) {
       throw new ApiError(
         422,
-        "GitHub account does not expose an email. Please make your email available or connect from an existing account."
+        "GitHub account does not expose an email. Please make your primary email public on GitHub and try again."
       );
     }
 
+    // ── Case 4: Brand new user via GitHub ──────────────────────────────────
     const generatedPassword = crypto.randomBytes(32).toString("hex");
     const hashedPassword = await bcrypt.hash(generatedPassword, 10);
 
@@ -502,31 +477,28 @@ class AuthService {
       authProvider: user.authProvider,
       profile: user.profile,
       handles: user.handles,
-      oauth: user.oauth
+      oauth: {
+        github: user.oauth?.github
+          ? {
+              id:         user.oauth.github.id,
+              username:   user.oauth.github.username,
+              profileUrl: user.oauth.github.profileUrl,
+              // Never expose accessToken to the client
+            }
+          : undefined
+      }
     };
   }
 
-  static #buildFrontendRedirectUrl(path, query = {}, fragment = {}) {
+  static #buildFrontendRedirectUrl(path, query = {}) {
     const baseUrl = process.env.CLIENT_URL || "http://localhost:5173";
-    const redirect = new URL(path || "/login", baseUrl);
+    const redirect = new URL(path || "/", baseUrl);
 
     Object.entries(query).forEach(([key, value]) => {
       if (value !== undefined && value !== null && value !== "") {
         redirect.searchParams.set(key, String(value));
       }
     });
-
-    const fragmentParams = new URLSearchParams();
-    Object.entries(fragment).forEach(([key, value]) => {
-      if (value !== undefined && value !== null && value !== "") {
-        fragmentParams.set(key, String(value));
-      }
-    });
-
-    const fragmentString = fragmentParams.toString();
-    if (fragmentString) {
-      redirect.hash = fragmentString;
-    }
 
     return redirect.toString();
   }

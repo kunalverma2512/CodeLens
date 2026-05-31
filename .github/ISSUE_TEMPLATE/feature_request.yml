@@ -1,0 +1,71 @@
+name: Feature Request
+description: Propose a new feature or enhancement with enough detail for planning and implementation.
+title: "[Feature]: "
+labels: ["type:feature"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for sharing your idea.
+        Please describe the problem and the proposed solution as clearly as possible.
+
+  - type: checkboxes
+    id: prerequisites
+    attributes:
+      label: Before submitting
+      description: Please confirm the following before opening the issue.
+      options:
+        - label: I have searched existing issues and discussions to make sure this idea is not already covered.
+          required: true
+        - label: I have read the contribution guidelines.
+          required: true
+
+  - type: textarea
+    id: problem-statement
+    attributes:
+      label: Problem statement
+      description: What problem, gap, or limitation are you trying to solve?
+      placeholder: Describe the current pain point or missing capability
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposed-solution
+    attributes:
+      label: Proposed solution
+      description: Describe the feature or change you would like to see.
+      placeholder: Explain what should be added or changed
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives-considered
+    attributes:
+      label: Alternative solutions considered
+      description: Tell us about other approaches you considered and why they are less suitable.
+      placeholder: List alternatives, tradeoffs, or why other options are less suitable
+    validations:
+      required: true
+
+  - type: textarea
+    id: use-case-motivation
+    attributes:
+      label: Use case or motivation
+      description: Why is this feature valuable, and who benefits from it?
+      placeholder: Describe the workflow, scenario, or user need this would improve
+    validations:
+      required: true
+
+  - type: textarea
+    id: references-or-mockups
+    attributes:
+      label: References or mockups
+      description: Share links, screenshots, diagrams, examples, or mockups if available.
+      placeholder: Paste references, mockups, or related examples here
+
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: Additional context
+      description: Include technical notes, dependencies, risks, or anything else relevant.
+      placeholder: Add any extra context here

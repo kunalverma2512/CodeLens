@@ -5,56 +5,65 @@ import { useAuth } from "../context/AuthContext";
 /**
  * GitHubCallbackPage
  *
- * The backend redirects here after OAuth completes:
- *   /login?authStatus=success#token=JWT...
- *   /login?githubAuthError=...
+ * The backend redirects here after GitHub OAuth completes:
+ *   Success: /auth/github/callback?authStatus=success&redirectTo=/dashboard
+ *   Error:   /login?githubAuthError=...
  *
- * This component is mounted on /auth/github/callback (frontend).
- * It extracts the token from the URL hash fragment, saves it, and
- * redirects to the dashboard. On error, it redirects to login with the error.
+ * For SUCCESS flow:
+ *   - The server has already set HttpOnly auth cookies BEFORE the redirect.
+ *   - We call refreshUser() to hydrate the AuthContext from the server (GET /auth/me).
+ *   - Then navigate to the intended destination (redirectTo param).
+ *
+ * For CONNECT flow (linking GitHub to existing account):
+ *   - The server redirects to /account-center?githubStatus=connected
+ *   - That page handles the success UI (this component is NOT used for connect)
+ *
+ * For ERROR flow:
+ *   - The server redirects to /login?githubAuthError=... (not here)
+ *
+ * This component handles ONLY the login/signup success path.
  */
 export default function GitHubCallbackPage() {
-  const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
-  const { login } = useAuth();
-  const [status, setStatus] = useState("processing"); // processing | error
-  const [errorMsg, setErrorMsg] = useState("");
+  const navigate                     = useNavigate();
+  const [searchParams]               = useSearchParams();
+  const { refreshUser }              = useAuth();
+  const [status, setStatus]          = useState("processing");
+  const [errorMsg, setErrorMsg]      = useState("");
 
   useEffect(() => {
-    const error = searchParams.get("githubAuthError");
-    if (error) {
-      setStatus("error");
-      setErrorMsg(decodeURIComponent(error));
-      setTimeout(() => navigate(`/login?error=${encodeURIComponent(error)}`), 2000);
-      return;
-    }
+    const handleCallback = async () => {
+      const authStatus = searchParams.get("authStatus");
+      const redirectTo = searchParams.get("redirectTo") || "/dashboard";
 
-    // Token is passed in the hash fragment: #token=JWT&...
-    const hash = window.location.hash.slice(1); // strip leading #
-    const params = new URLSearchParams(hash);
-    const token = params.get("token");
+      // Only handle success — errors are redirected to /login by the server
+      if (authStatus !== "success") {
+        setStatus("error");
+        setErrorMsg("Unexpected callback state. Redirecting to login...");
+        setTimeout(() => navigate("/login", { replace: true }), 2000);
+        return;
+      }
 
-    if (!token) {
-      setStatus("error");
-      setErrorMsg("No token received. Please try again.");
-      setTimeout(() => navigate("/login"), 2500);
-      return;
-    }
+      try {
+        // The HttpOnly cookie has already been set by the server.
+        // Fetch the full user profile to hydrate the AuthContext.
+        const userData = await refreshUser();
 
-    // Persist token and bootstrap user
-    localStorage.setItem("token", token);
+        if (!userData) {
+          throw new Error("Failed to load user profile after GitHub authentication.");
+        }
 
-    // Decode name from JWT payload (base64 decode middle segment)
-    try {
-      const payload = JSON.parse(atob(token.split(".")[1]));
-      // login() with minimal stub — AuthContext will re-fetch full profile on next load
-      login(token, { id: payload.userId, email: payload.email, role: payload.role });
-    } catch {
-      login(token, {});
-    }
+        // Navigate to intended destination
+        navigate(redirectTo, { replace: true });
+      } catch (err) {
+        setStatus("error");
+        setErrorMsg(err?.message || "GitHub authentication could not be completed. Please try again.");
+        setTimeout(() => navigate("/login", { replace: true }), 3000);
+      }
+    };
 
-    navigate("/dashboard", { replace: true });
-  }, []);
+    handleCallback();
+    // searchParams is stable but included in deps to satisfy the exhaustive-deps lint rule
+  }, [searchParams, refreshUser, navigate]); // Run once on mount, using stable hooks
 
   return (
     <div className="min-h-screen bg-white flex items-center justify-center px-6">

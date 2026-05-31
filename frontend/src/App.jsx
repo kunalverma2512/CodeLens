@@ -10,6 +10,7 @@ import CodeforcesPage from "./pages/CodeforcesPage";
 import PracticePage from "./pages/PracticePage";
 
 import ApexAIPage from "./pages/ApexAIPage";
+import ApexWorkspacePage from "./pages/ApexWorkspacePage";
 import AlgoVersePage from "./pages/AlgoVersePage";
 import ContestCodeforcesPage from "./pages/ContestCodeforcesPage";
 import ContestCodeChefPage from "./pages/ContestCodeChefPage";
@@ -17,6 +18,7 @@ import ContestLeetCodePage from "./pages/ContestLeetCodePage";
 import ContestAtCoderPage from "./pages/ContestAtCoderPage";
 import TermsPage from "./pages/TermsPage";
 import PrivacyPage from "./pages/PrivacyPage";
+import FAQPage from "./pages/FAQPage";
 import NotFoundPage from "./pages/NotFoundPage";
 import ForgotPassword from "./components/auth/ForgotPassword";
 import AccountCenterPage from "./pages/AccountCenterPage";
@@ -25,6 +27,7 @@ import GitHubCallbackPage from "./pages/GitHubCallbackPage";
 import ProtectedRoute from "./components/shared/ProtectedRoute";
 import PublicRoute from "./components/shared/PublicRoute";
 import FAQSection from "./components/explore/FAQSection";
+import BugReportsPage from "./pages/BugReportsPage";
 export default function App() {
   return (
     <AuthProvider>
@@ -86,6 +89,14 @@ export default function App() {
             <Route path="/practice" element={<PracticePage />} />
 
             <Route path="/apex-ai" element={<ApexAIPage />} />
+            <Route 
+              path="/apex-ai/workspace" 
+              element={
+                <ProtectedRoute>
+                  <ApexWorkspacePage />
+                </ProtectedRoute>
+              } 
+            />
             <Route path="/algoverse" element={<AlgoVersePage />} />
             <Route path="/contests/codeforces" element={<ContestCodeforcesPage />} />
             <Route path="/contests/codechef" element={<ContestCodeChefPage />} />
@@ -101,6 +112,7 @@ export default function App() {
             />
             <Route path="/terms" element={<TermsPage/>} />
             <Route path="/privacy" element={<PrivacyPage/>} />
+            <Route path="/bug-reports" element={<BugReportsPage />} />
             <Route path="*" element={<NotFoundPage />} />
           </Routes>
         </MainLayout>

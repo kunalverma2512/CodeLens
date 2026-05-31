@@ -12,6 +12,15 @@ class GitHubController {
     }
   }
 
+  static async syncDashboard(req, res, next) {
+    try {
+      const data = await GitHubService.syncDashboard(req.user._id);
+      res.status(200).json(ApiResponse.success("GitHub dashboard synced successfully", data));
+    } catch (err) {
+      next(err instanceof ApiError ? err : new ApiError(500, err.message));
+    }
+  }
+
   static async getProfile(req, res, next) {
     try {
       const data = await GitHubService.getProfile(req.user._id);

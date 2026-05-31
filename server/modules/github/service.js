@@ -1,5 +1,6 @@
 import axios from "axios";
 import User from "../../models/User.js";
+import GithubData from "../../models/GithubData.js";
 import ApiError from "../../utils/ApiError.js";
 
 const GH_API = "https://api.github.com";
@@ -149,10 +150,9 @@ class GitHubService {
     };
   }
 
-  /** ── Full dashboard ─────────────────────────────────────────────────── */
-  static async getDashboard(userId) {
-    const { token, username } = await this.#getToken(userId);
-    console.log(`[GitHub] ▶ Dashboard for @${username}`);
+  /** ── Fetch and aggregate dashboard from GitHub API ──────────────────── */
+  static async #fetchDashboardData(userId, token, username) {
+    console.log(`[GitHub] ▶ Fetching fresh Dashboard data for @${username}`);
 
     // Parallel fetch everything
     const [
@@ -232,6 +232,52 @@ class GitHubService {
       prs:            prs || { total_count: 0, items: [] },
       issues:         issues || { total_count: 0, items: [] },
       metrics,
+    };
+  }
+
+  /** ── Full dashboard (cached) ────────────────────────────────────────── */
+  static async getDashboard(userId) {
+    // Check if we have cached data for this user
+    let githubData = await GithubData.findOne({ userId });
+    
+    if (githubData && githubData.data) {
+      console.log(`[GitHub] ✓ Dashboard returned from cache for user ${userId}`);
+      return {
+        ...githubData.data,
+        lastSyncedAt: githubData.lastSyncedAt
+      };
+    }
+
+    // If no cache, fetch fresh data and store it
+    const { token, username } = await this.#getToken(userId);
+    const data = await this.#fetchDashboardData(userId, token, username);
+    
+    await GithubData.findOneAndUpdate(
+      { userId },
+      { userId, data, lastSyncedAt: new Date() },
+      { upsert: true, new: true }
+    );
+
+    return {
+      ...data,
+      lastSyncedAt: new Date()
+    };
+  }
+
+  /** ── Manual Sync Dashboard ─────────────────────────────────────────── */
+  static async syncDashboard(userId) {
+    const { token, username } = await this.#getToken(userId);
+    const data = await this.#fetchDashboardData(userId, token, username);
+    
+    const githubData = await GithubData.findOneAndUpdate(
+      { userId },
+      { userId, data, lastSyncedAt: new Date() },
+      { upsert: true, new: true }
+    );
+
+    return {
+      ...data,
+      lastSyncedAt: githubData.lastSyncedAt
     };
   }
 
