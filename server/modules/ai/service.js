@@ -3,6 +3,8 @@ import CodeforcesProfile from "../../models/CodeforcesProfile.js";
 import CodeforcesRatingHistory from "../../models/CodeforcesRatingHistory.js";
 import User from "../../models/User.js";
 import ApiError from "../../utils/ApiError.js";
+import ApexConversation from "../../models/ApexConversation.js";
+import { compileUserContext } from "../../utils/apexContextCompiler.js";
 
 // ── Gemini client (new SDK) ───────────────────────────────────────────────────
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
@@ -86,7 +88,51 @@ Write the insight now:
 `.trim();
 };
 
+// ── APEX System Prompt Builder ────────────────────────────────────────────────
+
+/**
+ * Builds the system prompt for an APEX conversation.
+ * This is set ONCE per conversation and gives Gemini its full persona
+ * and the pre-compiled user intelligence context.
+ *
+ * @param {string} contextPromptBlock - Pre-formatted user context string from apexContextCompiler
+ */
+const buildApexSystemPrompt = (contextPromptBlock) => `
+You are APEX — an advanced AI career intelligence embedded inside CodeLens, a developer analytics platform.
+
+Your role is to serve as a brutally honest, deeply technical, and highly personalized advisor.
+You have access to REAL performance data for this specific user. Always reference their actual data.
+
+WHAT YOU DO:
+1. SKILL TRUTH ANALYSIS: Tell the user exactly where they stand based on their actual data.
+   - Use the skill decay scores to identify what they THINK they know vs. what they actually practice.
+   - A topic with many solves but a long gap since last practice = rusty, be honest about this.
+
+2. PROJECT GUIDANCE: When asked "how do I build X", respond with a structured milestone plan.
+   Format: MILESTONE 1 (Day X-Y): [specific task] — never give vague walls of text.
+   Tailor the project complexity to the user's actual skill level from their data.
+
+3. CP STRATEGY: Give specific, data-driven contest preparation advice.
+   Reference their rating trajectory, rustiest tags, and consistency pattern.
+
+4. CAREER GUIDANCE: Help them understand how their current trajectory maps to real-world opportunities.
+
+RULES:
+- Never make up statistics. If data is unavailable for something, say "I don't have data on that yet."
+- No generic advice. Every meaningful statement must either reference their data or be explicitly general.
+- Tone: Direct, confident, like a senior engineer who respects the user enough to be honest.
+- For milestone/project answers: Always use the format "MILESTONE N (Day X-Y): [task]"
+- Keep responses focused and structured. Avoid walls of text.
+- Do NOT use excessive bullet points for conversational responses. Use prose.
+- You remember everything said in this conversation — refer back to earlier context naturally.
+
+${contextPromptBlock}
+
+You are now ready to assist. Wait for the user's first message.
+`.trim();
+
 // ── Service ───────────────────────────────────────────────────────────────────
+
 
 class AiService {
   /**
@@ -217,6 +263,240 @@ class AiService {
     console.log(`[AI] ✓ Summary generated and cached for ${user.name}.`);
     return text;
   }
+
+  // ══════════════════════════════════════════════════════════════════════════
+  // APEX CHAT METHODS (multi-turn conversational AI)
+  // ══════════════════════════════════════════════════════════════════════════
+
+  /**
+   * Creates a brand-new APEX conversation for a user.
+   * Compiles fresh user context once and stores it in the conversation document
+   * so it is reused for every subsequent message in this session.
+   *
+   * Returns the created conversation document (without messages for brevity).
+   */
+  static async createConversation(userId) {
+    // 1. Compile fresh context — reads CF, GitHub, goals from DB
+    const { raw, promptBlock } = await compileUserContext(userId);
+
+    // 2. Create the conversation document
+    const conversation = await ApexConversation.create({
+      user: userId,
+      title: "New Conversation",
+      messages: [],
+      contextSnapshot: raw,
+      contextPromptBlock: promptBlock,
+    });
+
+    console.log(`[APEX] ✓ Conversation created: ${conversation._id} for user ${userId}`);
+
+    // 3. Return lean doc (sidebar-safe: no messages array bloat)
+    return {
+      _id: conversation._id,
+      title: conversation.title,
+      pinned: conversation.pinned,
+      createdAt: conversation.createdAt,
+      updatedAt: conversation.updatedAt,
+    };
+  }
+
+  /**
+   * Returns all non-deleted conversations for a user, sorted newest-first.
+   * Lean projection: only fields needed for the sidebar.
+   */
+  static async listConversations(userId) {
+    const conversations = await ApexConversation.find(
+      { user: userId, isDeleted: false },
+      {
+        title: 1,
+        pinned: 1,
+        createdAt: 1,
+        updatedAt: 1,
+        // Last message preview — computed below after fetch
+        messages: { $slice: -1 }, // Only pull the very last message for preview
+      }
+    )
+      .sort({ pinned: -1, updatedAt: -1 }) // Pinned first, then newest
+      .lean();
+
+    // Attach a short preview of the last message
+    return conversations.map((conv) => ({
+      _id: conv._id,
+      title: conv.title,
+      pinned: conv.pinned,
+      createdAt: conv.createdAt,
+      updatedAt: conv.updatedAt,
+      lastMessagePreview: conv.messages?.[0]?.content?.slice(0, 80) ?? null,
+      lastMessageRole: conv.messages?.[0]?.role ?? null,
+    }));
+  }
+
+  /**
+   * Loads a specific conversation's full message history.
+   * Auth-gated: throws 403 if the requesting user doesn't own this conversation.
+   */
+  static async loadConversation(conversationId, userId) {
+    const conversation = await ApexConversation.findOne({
+      _id: conversationId,
+      isDeleted: false,
+    }).lean();
+
+    if (!conversation) {
+      throw new ApiError(404, "Conversation not found.");
+    }
+
+    // Ownership check — critical security guard
+    if (conversation.user.toString() !== userId.toString()) {
+      throw new ApiError(403, "You do not have access to this conversation.");
+    }
+
+    return {
+      _id: conversation._id,
+      title: conversation.title,
+      pinned: conversation.pinned,
+      messages: conversation.messages,
+      createdAt: conversation.createdAt,
+      updatedAt: conversation.updatedAt,
+    };
+  }
+
+  /**
+   * Soft-deletes a conversation.
+   * Auth-gated: throws 403 if the requesting user doesn't own this conversation.
+   */
+  static async deleteConversation(conversationId, userId) {
+    const conversation = await ApexConversation.findOne({
+      _id: conversationId,
+      isDeleted: false,
+    });
+
+    if (!conversation) {
+      throw new ApiError(404, "Conversation not found.");
+    }
+
+    if (conversation.user.toString() !== userId.toString()) {
+      throw new ApiError(403, "You do not have access to this conversation.");
+    }
+
+    conversation.isDeleted = true;
+    await conversation.save();
+
+    console.log(`[APEX] ✓ Conversation soft-deleted: ${conversationId}`);
+    return { deleted: true };
+  }
+
+  /**
+   * The core APEX chat method.
+   *
+   * Flow:
+   *   1. Load conversation + verify ownership
+   *   2. Append user message to history
+   *   3. Auto-generate title from first message (if still "New Conversation")
+   *   4. Build the full Gemini multi-turn payload:
+   *        - System prompt (APEX persona + user context snapshot)
+   *        - History (all previous turns in Gemini format)
+   *        - New user message
+   *   5. Call Gemini with streaming
+   *   6. Stream chunks to client via SSE
+   *   7. After stream completes, save the full assistant reply to the DB
+   *
+   * @param {string} conversationId
+   * @param {string} userId
+   * @param {string} userMessage
+   * @param {import('express').Response} res - Express response object for SSE
+   */
+  static async sendMessage(conversationId, userId, userMessage, res) {
+    // ── 1. Load and verify conversation ──────────────────────────────────────
+    const conversation = await ApexConversation.findOne({
+      _id: conversationId,
+      isDeleted: false,
+    });
+
+    if (!conversation) throw new ApiError(404, "Conversation not found.");
+    if (conversation.user.toString() !== userId.toString()) {
+      throw new ApiError(403, "You do not have access to this conversation.");
+    }
+
+    // ── 2. Append user message to DB immediately ──────────────────────────────
+    const userMsg = { role: "user", content: userMessage.trim() };
+    conversation.messages.push(userMsg);
+
+    // ── 3. Auto-generate title from first message ─────────────────────────────
+    if (conversation.title === "New Conversation") {
+      conversation.generateTitle(userMessage);
+    }
+
+    await conversation.save();
+
+    // ── 4. Build Gemini payload ───────────────────────────────────────────────
+
+    // System prompt: APEX persona + the pre-compiled user context block
+    const systemPrompt = buildApexSystemPrompt(conversation.contextPromptBlock);
+
+    // Convert stored messages (excluding the just-added one) to Gemini history format
+    // We pass all messages EXCEPT the last one (the current user message) as history
+    const historyMessages = conversation.messages.slice(0, -1);
+    const geminiHistory = historyMessages.map((msg) => ({
+      role: msg.role === "assistant" ? "model" : "user",
+      parts: [{ text: msg.content }],
+    }));
+
+    // ── 5. Set SSE headers ────────────────────────────────────────────────────
+    res.setHeader("Content-Type", "text/event-stream");
+    res.setHeader("Cache-Control", "no-cache");
+    res.setHeader("Connection", "keep-alive");
+    res.setHeader("X-Accel-Buffering", "no");
+    res.flushHeaders();
+
+    // ── 6. Stream from Gemini ─────────────────────────────────────────────────
+    let fullAssistantReply = "";
+
+    try {
+      console.log(`[APEX] ▶ sendMessage: conv=${conversationId} | history=${geminiHistory.length} turns | msg="${userMessage.slice(0, 60)}..."`);
+
+      const result = await ai.models.generateContentStream({
+        model: "gemini-2.5-flash",
+        config: {
+          systemInstruction: systemPrompt,
+        },
+        contents: [
+          ...geminiHistory,
+          { role: "user", parts: [{ text: userMessage }] },
+        ],
+      });
+
+      // Stream each chunk to the client as an SSE event
+      for await (const chunk of result) {
+        const text = chunk.text;
+        if (text) {
+          fullAssistantReply += text;
+          res.write(`data: ${JSON.stringify({ content: text })}\n\n`);
+        }
+      }
+
+      console.log(`[APEX] ✓ Stream complete (${fullAssistantReply.length} chars)`);
+
+      // ── 7. Save completed assistant reply to DB ───────────────────────────
+      if (fullAssistantReply.trim()) {
+        conversation.messages.push({
+          role: "assistant",
+          content: fullAssistantReply.trim(),
+        });
+        await conversation.save();
+        console.log(`[APEX] ✓ Assistant reply saved to conversation ${conversationId}`);
+      }
+
+      // Send done signal so the client knows the stream is complete
+      res.write(`data: ${JSON.stringify({ done: true, title: conversation.title })}\n\n`);
+
+    } catch (err) {
+      console.error(`[APEX] ✗ Gemini streaming error:`, err.message);
+      res.write(`data: ${JSON.stringify({ error: "APEX is temporarily unavailable. Please try again." })}\n\n`);
+    } finally {
+      res.end();
+    }
+  }
 }
 
 export default AiService;
+

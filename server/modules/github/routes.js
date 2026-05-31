@@ -1,5 +1,6 @@
 import { Router } from "express";
 import authMiddleware from "../../middlewares/authMiddleware.js";
+import { githubSyncLimiter } from "../../middlewares/rateLimiter.js";
 import GitHubController from "./controller.js";
 
 const router = Router();
@@ -9,9 +10,15 @@ router.use(authMiddleware);
 
 /**
  * GET /api/github/dashboard
- * Returns all GitHub data in one shot — profile, repos, languages, contributions, events.
+ * Returns all GitHub data in one shot (cached).
  */
 router.get("/dashboard", GitHubController.getDashboard);
+
+/**
+ * POST /api/github/sync
+ * Manually force a sync with GitHub API, updates the cache. Rate limited to 1 request per 15 mins.
+ */
+router.post("/sync", githubSyncLimiter, GitHubController.syncDashboard);
 
 /** GET /api/github/profile */
 router.get("/profile", GitHubController.getProfile);

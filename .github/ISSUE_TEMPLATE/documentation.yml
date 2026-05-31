@@ -1,0 +1,64 @@
+name: Documentation Improvement
+description: Suggest a clarification, correction, or enhancement to the project documentation.
+title: "[Docs]: "
+labels: ["type:docs"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for helping improve the documentation.
+        Please point us to the exact docs area and explain how it can be made clearer or more accurate.
+
+  - type: checkboxes
+    id: prerequisites
+    attributes:
+      label: Before submitting
+      description: Please confirm the following before opening the issue.
+      options:
+        - label: I have searched existing issues to make sure this is not a duplicate.
+          required: true
+        - label: I have read the contribution guidelines.
+          required: true
+
+  - type: input
+    id: documentation-summary
+    attributes:
+      label: Documentation issue summary
+      description: A short summary of the documentation problem or opportunity.
+      placeholder: "Example: README setup steps are missing the backend environment variables"
+    validations:
+      required: true
+
+  - type: input
+    id: affected-section-file
+    attributes:
+      label: Affected section or file
+      description: Which page, section, or file needs improvement?
+      placeholder: Example: README.md - Installation section
+    validations:
+      required: true
+
+  - type: textarea
+    id: suggested-improvement
+    attributes:
+      label: Suggested improvement
+      description: What should be changed, added, or clarified?
+      placeholder: Describe the exact change you are proposing
+    validations:
+      required: true
+
+  - type: textarea
+    id: reason-for-improvement
+    attributes:
+      label: Reason for improvement
+      description: Why is this change needed? What confusion, inaccuracy, or usability problem does it solve?
+      placeholder: Explain how this improves clarity, accuracy, or maintainability
+    validations:
+      required: true
+
+  - type: textarea
+    id: screenshots-references
+    attributes:
+      label: Screenshots or references
+      description: Add screenshots, examples from other docs, or any supporting references if applicable.
+      placeholder: Paste links or attach screenshots here

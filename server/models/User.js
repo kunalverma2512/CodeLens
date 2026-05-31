@@ -62,7 +62,10 @@ const userSchema = new mongoose.Schema({
   // Security
   security: {
     resetPasswordToken: String,
-    resetPasswordExpiry: Date
+    resetPasswordExpiry: Date,
+    // Hashed refresh token — enables server-side logout/revocation.
+    // We store the hash (not the raw token) so a DB breach doesn't expose live tokens.
+    refreshTokenHash: { type: String, select: false }
   },
 
   // Metadata

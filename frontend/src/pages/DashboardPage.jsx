@@ -23,8 +23,8 @@ export default function DashboardPage() {
     connectError,
   } = useCodeforces(true);
 
-  const handleLogout = () => {
-    logout();
+  const handleLogout = async () => {
+    await logout(); // clears HttpOnly cookies server-side
     navigate("/");
   };
 

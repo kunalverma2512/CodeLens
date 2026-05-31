@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { getGitHubDashboard } from "../services/githubService";
+import { getGitHubDashboard, syncGitHubDashboard } from "../services/githubService";
 import {
   StatCard, ScoreMeter, LangBytesChart, ActivityChart,
   ContribHeatmap, TopReposTable, ActivityFeed,
@@ -42,10 +42,40 @@ function NotConnected() {
 }
 
 // ── Profile Hero ──────────────────────────────────────────────────────────────
-function ProfileHero({ profile, orgs, totalStars, totalForks, ownedRepos, forkedRepos }) {
+function ProfileHero({ profile, orgs, totalStars, totalForks, ownedRepos, forkedRepos, lastSyncedAt, onSync, syncing }) {
   return (
-    <div className="border-[4px] border-black bg-black text-white shadow-[12px_12px_0_0_rgba(0,0,0,0.25)]">
-      <div className="p-6 sm:p-10 flex flex-col sm:flex-row gap-6 sm:items-start">
+    <div className="border-[4px] border-black bg-black text-white shadow-[12px_12px_0_0_rgba(0,0,0,0.25)] relative">
+      {/* Sync Button */}
+      <div className="absolute top-4 right-4 sm:top-6 sm:right-6 flex flex-col items-end gap-2">
+        <button
+          onClick={onSync}
+          disabled={syncing}
+          className="px-4 py-2 bg-white text-black text-xs font-black uppercase tracking-widest border-[2px] border-white hover:bg-black hover:text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+        >
+          {syncing ? (
+            <>
+              <div className="w-3 h-3 border-[2px] border-current border-t-transparent rounded-full animate-spin" />
+              Syncing...
+            </>
+          ) : (
+            <>
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="23 4 23 10 17 10"></polyline>
+                <polyline points="1 20 1 14 7 14"></polyline>
+                <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+              </svg>
+              Sync Data
+            </>
+          )}
+        </button>
+        {lastSyncedAt && (
+          <p className="text-[9px] font-bold uppercase tracking-widest text-gray-400">
+            Last synced: {new Date(lastSyncedAt).toLocaleString()}
+          </p>
+        )}
+      </div>
+
+      <div className="p-6 sm:p-10 pt-20 sm:pt-10 flex flex-col sm:flex-row gap-6 sm:items-start">
         {/* Avatar */}
         {profile?.avatar_url && (
           <img src={profile.avatar_url} alt={profile.login}
@@ -147,18 +177,45 @@ function ScoresSection({ metrics }) {
 
 // ── Main ──────────────────────────────────────────────────────────────────────
 export default function GitHubIntelligencePage() {
-  const [data, setData]     = useState(null);
+  const [data, setData]       = useState(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError]   = useState(null);
+  const [error, setError]     = useState(null);
+  const [syncing, setSyncing] = useState(false);
+  const [syncMsg, setSyncMsg] = useState(null);
 
-  useEffect(() => {
+  const fetchDashboard = () => {
+    setLoading(true);
     getGitHubDashboard()
       .then(res => setData(res.data.data))
       .catch(err => setError(err.response?.data?.message || err.message))
       .finally(() => setLoading(false));
+  };
+
+  useEffect(() => {
+    fetchDashboard();
   }, []);
 
-  if (loading) return <Skeleton />;
+  const handleSync = async () => {
+    setSyncing(true);
+    setSyncMsg(null);
+    try {
+      const res = await syncGitHubDashboard();
+      setData(res.data.data);
+      setSyncMsg({ type: "success", text: "Dashboard synced successfully." });
+    } catch (err) {
+      if (err.response?.status === 429) {
+        setSyncMsg({ type: "error", text: err.response?.data?.message || "Rate limit exceeded. Please wait 15 minutes before syncing again." });
+      } else {
+        setSyncMsg({ type: "error", text: "Failed to sync dashboard." });
+      }
+    } finally {
+      setSyncing(false);
+      // Auto-hide the message after 5 seconds
+      setTimeout(() => setSyncMsg(null), 5000);
+    }
+  };
+
+  if (loading && !data) return <Skeleton />;
   if (error?.toLowerCase().includes("not connected")) return <NotConnected />;
   if (error) return (
     <div className="w-full flex-1 flex items-center justify-center p-10">
@@ -182,13 +239,27 @@ export default function GitHubIntelligencePage() {
   } = data;
 
   return (
-    <div className="w-full flex-1 bg-white px-4 sm:px-6 md:px-8 py-12 sm:py-16">
+    <div className="w-full flex-1 bg-white px-4 sm:px-6 md:px-8 py-12 sm:py-16 relative">
+      {/* Sync Notification Banner */}
+      {syncMsg && (
+        <div className="fixed top-20 left-1/2 -translate-x-1/2 z-50 w-full max-w-md px-4 pointer-events-none">
+          <div className={`p-4 border-[4px] border-black shadow-[8px_8px_0_0_rgba(0,0,0,1)] ${syncMsg.type === 'error' ? 'bg-[#ffeb3b]' : 'bg-[#4caf50] text-white'}`}>
+            <p className="text-sm font-black uppercase tracking-widest text-center">
+              {syncMsg.text}
+            </p>
+          </div>
+        </div>
+      )}
+
       <div className="max-w-7xl mx-auto space-y-8">
 
         {/* Hero */}
         <ProfileHero profile={profile} orgs={orgs}
           totalStars={totalStars} totalForks={totalForks}
-          ownedRepos={ownedRepos} forkedRepos={forkedRepos} />
+          ownedRepos={ownedRepos} forkedRepos={forkedRepos} 
+          lastSyncedAt={data.lastSyncedAt}
+          onSync={handleSync}
+          syncing={syncing} />
 
         {/* Scores */}
         {metrics && <ScoresSection metrics={metrics} />}
