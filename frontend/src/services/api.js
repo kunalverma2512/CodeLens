@@ -7,6 +7,17 @@ const api = axios.create({
 });
 
 const AUTH_FAILURE_STATUSES = new Set([401, 403]);
+const AUTH_ONLY_PATHS = new Set(["/api/auth/me", "/api/user/profile"]);
+
+const getRequestPathname = (requestUrl) => {
+  try {
+    const origin = typeof window !== "undefined" ? window.location.origin : "http://localhost";
+    const { pathname } = new URL(requestUrl, origin);
+    return pathname.replace(/\/+$/, "") || "/";
+  } catch {
+    return "";
+  }
+};
 
 // No token injection needed — cookies are sent automatically by the browser.
 api.interceptors.request.use((config) => config);
@@ -14,8 +25,6 @@ api.interceptors.request.use((config) => config);
 // Redirect only when the application's own session endpoints confirm auth loss.
 // Other 401/403 responses, such as GitHub proxy failures, should be handled by
 // the feature page that made the request.
-const AUTH_ONLY_PATHS = ["/api/auth/me", "/api/user/profile"];
-
 api.interceptors.response.use(
   (response) => response,
   (error) => {
@@ -23,7 +32,7 @@ api.interceptors.response.use(
     const requestUrl = error.config?.url || "";
 
     if (AUTH_FAILURE_STATUSES.has(status)) {
-      const isAuthPath = AUTH_ONLY_PATHS.some((path) => requestUrl.includes(path));
+      const isAuthPath = AUTH_ONLY_PATHS.has(getRequestPathname(requestUrl));
 
       if (isAuthPath) {
         window.location.replace("/login");
