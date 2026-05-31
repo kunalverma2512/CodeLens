@@ -69,13 +69,13 @@ export default function DashboardPage() {
 
         {/* Metrics Grid - Skeleton OR Actual Content */}
         {isSkeletonLoading ? (
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-10 mb-12 sm:mb-16">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-10 mb-12 sm:mb-16">
             <SkeletonCard />
             <SkeletonCard />
             <SkeletonCard />
           </div>
         ) : (
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-10 mb-12 sm:mb-16">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-10 mb-12 sm:mb-16">
             {/* GitHub Stats */}
             <div className="border-4 border-black p-6 sm:p-8 bg-white shadow-[8px_8px_0_0_rgba(0,0,0,1)] hover:-translate-y-1 transition-transform duration-300">
               <h3 className="text-2xl sm:text-3xl font-black uppercase tracking-tighter text-black mb-6 border-b-4 border-black pb-4">GitHub</h3>
