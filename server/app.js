@@ -1,5 +1,6 @@
 import express from 'express';
 import cors from "cors";
+import logger from "./middlewares/logger.js";
 import errorHandler from "./middlewares/errorHandler.js";
 import authRoutes from "./modules/auth/routes.js";
 import userRoutes from "./modules/user/routes.js";
@@ -8,6 +9,8 @@ import aiRoutes from "./modules/ai/routes.js";
 import githubRoutes from "./modules/github/routes.js";
 
 const app = express();
+
+app.use(logger);
 
 const allowedOrigins = [
   process.env.CLIENT_URL,
