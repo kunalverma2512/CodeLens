@@ -1,43 +1,31 @@
 import dotenv from "dotenv";
+import { z } from "zod";
 
 dotenv.config();
 
-const requiredEnvVars = [
-  "PORT",
-  "MONGO_URI",
-  "JWT_SECRET",
-  "JWT_EXPIRES_IN",
-  // JWT_REFRESH_SECRET must be a separate key from JWT_SECRET.
-  // Using the same key for both would allow forging refresh tokens from an access token.
-  "JWT_REFRESH_SECRET",
-  "GEMINI_API_KEY",
-  "CLIENT_URL",
-  "NODE_ENV",
-  "SMTP_HOST",
-  "SMTP_PORT",
-  "SMTP_USER",
-  "SMTP_PASS"
-];
+const envSchema = z.object({
+  PORT: z.string().default("5000").transform((val) => parseInt(val, 10)),
+  MONGO_URI: z.string().min(1, "MONGO_URI is required"),
+  JWT_SECRET: z.string().min(8, "JWT_SECRET must be at least 8 characters long"),
+  JWT_EXPIRES_IN: z.string().default("24h"),
+  GEMINI_API_KEY: z.string().min(1, "GEMINI_API_KEY is required"),
+  CLIENT_URL: z.string().min(1, "CLIENT_URL is required"),
+  NODE_ENV: z.enum(["development", "production", "test"]).default("development"),
+  SMTP_HOST: z.string().min(1, "SMTP_HOST is required"),
+  SMTP_PORT: z.string().transform((val) => parseInt(val, 10)),
+  SMTP_USER: z.string().min(1, "SMTP_USER is required"),
+  SMTP_PASS: z.string().min(1, "SMTP_PASS is required")
+});
 
-const missingEnvVars = requiredEnvVars.filter(envVar => !process.env[envVar]);
+const parsed = envSchema.safeParse(process.env);
 
-if (missingEnvVars.length > 0) {
-  throw new Error(`Missing required environment variables: ${missingEnvVars.join(", ")}`);
+if (!parsed.success) {
+  console.error("❌ Invalid environment variables:");
+  parsed.error.errors.forEach((err) => {
+    console.error(`   - ${err.path.join(".")}: ${err.message}`);
+  });
+  process.exit(1);
 }
 
-export const env = {
-  PORT: process.env.PORT,
-  MONGO_URI: process.env.MONGO_URI,
-  JWT_SECRET: process.env.JWT_SECRET,
-  JWT_EXPIRES_IN: process.env.JWT_EXPIRES_IN,
-  JWT_REFRESH_SECRET: process.env.JWT_REFRESH_SECRET,
-  GEMINI_API_KEY: process.env.GEMINI_API_KEY,
-  CLIENT_URL: process.env.CLIENT_URL,
-  NODE_ENV: process.env.NODE_ENV,
-  SMTP_HOST: process.env.SMTP_HOST,
-  SMTP_PORT: parseInt(process.env.SMTP_PORT, 10),
-  SMTP_USER: process.env.SMTP_USER,
-  SMTP_PASS: process.env.SMTP_PASS
-};
-
+export const env = parsed.data;
 export default env;
