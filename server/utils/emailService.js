@@ -1,10 +1,15 @@
 import nodemailer from "nodemailer";
 import "dotenv/config";
 
+// SMTP_PORT must be parsed as an integer — env vars are always strings.
+// Port 465 uses SSL directly (secure: true).
+// Port 587 uses STARTTLS (secure: false, then upgrades) — this is Gmail's standard.
+const SMTP_PORT = parseInt(process.env.SMTP_PORT, 10) || 587;
+
 const transporter = nodemailer.createTransport({
   host: process.env.SMTP_HOST,
-  port: process.env.SMTP_PORT,
-  secure: false,
+  port: SMTP_PORT,
+  secure: SMTP_PORT === 465,  // true for 465, false for 587 (STARTTLS)
   auth: {
     user: process.env.SMTP_USER,
     pass: process.env.SMTP_PASS
