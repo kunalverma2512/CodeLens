@@ -81,7 +81,6 @@ export default function Footer() {
                 { label: "Codeforces API", status: "LIVE" },
                 { label: "GitHub Sync", status: "BETA" },
                 { label: "LeetCode Auth", status: "SOON" },
-                { label: "AtCoder", status: "SOON" },
               ].map((item) => (
                 <div key={item.label} className="flex items-center justify-between gap-4">
                   <a

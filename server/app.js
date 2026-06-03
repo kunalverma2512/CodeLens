@@ -11,14 +11,24 @@ import { globalLimiter, apiLimiter } from "./middlewares/rateLimiter.js";
 
 const app = express();
 
+// ── Trust Proxy (REQUIRED for Render deployment) ──────────────────────────────
+// Render sits behind a reverse proxy. Without this, express-rate-limit sees
+// the proxy's IP for every user — meaning the first user to hit the rate limit
+// blocks EVERYONE. This tells Express to trust the X-Forwarded-For header from
+// Render's proxy layer so each real client IP is identified separately.
+app.set("trust proxy", 1);
+
+// ── Allowed CORS origins ──────────────────────────────────────────────────────
+// CLIENT_URL must be your live Vercel URL in production, e.g. https://codelens.vercel.app
 const allowedOrigins = [
   process.env.CLIENT_URL,
-  process.env.CLIENT_URI,
+  // Allow localhost in non-production for local development to keep working
   ...(process.env.NODE_ENV !== "production" ? ["http://localhost:5173"] : [])
 ].filter(Boolean);
 
 const corsOptions = {
   origin: function (origin, callback) {
+    // Allow requests with no origin (curl, Postman, server-to-server)
     if (!origin || allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {

@@ -36,6 +36,10 @@ export default function FAQPage() {
   return (
     <main className="w-full overflow-x-hidden bg-white text-black">
       <title>FAQ - CodeLens</title>
+      <meta
+        name="description"
+        content="Frequently asked questions about CodeLens – platform tracking, data privacy, open source contributions, and more."
+      />
       <section className="border-b-4 border-black px-6 py-20 sm:px-10 lg:px-16 lg:py-28">
         <div className="mx-auto grid max-w-7xl gap-12 lg:grid-cols-[0.9fr_1.1fr] lg:items-end">
           <div>
@@ -78,11 +82,10 @@ export default function FAQPage() {
                   key={item.id}
                   type="button"
                   onClick={() => toggleFaq(index, true)}
-                  className={`break-words border-2 px-4 py-3 text-left text-xs font-black uppercase tracking-widest transition-colors ${
-                    openIdx === index
+                  className={`break-words border-2 px-4 py-3 text-left text-xs font-black uppercase tracking-widest transition-colors ${openIdx === index
                       ? "border-white bg-white text-black"
                       : "border-white text-white hover:bg-white hover:text-black"
-                  }`}
+                    }`}
                 >
                   {String(index + 1).padStart(2, "0")} / {item.q}
                 </button>
@@ -125,9 +128,8 @@ export default function FAQPage() {
                     role="region"
                     aria-labelledby={buttonId}
                     aria-hidden={!isOpen}
-                    className={`grid transition-all duration-300 ease-in-out ${
-                      isOpen ? "grid-rows-[1fr] border-t-4 border-black" : "grid-rows-[0fr]"
-                    }`}
+                    className={`grid transition-all duration-300 ease-in-out ${isOpen ? "grid-rows-[1fr] border-t-4 border-black" : "grid-rows-[0fr]"
+                      }`}
                   >
                     <div className="overflow-hidden">
                       <p className="max-w-3xl px-6 py-6 text-base font-bold leading-relaxed text-black sm:px-8 sm:text-lg">

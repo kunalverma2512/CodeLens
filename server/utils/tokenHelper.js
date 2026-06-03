@@ -33,8 +33,13 @@ const isProd = process.env.NODE_ENV === "production";
 // Shared base options — single source of truth for all auth cookies.
 const cookieBaseOptions = {
   httpOnly: true,
-  secure: isProd,   // HTTPS-only in production
-  sameSite: "Lax",  // Lax in all envs; change to Strict if no cross-site top-level GET flows
+  // In production, Vercel (frontend) and Render (backend) are on DIFFERENT domains.
+  // Browsers block cross-origin cookies unless:
+  //   - secure: true    (cookie only sent over HTTPS — Render provides this automatically)
+  //   - sameSite: None  (explicitly allows cross-site cookie sending)
+  // In development, sameSite: Lax works fine because both run on localhost.
+  secure: isProd,
+  sameSite: isProd ? "None" : "Lax",
   path: "/",
 };
 
