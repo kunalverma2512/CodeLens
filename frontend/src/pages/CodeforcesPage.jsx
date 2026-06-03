@@ -360,7 +360,7 @@ export default function CodeforcesPage() {
   // ── Connected — full data view ────────────────────────────────────────────
   return (
     <main>
-      <title>Codeforces - Codelens</title>
+      <title>Codeforces - CodeLens</title>
     <div className="min-h-screen bg-white text-black">
 
       {/* ── Profile Header ─────────────────────────────────────────────── */}
