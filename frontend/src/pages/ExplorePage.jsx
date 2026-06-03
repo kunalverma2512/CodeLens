@@ -43,6 +43,8 @@ export default function ExplorePage() {
     });
   };
   return (
+    <main>
+      <title>Explore - CodeLens</title>
     <div className="w-full bg-white flex flex-col">
       <ExploreHero />
       <AIExplanation />
@@ -61,10 +63,10 @@ export default function ExplorePage() {
 
       {showScrollTop && (
         <button
-          onClick={scrollToTop}
-          className="fixed right-8 w-12 h-12 bg-black text-white flex items-center justify-center cursor-pointer z-50 border-2 border-black hover:bg-white hover:text-black transition-colors duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black"
-          style={{ bottom: "calc(2rem + env(safe-area-inset-bottom, 0px))" }}
-          aria-label="Scroll to top"
+        onClick={scrollToTop}
+        className="fixed right-8 w-12 h-12 bg-black text-white flex items-center justify-center cursor-pointer z-50 border-2 border-black hover:bg-white hover:text-black transition-colors duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black"
+        style={{ bottom: "calc(2rem + env(safe-area-inset-bottom, 0px))" }}
+        aria-label="Scroll to top"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -73,15 +75,16 @@ export default function ExplorePage() {
             viewBox="0 0 24 24"
             stroke="currentColor"
             strokeWidth={3}
-          >
+            >
             <path
               strokeLinecap="square"
               strokeLinejoin="miter"
               d="M5 15l7-7 7 7"
-            />
+              />
           </svg>
         </button>
       )}
     </div>
+      </main>
   );
 }

@@ -59,6 +59,8 @@ export default function LandingPage() {
   const currentWord = useWordCycle(cycleWords);
 
   return (
+    <main>
+      <title>CodeLens — Track, Analyze, Grow</title>
     <div ref={containerRef} className="min-h-screen bg-white text-black selection:bg-black selection:text-white overflow-hidden font-sans">
       
       {/* ───── 1. HERO SECTION ───── */}
@@ -228,7 +230,7 @@ export default function LandingPage() {
             <Link 
               to="/dashboard" 
               className="group inline-flex w-full sm:w-auto justify-center items-center gap-4 sm:gap-8 bg-white text-black px-6 sm:px-16 py-5 sm:py-8 text-lg sm:text-2xl md:text-3xl font-black tracking-[0.2em] uppercase transition-all duration-300 shadow-[12px_12px_0_0_rgba(59,130,246,0.6)] sm:shadow-[24px_24px_0_0_rgba(59,130,246,0.6)] hover:-translate-y-1 sm:hover:-translate-y-2 hover:-translate-x-1 sm:hover:-translate-x-2 hover:shadow-[16px_16px_0_0_rgba(59,130,246,0.9)] sm:hover:shadow-[32px_32px_0_0_rgba(59,130,246,0.9)] border-4 border-white"
-            >
+              >
               <span>Initialize System</span>
               <div className="w-10 h-10 sm:w-16 sm:h-16 bg-black text-white flex items-center justify-center group-hover:bg-blue-600 transition-colors shrink-0">
                 <ArrowRight className="w-5 h-5 sm:w-8 sm:h-8 group-hover:-rotate-45 transition-transform" />
@@ -239,5 +241,6 @@ export default function LandingPage() {
       </section>
 
     </div>
+              </main>
   );
 }

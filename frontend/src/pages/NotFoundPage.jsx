@@ -6,6 +6,7 @@ export default function NotFoundPage() {
       className="relative min-h-screen overflow-hidden border-t-4 border-black bg-white"
       aria-label="404 Not Found Page"
     >
+      <title>Page Not Found - CodeLens</title>
       {/* Background Grid */}
       <div
         className="absolute inset-0 pointer-events-none"

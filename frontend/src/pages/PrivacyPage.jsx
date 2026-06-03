@@ -1,5 +1,7 @@
 export default function PrivacyPage() {
     return(
+        <main>
+            <title>Privacy Policy - CodeLens</title>
         <section>
             <div className="m-20">
                 <p className="text-center text-black font-black text-2xl uppercase tracking-widest underline underline-offset-8 decoration-[3px]">Privacy Policy</p>
@@ -8,5 +10,6 @@ export default function PrivacyPage() {
                 </p>
             </div>
         </section>
+        </main>
     );
 }

@@ -64,6 +64,8 @@ export default function LoginPage() {
   };
 
   return (
+    <main>
+      <title>Login - CodeLens</title>
     <div className="w-full flex-1 flex flex-col items-center justify-center px-4 sm:px-6 md:px-8 py-12 sm:py-20 bg-white">
       <div className="w-full max-w-md border-4 border-black p-6 sm:p-8 md:p-12 bg-white shadow-[8px_8px_0_0_rgba(0,0,0,1)] md:shadow-[16px_16px_0_0_rgba(0,0,0,1)]">
         <h2 className="text-3xl sm:text-4xl md:text-5xl font-black uppercase tracking-tighter text-black mb-8 sm:mb-12">
@@ -109,7 +111,7 @@ export default function LoginPage() {
               className="w-full p-5 border-4 border-black rounded-none text-black font-bold focus:outline-none focus:border-gray-500"
               placeholder="YOUR@EMAIL.COM"
               required
-            />
+              />
           </div>
 
           <div className="flex flex-col space-y-3">
@@ -123,14 +125,14 @@ export default function LoginPage() {
               className="w-full p-5 border-4 border-black rounded-none text-black font-bold focus:outline-none focus:border-gray-500"
               placeholder="••••••••"
               required
-            />
+              />
           </div>
 
           <div className="flex justify-end">
             <Link
               to="/forgot-password"
               className="text-sm font-black uppercase tracking-widest text-black underline underline-offset-4 decoration-[3px] hover:text-gray-600"
-            >
+              >
               Forgot Password?
             </Link>
           </div>
@@ -139,7 +141,7 @@ export default function LoginPage() {
             type="submit"
             disabled={loading}
             className="w-full py-6 bg-black text-white text-xl font-black uppercase tracking-widest hover:bg-gray-900 transition-colors border-4 border-black rounded-none disabled:opacity-50 disabled:cursor-not-allowed"
-          >
+            >
             {loading ? 'AUTHENTICATING...' : 'SIGN IN'}
           </button>
         </form>
@@ -154,5 +156,6 @@ export default function LoginPage() {
         </div>
       </div>
     </div>
+            </main>
   );
 }

@@ -34,6 +34,8 @@ export default function ContestAtCoderPage() {
   ];
 
   return (
+    <main>
+      <title>AtCoder Contests - CodeLens</title>
     <div className="w-full min-h-screen bg-white">
       {/* Hero Section */}
       <section className="w-full border-b-4 border-black px-4 sm:px-6 md:px-8 py-16 sm:py-20 md:py-24 bg-gradient-to-br from-gray-50 to-white">
@@ -81,14 +83,14 @@ export default function ContestAtCoderPage() {
           <div className="flex flex-wrap gap-3">
             {["all", "ABC", "ARC", "AGC", "Heuristic"].map((type) => (
               <button
-                key={type}
+              key={type}
                 onClick={() => setSelectedType(type)}
                 className={`px-6 py-3 border-4 border-black font-black text-sm uppercase tracking-widest transition-all ${
                   selectedType === type
-                    ? "bg-black text-white"
-                    : "bg-white text-black hover:bg-black hover:text-white"
+                  ? "bg-black text-white"
+                  : "bg-white text-black hover:bg-black hover:text-white"
                 }`}
-              >
+                >
                 {type}
               </button>
             ))}
@@ -106,8 +108,8 @@ export default function ContestAtCoderPage() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {contestSolutions.map((contest) => (
               <div
-                key={contest.id}
-                className="border-4 border-black bg-white p-6 hover:shadow-[12px_12px_0_0_rgba(0,0,0,1)] hover:-translate-x-2 hover:-translate-y-2 transition-all cursor-pointer"
+              key={contest.id}
+              className="border-4 border-black bg-white p-6 hover:shadow-[12px_12px_0_0_rgba(0,0,0,1)] hover:-translate-x-2 hover:-translate-y-2 transition-all cursor-pointer"
               >
                 <div className="flex items-start justify-between mb-4">
                   <div className="border-2 border-black bg-gray-100 text-black px-3 py-1 text-xs font-black uppercase tracking-wide">
@@ -140,8 +142,8 @@ export default function ContestAtCoderPage() {
                 <div className="flex flex-wrap gap-2 mb-4">
                   {contest.tags.map((tag, idx) => (
                     <span
-                      key={idx}
-                      className="text-[10px] font-black uppercase tracking-wide border-2 border-black px-2 py-1 bg-white"
+                    key={idx}
+                    className="text-[10px] font-black uppercase tracking-wide border-2 border-black px-2 py-1 bg-white"
                     >
                       {tag}
                     </span>
@@ -192,5 +194,6 @@ export default function ContestAtCoderPage() {
         </div>
       </section>
     </div>
+                  </main>
   );
 }

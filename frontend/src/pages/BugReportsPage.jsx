@@ -32,6 +32,8 @@ const BugReportsPage = () => {
   };
 
   return (
+    <main>
+      <title>Bug Reports - CodeLens</title>
     <div ref={containerRef} className="min-h-screen bg-white text-black selection:bg-black selection:text-white overflow-hidden">
       
       {/* ───── Dynamic Hero Section ───── */}
@@ -343,6 +345,7 @@ const BugReportsPage = () => {
       </section>
 
     </div>
+          </main>
   );
 };
 

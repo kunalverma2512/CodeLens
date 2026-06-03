@@ -59,6 +59,8 @@ export default function ApexAIPage() {
   const typedText = useTypewriter("Stop guessing. Start executing.", 40, 500);
 
   return (
+    <main>
+      <title>Apex AI - CodeLens</title>
     <div ref={containerRef} className="min-h-screen bg-white text-black selection:bg-black selection:text-white overflow-hidden">
       
       {/* ───── SECTION 1: HERO (100vh) ───── */}
@@ -133,10 +135,10 @@ export default function ApexAIPage() {
             { title: "Skill Imbalance", desc: "You might be a Grandmaster at algorithms but write terrible, unmaintainable monolithic code." },
           ].map((item, idx) => (
             <motion.div 
-              key={idx}
-              variants={popIn}
-              whileHover={{ y: -10 }}
-              className="bg-white border-4 border-black p-10 flex flex-col h-full shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] hover:shadow-[16px_16px_0px_0px_rgba(0,0,0,1)] transition-all duration-300"
+            key={idx}
+            variants={popIn}
+            whileHover={{ y: -10 }}
+            className="bg-white border-4 border-black p-10 flex flex-col h-full shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] hover:shadow-[16px_16px_0px_0px_rgba(0,0,0,1)] transition-all duration-300"
             >
               <div className="text-6xl font-black text-gray-200 mb-6 border-b-4 border-black pb-4">0{idx + 1}</div>
               <h3 className="text-3xl font-black uppercase tracking-tighter mb-4">{item.title}</h3>
@@ -269,7 +271,7 @@ export default function ApexAIPage() {
           viewport={{ once: true, amount: 0.4 }}
           variants={staggerContainer}
           className="max-w-5xl mx-auto flex flex-col items-center text-center relative z-10"
-        >
+          >
           <motion.div variants={popIn} className="relative mb-12 group">
             <div className="absolute inset-0 bg-black translate-x-3 translate-y-3 shadow-xl transition-transform duration-300 group-hover:translate-x-5 group-hover:translate-y-5"></div>
             <div className="relative w-32 h-32 bg-white border-4 border-black flex items-center justify-center z-10 transition-all duration-300">
@@ -300,5 +302,6 @@ export default function ApexAIPage() {
       </section>
 
     </div>
+              </main>
   );
 }
