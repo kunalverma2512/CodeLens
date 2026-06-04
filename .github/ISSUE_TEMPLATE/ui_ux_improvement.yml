@@ -1,0 +1,71 @@
+name: UI/UX Improvement
+description: Propose an interface or usability enhancement with visual, responsive, and accessibility context.
+title: "[UI/UX]: "
+labels: ["UI/UX"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for proposing a UI/UX improvement.
+        Please include enough detail for maintainers to understand both the current issue and the intended experience.
+
+  - type: checkboxes
+    id: prerequisites
+    attributes:
+      label: Before submitting
+      description: Please confirm the following before opening the issue.
+      options:
+        - label: I have searched existing issues to make sure this is not a duplicate.
+          required: true
+        - label: I have read the contribution guidelines.
+          required: true
+
+  - type: textarea
+    id: current-ui-ux-issue
+    attributes:
+      label: Current UI/UX issue
+      description: What is not working well in the current interface or experience?
+      placeholder: Describe the current usability, layout, interaction, or visual problem
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposed-improvement
+    attributes:
+      label: Proposed improvement
+      description: What change would improve the current experience?
+      placeholder: Describe the ideal UI/UX behavior, layout, or interaction
+    validations:
+      required: true
+
+  - type: textarea
+    id: screenshots-mockups
+    attributes:
+      label: Screenshots or mockups
+      description: Attach screenshots, annotated examples, recordings, wireframes, or mockups if available.
+      placeholder: Paste links or attach supporting visuals here
+
+  - type: textarea
+    id: responsive-considerations
+    attributes:
+      label: Responsive behavior considerations
+      description: Explain how this should behave across mobile, tablet, and desktop layouts.
+      placeholder: Describe any layout or interaction expectations for different screen sizes
+    validations:
+      required: true
+
+  - type: textarea
+    id: accessibility-considerations
+    attributes:
+      label: Accessibility considerations
+      description: Note any accessibility improvements or constraints related to this proposal.
+      placeholder: Consider keyboard access, focus states, contrast, semantics, motion, or screen readers
+    validations:
+      required: true
+
+  - type: textarea
+    id: implementation-notes
+    attributes:
+      label: Additional implementation notes
+      description: Include technical constraints, component references, related pages, or rollout notes.
+      placeholder: Add any extra implementation context here

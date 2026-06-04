@@ -1,0 +1,89 @@
+name: Bug Report
+description: Report a reproducible problem to help maintainers investigate and fix it.
+title: "[Bug]: "
+labels: ["type:bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to report a bug.
+        Please fill in the details below so we can reproduce the issue quickly.
+
+  - type: checkboxes
+    id: prerequisites
+    attributes:
+      label: Before submitting
+      description: Please confirm the following before opening the issue.
+      options:
+        - label: I have searched existing issues to make sure this is not a duplicate.
+          required: true
+        - label: I have read the contribution guidelines.
+          required: true
+
+  - type: input
+    id: bug-summary
+    attributes:
+      label: Bug summary
+      description: A short, clear description of the bug.
+      placeholder: "Example: Search results stay empty after submitting a valid query"
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps-to-reproduce
+    attributes:
+      label: Steps to reproduce
+      description: Tell us exactly how to reproduce the issue.
+      value: |
+        1. Go to ...
+        2. Click on ...
+        3. Enter ...
+        4. Observe ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected-behavior
+    attributes:
+      label: Expected behavior
+      description: What did you expect to happen?
+      placeholder: The application should ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual-behavior
+    attributes:
+      label: Actual behavior
+      description: What actually happened instead?
+      placeholder: Instead, the application ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: screenshots-recordings
+    attributes:
+      label: Screenshots or recordings
+      description: Drag and drop screenshots, recordings, or paste image/video links if available.
+      placeholder: Attach screenshots or links here
+
+  - type: textarea
+    id: browser-device-info
+    attributes:
+      label: Browser and device information
+      description: Share the environment where the issue occurred.
+      value: |
+        Browser:
+        Browser version:
+        Operating system:
+        Device:
+        Screen size/resolution:
+    validations:
+      required: true
+
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: Additional context
+      description: Include logs, edge cases, related issues, or anything else that may help.
+      placeholder: Add any extra context here

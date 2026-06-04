@@ -1,8 +1,8 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 
-// ─── Mega Menu Data (unchanged) ───────────────────────────────────────────────
+// ─── Mega Menu Data  ───────────────────────────────────────────────
 const MEGA_MENU_ITEMS = [
   {
     label: "Practice CP",
@@ -225,20 +225,21 @@ function MegaMenuPanel({ megaRef, onMouseEnter, onMouseLeave, onClose, megaTrigg
 
 // ─── Main Navbar ───────────────────────────────────────────────────────────────
 export default function Navbar() {
-  const [isMenuOpen, setIsMenuOpen]       = useState(false);
-  const [megaOpen, setMegaOpen]           = useState(false);
-  const [mobileMegaOpen, setMobileMegaOpen] = useState(false);
+  const [isMenuOpen, setIsMenuOpen]           = useState(false);
+  const [megaOpen, setMegaOpen]               = useState(false);
+  const [mobileMegaOpen, setMobileMegaOpen]   = useState(false);
   const [expandedSubmenu, setExpandedSubmenu] = useState(null);
-  const [scrolled, setScrolled]           = useState(false);
+  const [scrolled, setScrolled]               = useState(false);
 
-  const megaRef        = useRef(null);
+  const megaRef          = useRef(null);
   const firstMenuItemRef = useRef(null);
-  const megaTriggerRef = useRef(null);
-  const megaLeaveTimer = useRef(null);
+  const megaTriggerRef   = useRef(null);
+  const hamburgerRef     = useRef(null);
+  const megaLeaveTimer   = useRef(null);
 
   const { isAuthenticated, user, logout } = useAuth();
-  const navigate  = useNavigate();
-  const location  = useLocation();
+  const navigate = useNavigate();
+  const location = useLocation();
 
   // ── Scroll elevation shadow ──────────────────────────────────────────────
   useEffect(() => {
@@ -269,33 +270,60 @@ export default function Navbar() {
     setMobileMegaOpen(false);
   }, [location.pathname]);
 
+  // ── iOS-safe body scroll lock with scroll position restoration ───────────
   useEffect(() => {
-  return () => {
-    clearTimeout(megaLeaveTimer.current);
-  };
-}, []);
+    if (isMenuOpen) {
+      const scrollY = window.scrollY;
+      document.body.style.position = "fixed";
+      document.body.style.top = `-${scrollY}px`;
+      document.body.style.width = "100%";
+      return () => {
+        document.body.style.position = "";
+        document.body.style.top = "";
+        document.body.style.width = "";
+        window.scrollTo(0, scrollY);
+      };
+    }
+  }, [isMenuOpen]);
 
+  // ── Close menu on Escape key, restore focus to hamburger ────────────────
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === "Escape" && isMenuOpen) {
+        closeMenu();
+        setTimeout(() => hamburgerRef.current?.focus(), 0);
+      }
+    };
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [isMenuOpen]);
+
+  useEffect(() => {
+    return () => {
+      clearTimeout(megaLeaveTimer.current);
+    };
+  }, []);
 
   // ── Handlers ────────────────────────────────────────────────────────────
-  const handleLogout = () => {
-    logout();
+  const handleLogout = async () => {
+    await logout(); // clears HttpOnly cookies server-side
     navigate("/");
     setIsMenuOpen(false);
   };
   const toggleMenu = () => setIsMenuOpen((v) => !v);
-  const closeMenu  = () => {
+  const closeMenu  = useCallback(() => {
     setIsMenuOpen(false);
     setMobileMegaOpen(false);
     setMegaOpen(false);
-  };
+  }, []);
 
   const handleMegaMouseEnter = () => {
-  clearTimeout(megaLeaveTimer.current);
-  setMegaOpen(true);
+    clearTimeout(megaLeaveTimer.current);
+    setMegaOpen(true);
 
-  setTimeout(() => {
-    firstMenuItemRef.current?.focus();
-  }, 0);
+    setTimeout(() => {
+      firstMenuItemRef.current?.focus();
+    }, 0);
   };
 
   const handleMegaMouseLeave = () => {
@@ -320,8 +348,8 @@ export default function Navbar() {
 
   // ── Active link style ────────────────────────────────────────────────────
   // font-semibold + thin underline instead of font-black + decoration-4
-  const isActive    = (path) => location.pathname === path;
-  const navLinkCls  = (path) =>
+  const isActive   = (path) => location.pathname === path;
+  const navLinkCls = (path) =>
     `text-[13px] font-semibold uppercase tracking-[0.09em] transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2 ${
       isActive(path)
         ? "text-black underline underline-offset-4 decoration-[1.5px] decoration-black"
@@ -360,6 +388,9 @@ export default function Navbar() {
 
           <Link to="/explore" className={navLinkCls("/explore")}>
             Explore
+          </Link>
+          <Link to="/faq" className={navLinkCls("/faq")}>
+            FAQ
           </Link>
 
           {isAuthenticated && (
@@ -429,6 +460,9 @@ export default function Navbar() {
               />
             )}
           </div>
+           <Link to="/contact" className={navLinkCls("/contact")}>
+            Contact Us
+          </Link>
         </div>
 
         {/* ── Desktop Right Controls ────────────────────────────────────── */}
@@ -505,6 +539,7 @@ export default function Navbar() {
 
           {/* Animated hamburger — thinner, softer border */}
           <button
+            ref={hamburgerRef}
             onClick={toggleMenu}
             className="flex flex-col justify-center items-center w-9 h-9 gap-[5px] border border-zinc-200 hover:border-zinc-400 transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2 rounded-[2px]"
             aria-label={isMenuOpen ? "Close menu" : "Open menu"}
@@ -531,8 +566,12 @@ export default function Navbar() {
 
       {/* ── Mobile Menu ──────────────────────────────────────────────────── */}
       {isMenuOpen && (
-        <div className="lg:hidden w-full bg-white border-t border-zinc-100">
-          <div className="flex flex-col">
+        <div
+          className="lg:hidden w-full bg-white border-t border-zinc-100 flex flex-col min-h-0"
+          style={{ maxHeight: "calc(100vh - 3.5rem)", maxHeight: "calc(100svh - 3.5rem)", overflow: "hidden" }}
+        >
+          {/* Scrollable area */}
+          <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain">
 
             {/* Nav links */}
             {isAuthenticated && (
@@ -543,6 +582,12 @@ export default function Navbar() {
 
             <Link to="/explore" onClick={closeMenu} className={mobileLinkCls}>
               Explore <span className="text-zinc-300 text-sm">→</span>
+            </Link>
+            <Link to="/faq" onClick={closeMenu} className={mobileLinkCls}>
+              FAQ <span className="text-zinc-300 text-sm">→</span>
+            </Link>
+            <Link to="/contact" onClick={closeMenu} className={mobileLinkCls}>
+              Contact Us <span className="text-zinc-300 text-sm">→</span>
             </Link>
 
             {isAuthenticated && (
@@ -655,8 +700,10 @@ export default function Navbar() {
                 })}
               </div>
             )}
+          </div>
 
-            {/* ── Auth section ──────────────────────────────────────────── */}
+          {/* ── Auth section — pinned to bottom ──────────────────────────── */}
+          <div className="flex-shrink-0 border-t border-zinc-100 bg-white">
             {!isAuthenticated ? (
               <>
                 <Link to="/login" onClick={closeMenu} className={mobileLinkCls}>
@@ -690,7 +737,7 @@ export default function Navbar() {
 
                 <button
                   onClick={handleLogout}
-                  className="px-5 py-3.5 text-[13px] font-semibold uppercase tracking-[0.09em] text-zinc-400 hover:text-black border-b border-zinc-100 hover:bg-zinc-50 transition-colors duration-150 text-left"
+                  className="w-full px-5 py-3.5 text-[13px] font-semibold uppercase tracking-[0.09em] text-zinc-400 hover:text-black border-b border-zinc-100 hover:bg-zinc-50 transition-colors duration-150 text-left"
                 >
                   Logout
                 </button>

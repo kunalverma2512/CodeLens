@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo, useCallback, useRef } from "react";
+import useDebounce from "../hooks/useDebounce";
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
@@ -193,7 +194,7 @@ export default function PracticePage() {
 
   // Filter state
   const [searchQuery, setSearchQuery] = useState("");
-  const [debouncedSearch, setDebouncedSearch] = useState("");
+  const debouncedSearch = useDebounce(searchQuery, 300);
   const [selectedTags, setSelectedTags] = useState([]);
   const [tagInput, setTagInput] = useState("");
   const [ratingIdx, setRatingIdx] = useState(0); // index into RATING_RANGES
@@ -205,7 +206,6 @@ export default function PracticePage() {
 
   // Refs
   const searchRef = useRef(null);
-  const debounceRef = useRef(null);
   const tagPanelRef = useRef(null);
 
   // ── Fetch from CF API ──────────────────────────────────────────────────────
@@ -242,15 +242,10 @@ export default function PracticePage() {
     fetchProblems();
   }, [fetchProblems]);
 
-  // ── Search debounce ────────────────────────────────────────────────────────
+  // Reset page to 1 when debounced search changes
   useEffect(() => {
-    clearTimeout(debounceRef.current);
-    debounceRef.current = setTimeout(() => {
-      setDebouncedSearch(searchQuery);
-      setPage(1);
-    }, 300);
-    return () => clearTimeout(debounceRef.current);
-  }, [searchQuery]);
+    setPage(1);
+  }, [debouncedSearch]);
 
   // Close tag panel on outside click
   useEffect(() => {
