@@ -332,7 +332,6 @@ export default function PracticePage() {
 
   const clearAll = () => {
     setSearchQuery("");
-    setDebouncedSearch("");
     setSelectedTags([]);
     setRatingIdx(0);
     setSortBy("rating-asc");
