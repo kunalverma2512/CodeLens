@@ -1,7 +1,16 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { CardSkeleton } from "../components/shared/SkeletonLoader";
 
 export default function ContestCodeforcesPage() {
   const [selectedDivision, setSelectedDivision] = useState("all");
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 800);
+    return () => clearTimeout(timer);
+  }, []);
 
   const contestSolutions = [
     {
@@ -32,6 +41,10 @@ export default function ContestCodeforcesPage() {
       tags: ["Advanced DP", "FFT", "Segment Trees"],
     },
   ];
+
+  const filteredContests = contestSolutions.filter(
+    (c) => selectedDivision === "all" || c.division === selectedDivision
+  );
 
   return (
     <div className="w-full min-h-screen bg-white">
@@ -82,7 +95,7 @@ export default function ContestCodeforcesPage() {
             {["all", "Div. 1", "Div. 2", "Div. 3", "Div. 4", "Educational", "Global"].map((div) => (
               <button
                 key={div}
-                onClick={() => setSelectedDivision(div)}
+                onClick={() => { setSelectedDivision(div); setLoading(true); setTimeout(() => setLoading(false), 500); }}
                 className={`px-6 py-3 border-4 border-black font-black text-sm uppercase tracking-widest transition-all ${
                   selectedDivision === div
                     ? "bg-blue-600 text-white"
@@ -103,57 +116,66 @@ export default function ContestCodeforcesPage() {
             Recent Contests
           </h2>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {contestSolutions.map((contest) => (
-              <div
-                key={contest.id}
-                className="border-4 border-black bg-white p-6 hover:shadow-[12px_12px_0_0_rgba(0,0,0,1)] hover:-translate-x-2 hover:-translate-y-2 transition-all cursor-pointer"
-              >
-                <div className="flex items-start justify-between mb-4">
-                  <div className="border-2 border-blue-600 bg-blue-50 text-blue-800 px-3 py-1 text-xs font-black uppercase tracking-wide">
-                    {contest.division}
-                  </div>
-                  <div className="text-xs font-black uppercase tracking-widest text-gray-500">
-                    {contest.date}
-                  </div>
-                </div>
-
-                <h3 className="text-xl font-black uppercase tracking-tight text-black mb-3">
-                  {contest.contestName}
-                </h3>
-
-                <div className="grid grid-cols-2 gap-4 mb-4">
-                  <div className="border-2 border-black p-3 bg-gray-50">
-                    <div className="text-2xl font-black text-black">{contest.problems}</div>
-                    <div className="text-xs font-black uppercase tracking-wide text-gray-600 mt-1">
-                      Problems
+          {loading ? (
+            <CardSkeleton cards={2} />
+          ) : filteredContests.length === 0 ? (
+            <div className="border-4 border-black p-12 text-center bg-gray-50">
+              <p className="text-xl font-black uppercase">No Contests Loaded</p>
+              <p className="text-xs font-bold uppercase text-gray-500 mt-2">More editorials are coming soon!</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {filteredContests.map((contest) => (
+                <div
+                  key={contest.id}
+                  className="border-4 border-black bg-white p-6 hover:shadow-[12px_12px_0_0_rgba(0,0,0,1)] hover:-translate-x-2 hover:-translate-y-2 transition-all cursor-pointer"
+                >
+                  <div className="flex items-start justify-between mb-4">
+                    <div className="border-2 border-blue-600 bg-blue-50 text-blue-800 px-3 py-1 text-xs font-black uppercase tracking-wide">
+                      {contest.division}
+                    </div>
+                    <div className="text-xs font-black uppercase tracking-widest text-gray-500">
+                      {contest.date}
                     </div>
                   </div>
-                  <div className="border-2 border-black p-3 bg-gray-50">
-                    <div className="text-sm font-black text-black">{contest.difficulty}</div>
-                    <div className="text-xs font-black uppercase tracking-wide text-gray-600 mt-1">
-                      Rating
+
+                  <h3 className="text-xl font-black uppercase tracking-tight text-black mb-3">
+                    {contest.contestName}
+                  </h3>
+
+                  <div className="grid grid-cols-2 gap-4 mb-4">
+                    <div className="border-2 border-black p-3 bg-gray-50">
+                      <div className="text-2xl font-black text-black">{contest.problems}</div>
+                      <div className="text-xs font-black uppercase tracking-wide text-gray-600 mt-1">
+                        Problems
+                      </div>
+                    </div>
+                    <div className="border-2 border-black p-3 bg-gray-50">
+                      <div className="text-sm font-black text-black">{contest.difficulty}</div>
+                      <div className="text-xs font-black uppercase tracking-wide text-gray-600 mt-1">
+                        Rating
+                      </div>
                     </div>
                   </div>
-                </div>
 
-                <div className="flex flex-wrap gap-2 mb-4">
-                  {contest.tags.map((tag, idx) => (
-                    <span
-                      key={idx}
-                      className="text-[10px] font-black uppercase tracking-wide border-2 border-black px-2 py-1 bg-white"
-                    >
-                      {tag}
-                    </span>
-                  ))}
-                </div>
+                  <div className="flex flex-wrap gap-2 mb-4">
+                    {contest.tags.map((tag, idx) => (
+                      <span
+                        key={idx}
+                        className="text-[10px] font-black uppercase tracking-wide border-2 border-black px-2 py-1 bg-white"
+                      >
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
 
-                <button className="w-full px-6 py-3 border-4 border-black bg-blue-600 text-white font-black uppercase tracking-widest hover:bg-black transition-colors">
-                  View Solutions →
-                </button>
-              </div>
-            ))}
-          </div>
+                  <button className="w-full px-6 py-3 border-4 border-black bg-blue-600 text-white font-black uppercase tracking-widest hover:bg-black transition-colors">
+                    View Solutions →
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
 
           <div className="mt-12 text-center">
             <button className="px-10 py-4 border-4 border-black bg-black text-white font-black uppercase tracking-widest hover:bg-white hover:text-black transition-colors">
