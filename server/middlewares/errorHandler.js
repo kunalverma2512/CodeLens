@@ -8,8 +8,19 @@ const errorHandler = (err, req, res, next) => {
     message: message
   };
 
+  // Log 500 internal errors to the server console for debuggability
+  if (!err.statusCode || err.statusCode === 500) {
+    console.error(`[Error] Internal Server Error on ${req.method} ${req.originalUrl}:`, err);
+  }
+
+  // Handle express malformed JSON parsing error
+  if (err instanceof SyntaxError && err.status === 400 && 'body' in err) {
+    statusCode = 400;
+    message = "Invalid JSON syntax in request body.";
+    errorResponse.message = message;
+  }
   // Handle ApiError
-  if (err instanceof ApiError) {
+  else if (err instanceof ApiError) {
     statusCode = err.statusCode;
     message = err.message;
     errorResponse.message = message;
