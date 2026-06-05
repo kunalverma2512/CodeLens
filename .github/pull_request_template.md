@@ -1,76 +1,28 @@
-# 📌 Pull Request Summary
+# Description
 
-## 🔗 Related Issue
+Please include a summary of the change and which issue is fixed. Please also include relevant motivation and context. List any dependencies that are required for this change.
 
-Closes #
+Fixes # (issue)
 
----
+## Type of Change
 
-## 📝 Description
+- [ ] Bug fix (non-breaking change which fixes an issue)
+- [ ] New feature (non-breaking change which adds functionality)
+- [ ] Breaking change (fix or feature that would cause existing functionality to not work as expected)
+- [ ] Documentation update
 
-Provide a clear and concise summary of the changes made in this pull request.
+# How Has This Been Tested?
 
-### Changes Made
+Please describe the tests that you ran to verify your changes. Provide instructions so we can reproduce. Please also list any relevant details for your test configuration.
 
-*
-*
-*
+- [ ] Test A
+- [ ] Test B
 
-### Motivation
+# Checklist
 
-Explain why these changes were necessary and what problem they solve.
-
----
-
-## 🚀 Type of Change
-
-Select all that apply:
-
-* [ ] Bug Fix
-* [ ] New Feature
-* [ ] Enhancement
-* [ ] Documentation Update
-* [ ] Refactoring
-* [ ] Performance Improvement
-* [ ] DevOps / Tooling
-* [ ] Other
-
----
-
-## 🧪 Testing
-
-### Verification
-
-* [ ] Tested Locally
-* [ ] Existing Tests Passed
-* [ ] New Tests Added
-* [ ] No Testing Required
-
-### Test Details
-
-Describe how the changes were tested and verified.
-
----
-
-## 📸 Screenshots / Demo (If Applicable)
-
-Attach screenshots, GIFs, or recordings that help demonstrate the changes.
-
----
-
-## ✅ Checklist
-
-* [ ] I have read and followed the contribution guidelines.
-* [ ] I have self-reviewed my changes.
-* [ ] My changes are limited to the scope of this issue.
-* [ ] Documentation has been updated where necessary.
-* [ ] No unnecessary files or unrelated changes have been included.
-* [ ] The related issue has been linked correctly.
-* [ ] All applicable testing and validation steps have been completed.
-
----
-
-## 📚 Additional Notes
-
-Add any additional information that may help reviewers.
-
+- [ ] My code follows the style guidelines of this project
+- [ ] I have performed a self-review of my own code
+- [ ] I have commented my code, particularly in hard-to-understand areas
+- [ ] I have made corresponding changes to the documentation
+- [ ] My changes generate no new warnings
+- [ ] Any dependent changes have been merged and published in downstream modules
