@@ -3,64 +3,85 @@ import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import * as authService from '../services/authService';
 
-const API_BASE = import.meta.env.VITE_API_BASE_URL; // e.g. http://localhost:8000/api
+const API_BASE = import.meta.env.VITE_API_BASE_URL; // http://localhost:8000/api
 
 export default function LoginPage() {
   const [email, setEmail]       = useState('');
   const [password, setPassword] = useState('');
   const [error, setError]       = useState('');
   const [loading, setLoading]   = useState(false);
+  const [isEmailValid, setIsEmailValid] = useState(true);
 
-  const { login, isAuthenticated } = useAuth();
-  const navigate                   = useNavigate();
-  const [searchParams]             = useSearchParams();
+  const auth           = useAuth();
+  const navigate       = useNavigate();
+  const [searchParams] = useSearchParams();
 
-  // Show GitHub OAuth errors forwarded from the callback
+  const isPasswordValid = password.length >= 6;
+
+  const validateEmail = (value) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(value);
+  };
+
+  // Handle GitHub OAuth callback redirect:
+  // Backend sends: /login?authStatus=success#token=JWT
   useEffect(() => {
     const ghError = searchParams.get('githubAuthError') || searchParams.get('error');
     if (ghError) {
       setError(decodeURIComponent(ghError));
+      return;
+    }
+
+    const authStatus = searchParams.get('authStatus');
+    if (authStatus === 'success') {
+      // Token is in the URL hash: #token=JWT
+      const hash = window.location.hash.slice(1);
+      const hashParams = new URLSearchParams(hash);
+      const token = hashParams.get('token');
+
+      if (token) {
+        localStorage.setItem('token', token);
+        try {
+          const payload = JSON.parse(atob(token.split('.')[1]));
+          auth.login(token, { id: payload.userId, email: payload.email, role: payload.role });
+        } catch {
+          auth.login(token, {});
+        }
+        navigate('/dashboard', { replace: true });
+      }
     }
   }, [searchParams]);
-
-  // If already authenticated, redirect away from login
-  useEffect(() => {
-    if (isAuthenticated) {
-      navigate('/dashboard', { replace: true });
-    }
-  }, [isAuthenticated, navigate]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+
+    if (!validateEmail(email)) {
+      setError('Please enter a valid email address');
+      return;
+    }
+
+    if (!isPasswordValid) {
+      setError('Password must be at least 6 characters');
+      return;
+    }
+
     setLoading(true);
     try {
-      // Server sets HttpOnly cookies on success.
-      // Response body: { success, message, data: { user } }
       const response = await authService.login(email, password);
-      const userData = response.data?.user;
-      if (!userData) {
-        throw new Error('Login succeeded but no user data returned.');
-      }
-      login(userData);
-      navigate('/dashboard', { replace: true });
+      const { token, user } = response.data;
+      auth.login(token, user);
+      navigate('/dashboard');
     } catch (err) {
-      const msg = err.response?.data?.message || 'Login failed. Please check your credentials.';
-      setError(msg);
+      setError(err.response?.data?.message || 'Login failed');
     } finally {
       setLoading(false);
     }
   };
 
-  /**
-   * GitHub login:
-   * Redirects the browser to the backend, which builds a state JWT and
-   * redirects to GitHub. GitHub redirects to /api/auth/github/callback,
-   * which sets cookies and redirects to /auth/github/callback (frontend).
-   */
+  /** Redirect browser to backend — backend handles the entire OAuth dance */
   const handleGitHubLogin = () => {
-    // Pass redirectPath so after GitHub auth the user lands on /dashboard
-    window.location.href = `${API_BASE}/auth/github/start?redirectPath=${encodeURIComponent('/dashboard')}`;
+    window.location.href = `${API_BASE}/auth/github/start`;
   };
 
   return (
@@ -71,19 +92,20 @@ export default function LoginPage() {
         </h2>
 
         {error && (
-          <div className="mb-8 border-4 border-black bg-black p-4">
-            <p className="text-sm font-black uppercase tracking-widest text-white">
+          <div className="mb-8 border-4 border-red-650 bg-red-50 p-4">
+            <p className="text-sm font-black uppercase tracking-widest text-red-650">
               {error}
             </p>
           </div>
         )}
 
-        {/* ── GitHub button — top, most prominent ── */}
+        {/* ── GitHub button — top of form, most prominent ── */}
         <button
           type="button"
           onClick={handleGitHubLogin}
           className="w-full mb-8 py-5 border-4 border-black bg-black text-white text-sm font-black uppercase tracking-widest hover:bg-white hover:text-black transition-colors flex items-center justify-center gap-3"
         >
+          {/* GitHub SVG icon — no dependency */}
           <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
             <path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.44 9.8 8.21 11.39.6.11.82-.26.82-.58v-2.03c-3.34.73-4.04-1.61-4.04-1.61-.55-1.39-1.34-1.76-1.34-1.76-1.09-.75.08-.73.08-.73 1.21.08 1.84 1.24 1.84 1.24 1.07 1.84 2.81 1.31 3.5 1 .11-.78.42-1.31.76-1.61-2.66-.3-5.47-1.33-5.47-5.93 0-1.31.47-2.38 1.24-3.22-.12-.3-.54-1.52.12-3.18 0 0 1.01-.32 3.3 1.23a11.5 11.5 0 0 1 3-.4c1.02 0 2.04.14 3 .4 2.29-1.55 3.3-1.23 3.3-1.23.66 1.66.24 2.88.12 3.18.77.84 1.24 1.91 1.24 3.22 0 4.61-2.81 5.63-5.48 5.92.43.37.82 1.1.82 2.22v3.29c0 .32.21.7.83.58C20.56 21.8 24 17.3 24 12c0-6.63-5.37-12-12-12z"/>
           </svg>
@@ -97,7 +119,7 @@ export default function LoginPage() {
           </span>
         </div>
 
-        <form className="flex flex-col space-y-8" onSubmit={handleSubmit}>
+        <form className="flex flex-col space-y-8" onSubmit={handleSubmit} noValidate>
           <div className="flex flex-col space-y-3">
             <label className="text-sm font-black uppercase tracking-widest text-black">
               Email
@@ -105,11 +127,20 @@ export default function LoginPage() {
             <input
               type="email"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              onChange={(e) => {
+                setEmail(e.target.value);
+                setIsEmailValid(validateEmail(e.target.value));
+              }}
+              aria-invalid={email.length > 0 && !isEmailValid}
               className="w-full p-5 border-4 border-black rounded-none text-black font-bold focus:outline-none focus:border-gray-500"
               placeholder="YOUR@EMAIL.COM"
               required
             />
+            {email && !isEmailValid && (
+              <p role="alert" className="text-xs font-black uppercase tracking-widest text-red-650 mt-1">
+                Please enter a valid email address
+              </p>
+            )}
           </div>
 
           <div className="flex flex-col space-y-3">
@@ -120,10 +151,16 @@ export default function LoginPage() {
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              aria-invalid={password.length > 0 && !isPasswordValid}
               className="w-full p-5 border-4 border-black rounded-none text-black font-bold focus:outline-none focus:border-gray-500"
               placeholder="••••••••"
               required
             />
+            {password && !isPasswordValid && (
+              <p role="alert" className="text-xs font-black uppercase tracking-widest text-red-650 mt-1">
+                Password must be at least 6 characters
+              </p>
+            )}
           </div>
 
           <div className="flex justify-end">
