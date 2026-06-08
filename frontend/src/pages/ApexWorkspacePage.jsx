@@ -427,6 +427,8 @@ export default function ApexWorkspacePage() {
 
   // ── Render ──────────────────────────────────────────────────────────────────
   return (
+    <main>
+      <title>Apex Workspace - CodeLens</title>
     <div
       className="flex bg-zinc-950 text-white overflow-hidden"
       style={{
@@ -694,5 +696,6 @@ export default function ApexWorkspacePage() {
         </div>
       </div>
     </div>
+    </main>
   );
 }

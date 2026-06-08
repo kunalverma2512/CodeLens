@@ -126,6 +126,8 @@ export default function SignupPage() {
   };
 
   return (
+    <main>
+      <title>Sign Up - CodeLens</title>
     <div className="w-full flex-1 flex flex-col items-center justify-center px-4 sm:px-6 md:px-8 py-12 sm:py-20 bg-white">
       <div className="w-full max-w-md border-4 border-black p-6 sm:p-8 md:p-12 bg-white shadow-[8px_8px_0_0_rgba(0,0,0,1)] md:shadow-[16px_16px_0_0_rgba(0,0,0,1)]">
         <h2 className="text-3xl sm:text-4xl md:text-5xl font-black uppercase tracking-tighter text-black mb-8 sm:mb-12">
@@ -250,7 +252,7 @@ export default function SignupPage() {
               type="submit"
               disabled={loading}
               className="w-full mt-4 py-6 bg-black text-white text-xl font-black uppercase tracking-widest hover:bg-gray-900 transition-colors border-4 border-black rounded-none disabled:opacity-50 disabled:cursor-not-allowed"
-            >
+              >
               {loading ? "VERIFYING..." : "VERIFY"}
             </button>
 
@@ -260,7 +262,7 @@ export default function SignupPage() {
                 onClick={handleResendOtp}
                 disabled={cooldown > 0 || loading}
                 className="text-sm font-black uppercase tracking-widest text-black underline underline-offset-4 decoration-[3px] hover:text-gray-600 disabled:opacity-50 disabled:cursor-not-allowed disabled:no-underline"
-              >
+                >
                 {cooldown > 0 ? `RESEND CODE (${cooldown})` : "RESEND CODE"}
               </button>
             </div>
@@ -277,5 +279,6 @@ export default function SignupPage() {
         </div>
       </div>
     </div>
+                </main>
   );
 }

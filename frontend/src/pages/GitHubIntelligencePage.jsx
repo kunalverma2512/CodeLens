@@ -25,6 +25,8 @@ function Skeleton() {
 // ── Not connected ─────────────────────────────────────────────────────────────
 function NotConnected() {
   return (
+    <main>
+      <title>GitHub Intelligence - CodeLens</title>
     <div className="w-full flex-1 bg-white flex items-center justify-center px-4 py-20">
       <div className="max-w-md w-full border-[4px] border-black p-10 text-center shadow-[12px_12px_0_0_rgba(0,0,0,1)]">
         <div className="text-7xl font-black text-gray-100 mb-6 select-none">GH</div>
@@ -38,6 +40,7 @@ function NotConnected() {
         </Link>
       </div>
     </div>
+    </main>
   );
 }
 
@@ -177,6 +180,7 @@ function ScoresSection({ metrics }) {
 
 // ── Main ──────────────────────────────────────────────────────────────────────
 export default function GitHubIntelligencePage() {
+  const pageTitle = <title>GitHub Intelligence - CodeLens</title>;
   const [data, setData]       = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError]     = useState(null);
@@ -215,9 +219,11 @@ export default function GitHubIntelligencePage() {
     }
   };
 
-  if (loading && !data) return <Skeleton />;
+  if (loading && !data) return <>{pageTitle}<Skeleton />;</>
   if (error?.toLowerCase().includes("not connected")) return <NotConnected />;
   if (error) return (
+    <>
+    {pageTitle}
     <div className="w-full flex-1 flex items-center justify-center p-10">
       <div className="border-[4px] border-black p-8 max-w-md text-center">
         <p className="font-black uppercase tracking-widest text-sm mb-3">Failed to load GitHub data</p>
@@ -228,6 +234,7 @@ export default function GitHubIntelligencePage() {
         </button>
       </div>
     </div>
+            </>
   );
   if (!data) return <NotConnected />;
 
@@ -239,6 +246,8 @@ export default function GitHubIntelligencePage() {
   } = data;
 
   return (
+    <main>
+      {pageTitle}
     <div className="w-full flex-1 bg-white px-4 sm:px-6 md:px-8 py-12 sm:py-16 relative">
       {/* Sync Notification Banner */}
       {syncMsg && (
@@ -312,5 +321,6 @@ export default function GitHubIntelligencePage() {
 
       </div>
     </div>
+        </main>
   );
 }

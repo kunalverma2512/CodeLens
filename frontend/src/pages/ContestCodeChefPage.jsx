@@ -34,6 +34,8 @@ export default function ContestCodeChefPage() {
   ];
 
   return (
+    <main>
+      <title>CodeChef Contests - CodeLens</title>
     <div className="w-full min-h-screen bg-white">
       {/* Hero Section */}
       <section className="w-full border-b-4 border-black px-4 sm:px-6 md:px-8 py-16 sm:py-20 md:py-24 bg-gradient-to-br from-orange-50 to-white">
@@ -81,13 +83,13 @@ export default function ContestCodeChefPage() {
           <div className="flex flex-wrap gap-3">
             {["all", "Starters", "Long", "Lunchtime", "Cook-Off"].map((type) => (
               <button
-                key={type}
-                onClick={() => setSelectedType(type)}
-                className={`px-6 py-3 border-4 border-black font-black text-sm uppercase tracking-widest transition-all ${
-                  selectedType === type
-                    ? "bg-amber-700 text-white"
-                    : "bg-white text-black hover:bg-amber-700 hover:text-white"
-                }`}
+              key={type}
+              onClick={() => setSelectedType(type)}
+              className={`px-6 py-3 border-4 border-black font-black text-sm uppercase tracking-widest transition-all ${
+                selectedType === type
+                ? "bg-amber-700 text-white"
+                : "bg-white text-black hover:bg-amber-700 hover:text-white"
+              }`}
               >
                 {type}
               </button>
@@ -106,8 +108,8 @@ export default function ContestCodeChefPage() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {contestSolutions.map((contest) => (
               <div
-                key={contest.id}
-                className="border-4 border-black bg-white p-6 hover:shadow-[12px_12px_0_0_rgba(0,0,0,1)] hover:-translate-x-2 hover:-translate-y-2 transition-all cursor-pointer"
+              key={contest.id}
+              className="border-4 border-black bg-white p-6 hover:shadow-[12px_12px_0_0_rgba(0,0,0,1)] hover:-translate-x-2 hover:-translate-y-2 transition-all cursor-pointer"
               >
                 <div className="flex items-start justify-between mb-4">
                   <div className="border-2 border-amber-700 bg-orange-50 text-amber-900 px-3 py-1 text-xs font-black uppercase tracking-wide">
@@ -142,7 +144,7 @@ export default function ContestCodeChefPage() {
                     <span
                       key={idx}
                       className="text-[10px] font-black uppercase tracking-wide border-2 border-black px-2 py-1 bg-white"
-                    >
+                      >
                       {tag}
                     </span>
                   ))}
@@ -192,5 +194,6 @@ export default function ContestCodeChefPage() {
         </div>
       </section>
     </div>
+            </main>
   );
 }

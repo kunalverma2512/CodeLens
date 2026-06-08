@@ -96,6 +96,8 @@ export default function AlgoVersePage() {
   };
 
   return (
+    <main>
+      <title>AlgoVerse - CodeLens</title>
     <div className="w-full min-h-screen bg-white">
       {/* Hero Section */}
       <section className="w-full border-b-4 border-black px-4 sm:px-6 md:px-8 py-16 sm:py-20 md:py-24">
@@ -148,7 +150,7 @@ export default function AlgoVersePage() {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full border-4 border-black px-6 py-4 font-bold text-base uppercase tracking-wide placeholder:text-black placeholder:opacity-40 focus:outline-none focus:shadow-[4px_4px_0_0_rgba(0,0,0,1)] transition-shadow"
-              />
+                />
             </div>
             {/* Filter Button */}
             <button className="px-8 py-4 border-4 border-black bg-black text-white font-black uppercase tracking-widest hover:bg-white hover:text-black transition-colors">
@@ -167,13 +169,13 @@ export default function AlgoVersePage() {
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4">
             {algorithmCategories.map((category) => (
               <button
-                key={category.id}
-                onClick={() => setSelectedCategory(category.id)}
-                className={`border-4 border-black p-4 sm:p-6 transition-all duration-150 hover:-translate-x-1 hover:-translate-y-1 hover:shadow-[6px_6px_0_0_rgba(0,0,0,1)] ${
-                  selectedCategory === category.id
-                    ? "bg-black text-white shadow-[6px_6px_0_0_rgba(0,0,0,1)]"
+              key={category.id}
+              onClick={() => setSelectedCategory(category.id)}
+              className={`border-4 border-black p-4 sm:p-6 transition-all duration-150 hover:-translate-x-1 hover:-translate-y-1 hover:shadow-[6px_6px_0_0_rgba(0,0,0,1)] ${
+                selectedCategory === category.id
+                ? "bg-black text-white shadow-[6px_6px_0_0_rgba(0,0,0,1)]"
                     : "bg-white text-black"
-                }`}
+                  }`}
               >
                 <div className="text-3xl font-black mb-3">{category.icon}</div>
                 <div className="text-xs sm:text-sm font-black uppercase tracking-tight leading-tight mb-2">
@@ -201,15 +203,15 @@ export default function AlgoVersePage() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {featuredAlgorithms.map((algo) => (
               <div
-                key={algo.id}
-                className="border-4 border-black bg-white p-6 hover:shadow-[12px_12px_0_0_rgba(0,0,0,1)] hover:-translate-x-2 hover:-translate-y-2 transition-all cursor-pointer group"
+              key={algo.id}
+              className="border-4 border-black bg-white p-6 hover:shadow-[12px_12px_0_0_rgba(0,0,0,1)] hover:-translate-x-2 hover:-translate-y-2 transition-all cursor-pointer group"
               >
                 <div className="flex items-start justify-between mb-4">
                   <div
                     className={`border-2 px-3 py-1 text-xs font-black uppercase tracking-wide ${getDifficultyColor(
                       algo.difficulty
                     )}`}
-                  >
+                    >
                     {algo.difficulty}
                   </div>
                   <div className="text-xs font-black uppercase tracking-widest text-gray-500">
@@ -239,8 +241,8 @@ export default function AlgoVersePage() {
                 <div className="flex flex-wrap gap-2 pt-4 border-t-2 border-black">
                   {algo.tags.map((tag, idx) => (
                     <span
-                      key={idx}
-                      className="text-[10px] font-black uppercase tracking-wide border-2 border-black px-2 py-1 bg-gray-50"
+                    key={idx}
+                    className="text-[10px] font-black uppercase tracking-wide border-2 border-black px-2 py-1 bg-gray-50"
                     >
                       {tag}
                     </span>
@@ -281,5 +283,6 @@ export default function AlgoVersePage() {
         </div>
       </section>
     </div>
+            </main>
   );
 }

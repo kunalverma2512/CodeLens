@@ -34,6 +34,8 @@ export default function ContestLeetCodePage() {
   ];
 
   return (
+    <main>
+      <title>LeetCode Contests - CodeLens</title>
     <div className="w-full min-h-screen bg-white">
       {/* Hero Section */}
       <section className="w-full border-b-4 border-black px-4 sm:px-6 md:px-8 py-16 sm:py-20 md:py-24 bg-gradient-to-br from-yellow-50 to-white">
@@ -81,13 +83,13 @@ export default function ContestLeetCodePage() {
           <div className="flex flex-wrap gap-3">
             {["all", "Weekly", "Biweekly"].map((type) => (
               <button
-                key={type}
-                onClick={() => setSelectedType(type)}
-                className={`px-6 py-3 border-4 border-black font-black text-sm uppercase tracking-widest transition-all ${
-                  selectedType === type
-                    ? "bg-yellow-500 text-black"
-                    : "bg-white text-black hover:bg-yellow-500"
-                }`}
+              key={type}
+              onClick={() => setSelectedType(type)}
+              className={`px-6 py-3 border-4 border-black font-black text-sm uppercase tracking-widest transition-all ${
+                selectedType === type
+                ? "bg-yellow-500 text-black"
+                : "bg-white text-black hover:bg-yellow-500"
+              }`}
               >
                 {type}
               </button>
@@ -140,9 +142,9 @@ export default function ContestLeetCodePage() {
                 <div className="flex flex-wrap gap-2 mb-4">
                   {contest.tags.map((tag, idx) => (
                     <span
-                      key={idx}
+                    key={idx}
                       className="text-[10px] font-black uppercase tracking-wide border-2 border-black px-2 py-1 bg-white"
-                    >
+                      >
                       {tag}
                     </span>
                   ))}
@@ -192,5 +194,6 @@ export default function ContestLeetCodePage() {
         </div>
       </section>
     </div>
+                  </main>
   );
 }

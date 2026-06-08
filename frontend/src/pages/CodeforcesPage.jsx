@@ -320,12 +320,15 @@ export default function CodeforcesPage() {
   // ── Loading ──────────────────────────────────────────────────────────────
   if (loading) {
     return (
+      <main>
+        <title>Codeforces - CodeLens</title>
       <div className="min-h-screen flex items-center justify-center bg-white">
         <div className="flex flex-col items-center gap-6">
           <div className="w-16 h-16 border-[6px] border-black border-t-transparent animate-spin" />
           <p className="font-black uppercase tracking-widest text-lg">Loading Codeforces Data...</p>
         </div>
       </div>
+      </main>
     );
   }
 
@@ -333,6 +336,8 @@ export default function CodeforcesPage() {
   if (!isConnected) {
     return (
       <>
+      <main>
+        <title>Codeforces - CodeLens</title>
         <NotConnectedPage onOpenModal={() => setModalOpen(true)} />
         <VerifyModal
           isOpen={modalOpen}
@@ -343,6 +348,7 @@ export default function CodeforcesPage() {
           connectLoading={connectLoading}
           connectError={connectError}
         />
+          </main>
       </>
     );
   }
@@ -359,6 +365,8 @@ export default function CodeforcesPage() {
 
   // ── Connected — full data view ────────────────────────────────────────────
   return (
+    <main>
+      <title>Codeforces - CodeLens</title>
     <div className="min-h-screen bg-white text-black">
 
       {/* ── Profile Header ─────────────────────────────────────────────── */}
@@ -366,10 +374,10 @@ export default function CodeforcesPage() {
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-start sm:items-center gap-8">
           {profile?.avatar && (
             <img
-              src={profile.avatar}
+            src={profile.avatar}
               alt={profile.handle}
               className="w-24 h-24 sm:w-32 sm:h-32 border-[4px] border-white object-cover flex-shrink-0"
-            />
+              />
           )}
           <div className="flex-1">
             <div className="flex flex-wrap items-center gap-4 mb-2">
@@ -532,5 +540,6 @@ export default function CodeforcesPage() {
         </div>
       )}
     </div>
+          </main>
   );
 }

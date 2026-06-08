@@ -33,6 +33,8 @@ export default function DashboardPage() {
   }
 
   return (
+    <main>
+      <title>Dashboard - CodeLens</title>
     <div className="w-full flex-1 flex flex-col px-4 sm:px-6 md:px-8 py-12 sm:py-16 bg-white overflow-hidden">
       <div className="max-w-7xl mx-auto w-full">
         <header className="mb-12 sm:mb-16 border-b-4 border-black pb-6 sm:pb-8 flex flex-col md:flex-row md:items-end md:justify-between gap-4 sm:gap-6">
@@ -47,7 +49,7 @@ export default function DashboardPage() {
           <button
             onClick={handleLogout}
             className="px-6 sm:px-8 py-3 sm:py-4 border-4 border-black bg-white text-black font-black uppercase tracking-widest hover:bg-black hover:text-white transition-colors rounded-none w-full md:w-auto"
-          >
+            >
             Logout
           </button>
         </header>
@@ -79,8 +81,8 @@ export default function DashboardPage() {
             </div>
           ) : cfConnected && cfData ? (
             <Link
-              to="/codeforces"
-              className="border-4 border-black p-6 sm:p-8 bg-white shadow-[8px_8px_0_0_rgba(0,0,0,1)] hover:-translate-y-1 transition-transform duration-300 block"
+            to="/codeforces"
+            className="border-4 border-black p-6 sm:p-8 bg-white shadow-[8px_8px_0_0_rgba(0,0,0,1)] hover:-translate-y-1 transition-transform duration-300 block"
             >
               <h3 className="text-2xl sm:text-3xl font-black uppercase tracking-tighter text-black mb-6 border-b-4 border-black pb-4">Codeforces</h3>
               <div className="flex flex-col space-y-4">
@@ -131,7 +133,7 @@ export default function DashboardPage() {
                       width: cfConnected && cfData
                         ? `${Math.min((cfData.currentStreak / Math.max(cfData.longestStreak, 1)) * 100, 100)}%`
                         : "0%"
-                    }}
+                      }}
                   />
                 </div>
                 <div className="flex justify-between items-center mt-2">
@@ -162,7 +164,8 @@ export default function DashboardPage() {
         verificationCode={verificationCode}
         connectLoading={connectLoading}
         connectError={connectError}
-      />
+        />
     </div>
+        </main>
   );
 }

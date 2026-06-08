@@ -344,6 +344,8 @@ export default function PracticePage() {
 
   // ── Render ─────────────────────────────────────────────────────────────────
   return (
+    <main>
+      <title>Practice - CodeLens</title>
     <div className="min-h-screen bg-white text-black">
 
       {/* ── Hero Header ─────────────────────────────────────────────────── */}
@@ -439,7 +441,7 @@ export default function PracticePage() {
                   selectedTags.length > 0 || showTagPanel
                     ? "bg-black text-white"
                     : "bg-white text-black hover:bg-gray-100"
-                }`}
+                  }`}
               >
                 Tags{selectedTags.length > 0 ? ` (${selectedTags.length})` : ""} {showTagPanel ? "▴" : "▾"}
               </button>
@@ -459,7 +461,7 @@ export default function PracticePage() {
                   <div className="p-3 flex flex-wrap gap-2 max-h-60 overflow-y-auto">
                     {filteredTagList.map((t) => (
                       <TagPill
-                        key={t}
+                      key={t}
                         tag={t}
                         selected={selectedTags.includes(t)}
                         onToggle={toggleTag}
@@ -474,7 +476,7 @@ export default function PracticePage() {
                       <button
                         onClick={() => setSelectedTags([])}
                         className="text-xs font-black uppercase tracking-widest text-black hover:underline"
-                      >
+                        >
                         Clear Tags
                       </button>
                     </div>
@@ -504,9 +506,9 @@ export default function PracticePage() {
               )}
               {selectedTags.map((t) => (
                 <span
-                  key={t}
+                key={t}
                   className="text-xs font-black uppercase tracking-widest border-[2px] border-black bg-black text-white px-2 py-0.5 flex items-center gap-1"
-                >
+                  >
                   {t}
                   <button onClick={() => toggleTag(t)} className="hover:opacity-60">×</button>
                 </span>
@@ -514,7 +516,7 @@ export default function PracticePage() {
               <button
                 onClick={clearAll}
                 className="text-xs font-black uppercase tracking-widest text-gray-500 hover:text-black underline underline-offset-4 ml-2"
-              >
+                >
                 Clear All
               </button>
             </div>
@@ -604,11 +606,11 @@ export default function PracticePage() {
                 {/* Rows */}
                 {paginated.map((p, i) => (
                   <ProblemRow
-                    key={`${p.contestId}-${p.index}`}
-                    problem={p}
-                    stats={statsMap[`${p.contestId}/${p.index}`]}
+                  key={`${p.contestId}-${p.index}`}
+                  problem={p}
+                  stats={statsMap[`${p.contestId}/${p.index}`]}
                     index={(page - 1) * PAGE_SIZE + i}
-                  />
+                    />
                 ))}
               </div>
             )}
@@ -639,14 +641,14 @@ export default function PracticePage() {
                   for (let pg = start; pg <= end; pg++) {
                     pages.push(
                       <button
-                        key={pg}
-                        onClick={() => { setPage(pg); window.scrollTo({ top: 0 }); }}
-                        className={`w-10 h-10 border-[3px] border-black font-black text-xs transition-colors ${
-                          pg === page
-                            ? "bg-black text-white"
+                      key={pg}
+                      onClick={() => { setPage(pg); window.scrollTo({ top: 0 }); }}
+                      className={`w-10 h-10 border-[3px] border-black font-black text-xs transition-colors ${
+                        pg === page
+                        ? "bg-black text-white"
                             : "bg-white text-black hover:bg-gray-100"
-                        }`}
-                      >
+                          }`}
+                          >
                         {pg}
                       </button>
                     );
@@ -658,14 +660,14 @@ export default function PracticePage() {
                   onClick={() => { setPage((p) => Math.min(totalPages, p + 1)); window.scrollTo({ top: 0 }); }}
                   disabled={page === totalPages}
                   className="px-4 py-2 border-[3px] border-black font-black text-xs uppercase tracking-widest hover:bg-black hover:text-white transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
-                >
+                  >
                   Next ›
                 </button>
                 <button
                   onClick={() => { setPage(totalPages); window.scrollTo({ top: 0 }); }}
                   disabled={page === totalPages}
                   className="px-3 py-2 border-[3px] border-black font-black text-xs uppercase tracking-widest hover:bg-black hover:text-white transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
-                >
+                  >
                   »»
                 </button>
 
@@ -688,7 +690,7 @@ export default function PracticePage() {
               target="_blank"
               rel="noopener noreferrer"
               className="text-black font-black underline underline-offset-4 decoration-2 hover:opacity-60"
-            >
+              >
               Codeforces Problemset API
             </a>
           </p>
@@ -698,5 +700,6 @@ export default function PracticePage() {
         </div>
       </div>
     </div>
+              </main>
   );
 }

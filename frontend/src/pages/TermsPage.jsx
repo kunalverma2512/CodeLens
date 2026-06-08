@@ -1,5 +1,7 @@
 export default function TermsPage() {
     return(
+        <main>
+            <title>Terms of Service - CodeLens</title>
         <section>
             <div className="m-20">
                 <p className="text-center text-black font-black text-2xl uppercase tracking-widest underline underline-offset-8 decoration-[3px]">Terms of Service</p>
@@ -8,5 +10,6 @@ export default function TermsPage() {
                 </p>
             </div>
         </section>
+        </main>
     );
 }
