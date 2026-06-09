@@ -463,6 +463,9 @@ export default function Navbar() {
            <Link to="/contact" className={navLinkCls("/contact")}>
             Contact Us
           </Link>
+           <Link to="/about" className={navLinkCls("/about")}>
+            About
+          </Link>
         </div>
 
         {/* ── Desktop Right Controls ────────────────────────────────────── */}
@@ -588,6 +591,9 @@ export default function Navbar() {
             </Link>
             <Link to="/contact" onClick={closeMenu} className={mobileLinkCls}>
               Contact Us <span className="text-zinc-300 text-sm">→</span>
+            </Link>
+            <Link to="/about" onClick={closeMenu} className={mobileLinkCls}>
+              About <span className="text-zinc-300 text-sm">→</span>
             </Link>
 
             {isAuthenticated && (
