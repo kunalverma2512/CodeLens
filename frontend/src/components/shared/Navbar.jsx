@@ -106,6 +106,9 @@ function Chevron({ open, className = "" }) {
 
 // ─── Desktop Mega Menu Panel ───────────────────────────────────────────────────
 function MegaMenuPanel({ megaRef, onMouseEnter, onMouseLeave, onClose, megaTriggerRef, firstMenuItemRef, }) {
+  const coreTools = MEGA_MENU_ITEMS.filter((item) => !item.submenu);
+  const contestArsenal = MEGA_MENU_ITEMS.find((item) => item.submenu);
+
   return (
     <div
       id="tools-mega-menu"
@@ -124,100 +127,93 @@ function MegaMenuPanel({ megaRef, onMouseEnter, onMouseLeave, onClose, megaTrigg
       }}
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
-      className="absolute top-full left-1/2 mt-4 w-[620px] bg-white border border-zinc-200 shadow-2xl shadow-black/8 z-50 rounded-sm"
+      className="absolute top-full left-1/2 mt-5 w-[700px] bg-white border-[3px] border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] z-50 animate-dropdown"
       style={{ transform: "translateX(-50%)" }}
     >
-      {/* Single thin top accent — replaces aggressive border-4 */}
-      <div className="h-0.5 w-full bg-black rounded-t-sm" />
+      <div className="flex">
+        {/* Left Pane: Core Tools */}
+        <div className="flex-1 p-6 bg-white border-r-[3px] border-black relative overflow-hidden">
+          {/* Subtle grid pattern background to look premium */}
+          <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: "linear-gradient(to right, #000 1px, transparent 1px), linear-gradient(to bottom, #000 1px, transparent 1px)", backgroundSize: "16px 16px" }} />
+          
+          <p className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500 mb-5 relative z-10">
+            Core Arsenal
+          </p>
+          <div className="flex flex-col gap-2 relative z-10">
+            {coreTools.map((item, idx) => {
+              const Wrapper = item.to ? Link : "div";
+              const wrapperProps = item.to ? { to: item.to, onClick: onClose } : {};
 
-      <div className="p-5">
-        {/* Section label */}
-        <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-zinc-400 mb-4 pb-3 border-b border-zinc-100">
-          AI-Powered Tools — GSSoC '26
-        </p>
-
-        {/* Item grid — gap-px with bg-zinc-100 creates razor-thin dividers */}
-        <div className="grid grid-cols-2 gap-px bg-zinc-100 rounded-[2px] overflow-hidden">
-          {MEGA_MENU_ITEMS.map((item) => {
-            const hasSubmenu = item.submenu && item.submenu.length > 0;
-
-            // ── Contest Arsenal: full-width with nested submenu ────────────
-            if (hasSubmenu) {
               return (
-                <div key={item.label} className="col-span-2">
-                  {/* Parent header */}
-                  <div className="bg-zinc-900 text-white px-4 py-3">
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm leading-none opacity-70">{item.icon}</span>
-                      <span className="text-xs font-bold uppercase tracking-[0.1em]">{item.label}</span>
-                      <Tag label={item.tag} />
+                <Wrapper
+                  ref={idx === 0 ? firstMenuItemRef : null}
+                  key={item.label}
+                  {...wrapperProps}
+                  className={`group p-3 border-2 transition-all duration-200 ease-out ${
+                    item.to 
+                      ? "border-transparent hover:border-black hover:bg-white hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-1 hover:-translate-x-1 cursor-pointer bg-white relative z-20" 
+                      : "border-transparent opacity-50 cursor-default"
+                  }`}
+                >
+                  <div className="flex items-center gap-3 mb-1.5">
+                    {/* Icon wrapper */}
+                    <div className="w-7 h-7 flex items-center justify-center bg-zinc-100 border border-zinc-200 group-hover:bg-black group-hover:text-white transition-colors duration-200 rounded-sm">
+                      <span className="text-sm leading-none opacity-80 group-hover:opacity-100">
+                        {item.icon}
+                      </span>
                     </div>
-                    <p className="text-[11px] text-zinc-400 mt-1 pl-5 leading-snug font-normal">
-                      {item.desc}
-                    </p>
+                    <span className="text-xs font-black uppercase tracking-[0.1em] text-zinc-800 group-hover:text-black">
+                      {item.label}
+                    </span>
+                    <Tag label={item.tag} />
                   </div>
-                  {/* Submenu grid */}
-                  <div className="grid grid-cols-2 gap-px bg-zinc-100">
-                    {item.submenu.map((sub) => (
-                      <Link
-                        key={sub.label}
-                        to={sub.to}
-                        onClick={onClose}
-                        className="group bg-white px-4 py-3 hover:bg-zinc-900 hover:text-white transition-colors duration-150"
-                      >
-                        <div className="flex items-center gap-2 mb-0.5">
-                          <span className="text-sm leading-none">{sub.icon}</span>
-                          <span className="text-xs font-semibold uppercase tracking-[0.09em] group-hover:text-white">
-                            {sub.label}
-                          </span>
-                        </div>
-                        <p className="text-[11px] text-zinc-400 pl-5 leading-snug group-hover:text-zinc-300 font-normal">
-                          {sub.desc}
-                        </p>
-                      </Link>
-                    ))}
-                  </div>
-                </div>
+                  <p className="text-[11px] text-zinc-500 pl-10 leading-snug font-medium">
+                    {item.desc}
+                  </p>
+                </Wrapper>
               );
-            }
+            })}
+          </div>
+        </div>
 
-            // ── Standard grid item ─────────────────────────────────────────
-            const Wrapper = item.to ? Link : "div";
-            const wrapperProps = item.to ? { to: item.to, onClick: onClose } : {};
-
-            return (
-              <Wrapper
-                ref={item.label === "Practice CP" ? firstMenuItemRef : null}
-                key={item.label}
-                {...wrapperProps}
-                className={`bg-white px-4 py-3 transition-colors duration-150 ${
-                  item.to
-                    ? "cursor-pointer hover:bg-zinc-900 hover:text-white group"
-                    : "cursor-default opacity-50"
-                }`}
+        {/* Right Pane: Contest Arsenal */}
+        <div className="w-[320px] p-6 bg-zinc-50 relative z-10">
+          <p className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500 mb-5">
+            Contest Solutions
+          </p>
+          <div className="flex flex-col gap-2">
+            {contestArsenal.submenu.map((sub) => (
+              <Link
+                key={sub.label}
+                to={sub.to}
+                onClick={onClose}
+                className="group flex items-start gap-3 p-3 bg-white border-2 border-zinc-200 hover:border-black hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-1 hover:-translate-x-1 transition-all duration-200 ease-out cursor-pointer"
               >
-                <div className="flex items-center gap-2 mb-0.5">
-                  <span className="text-sm leading-none opacity-70">{item.icon}</span>
-                  <span className="text-xs font-semibold uppercase tracking-[0.09em]">{item.label}</span>
-                  <Tag label={item.tag} />
+                <span className="text-base leading-none mt-0.5 grayscale opacity-70 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-200">
+                  {sub.icon}
+                </span>
+                <div>
+                  <span className="block text-[11px] font-black uppercase tracking-[0.1em] text-zinc-800 group-hover:text-black mb-1">
+                    {sub.label}
+                  </span>
+                  <p className="text-[10px] text-zinc-500 leading-snug font-medium">
+                    {sub.desc}
+                  </p>
                 </div>
-                <p className="text-[11px] text-zinc-400 pl-5 leading-snug group-hover:text-zinc-300 font-normal">
-                  {item.desc}
-                </p>
-              </Wrapper>
-            );
-          })}
+              </Link>
+            ))}
+          </div>
         </div>
+      </div>
 
-        {/* Footer strip */}
-        <div className="mt-4 pt-3 border-t border-zinc-100 flex items-center justify-between">
-          <span className="text-[10px] font-medium uppercase tracking-[0.12em] text-zinc-400">
-            More tools shipping soon
-          </span>
-          <span className="text-[10px] font-semibold uppercase tracking-[0.1em] text-zinc-700 underline underline-offset-2 hover:text-black cursor-pointer transition-colors">
-            View All →
-          </span>
-        </div>
+      {/* Footer strip */}
+      <div className="px-6 py-4 border-t-[3px] border-black bg-black flex items-center justify-between text-white group cursor-pointer hover:bg-zinc-900 transition-colors" onClick={onClose}>
+        <span className="text-[10px] font-bold uppercase tracking-[0.15em] text-zinc-300">
+          Explore all integrations
+        </span>
+        <span className="text-sm group-hover:translate-x-2 transition-transform duration-200 ease-out">
+          →
+        </span>
       </div>
     </div>
   );
@@ -628,17 +624,17 @@ export default function Navbar() {
                           onClick={() =>
                             setExpandedSubmenu(isExpanded ? null : item.label)
                           }
-                          className="w-full text-left px-7 py-3 bg-zinc-900 text-white flex items-center justify-between"
+                          className="w-full text-left px-7 py-4 bg-zinc-50 hover:bg-zinc-100 text-zinc-800 flex items-center justify-between transition-colors"
                         >
                           <div className="flex-1">
                             <div className="flex items-center gap-2">
                               <span className="text-sm opacity-70">{item.icon}</span>
-                              <span className="text-[11px] font-semibold uppercase tracking-[0.09em]">
+                              <span className="text-[11px] font-semibold uppercase tracking-[0.09em] text-zinc-800">
                                 {item.label}
                               </span>
                               <Tag label={item.tag} />
                             </div>
-                            <p className="text-[11px] text-zinc-400 mt-0.5 pl-5 leading-snug font-normal">
+                            <p className="text-[11px] text-zinc-500 mt-1 pl-6 leading-snug font-normal">
                               {item.desc}
                             </p>
                           </div>
@@ -646,15 +642,15 @@ export default function Navbar() {
                         </button>
 
                         {isExpanded && (
-                          <div className="bg-white">
+                          <div className="bg-white pb-2">
                             {item.submenu.map((sub) => (
                               <Link
                                 key={sub.label}
                                 to={sub.to}
                                 onClick={closeMenu}
-                                className="flex items-start gap-2.5 px-10 py-3 border-b border-zinc-50 last:border-0 hover:bg-zinc-50 hover:text-black transition-colors duration-150"
+                                className="flex items-start gap-2.5 px-10 py-3 border-l-2 border-transparent hover:border-black hover:bg-zinc-50 hover:text-black transition-colors duration-150"
                               >
-                                <span className="text-sm mt-0.5">{sub.icon}</span>
+                                <span className="text-sm mt-0.5 grayscale opacity-80">{sub.icon}</span>
                                 <div>
                                   <p className="text-[11px] font-semibold uppercase tracking-[0.09em] text-zinc-800">
                                     {sub.label}
@@ -679,7 +675,7 @@ export default function Navbar() {
                     <Wrapper
                       key={item.label}
                       {...wrapperProps}
-                      className={`flex items-start gap-2.5 px-7 py-3 border-b border-zinc-100 last:border-0 transition-colors duration-150 ${
+                      className={`flex items-start gap-2.5 px-7 py-4 border-b border-zinc-100 last:border-0 transition-colors duration-150 ${
                         item.to
                           ? "cursor-pointer hover:bg-zinc-50 hover:text-black"
                           : "opacity-40 cursor-default"
@@ -693,7 +689,7 @@ export default function Navbar() {
                           </span>
                           <Tag label={item.tag} />
                         </div>
-                        <p className="text-[11px] text-zinc-400 leading-snug mt-0.5">{item.desc}</p>
+                        <p className="text-[11px] text-zinc-400 leading-snug mt-1">{item.desc}</p>
                       </div>
                     </Wrapper>
                   );
