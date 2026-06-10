@@ -373,8 +373,9 @@ export default function Navbar() {
         <Link
           to="/"
           onClick={closeMenu}
-          className="text-lg font-black tracking-tighter uppercase text-black hover:opacity-60 transition-opacity flex-shrink-0"
+          className="flex items-center gap-2 text-lg font-black tracking-tighter uppercase text-black hover:opacity-60 transition-opacity flex-shrink-0"
         >
+          <img src="/logo.png" alt="CodeLens Logo" className="h-6 w-auto" />
           CODELENS
         </Link>
 
