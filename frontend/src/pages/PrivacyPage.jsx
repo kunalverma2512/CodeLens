@@ -38,24 +38,21 @@ export default function PrivacyPage() {
           </div>
         </div>
       </section>
-      {/* Optional Desktop Section Indicator */}
+
+      {/* Desktop Section Indicator */}
       <div className="hidden xl:block fixed right-8 top-1/2 -translate-y-1/2 z-40">
         <div className="flex flex-col gap-3">
           {[...Array(11)].map((_, i) => (
             <a
               key={i}
               href={`#section-${String(i + 1).padStart(2, "0")}`}
+              aria-label={`Go to section ${i + 1}`}
               className="w-3 h-3 border-2 border-black rounded-full hover:bg-black transition"
             />
           ))}
         </div>
       </div>
-      <a
-        key={i}
-        href={`#section-${String(i + 1).padStart(2, "0")}`}
-        aria-label={`Go to section ${i + 1}`}
-        className="w-3 h-3 border-2 border-black rounded-full hover:bg-black transition"
-      />
+
       {/* Privacy Sections */}
       <PrivacyIntro />
       <PrivacyInfoCollect />
@@ -68,6 +65,7 @@ export default function PrivacyPage() {
       <PrivacyChildren />
       <PrivacyChanges />
       <PrivacyContact />
+
       {/* Footer Notice */}
       <section className="bg-[#ededed] border-t-[3px] border-black">
         <div className="max-w-7xl mx-auto px-6 py-12">
