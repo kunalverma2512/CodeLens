@@ -33,12 +33,11 @@ export default function PrivacyPage() {
               <span>•</span>
               <span>Last Updated: {LAST_UPDATED}</span>
               <span>•</span>
-              <span>Effective Date: June 2026</span>
+              <span>Effective Date: {LAST_UPDATED}</span>
             </div>
           </div>
         </div>
       </section>
-
       {/* Optional Desktop Section Indicator */}
       <div className="hidden xl:block fixed right-8 top-1/2 -translate-y-1/2 z-40">
         <div className="flex flex-col gap-3">
@@ -51,7 +50,12 @@ export default function PrivacyPage() {
           ))}
         </div>
       </div>
-
+      <a
+        key={i}
+        href={`#section-${String(i + 1).padStart(2, "0")}`}
+        aria-label={`Go to section ${i + 1}`}
+        className="w-3 h-3 border-2 border-black rounded-full hover:bg-black transition"
+      />
       {/* Privacy Sections */}
       <PrivacyIntro />
       <PrivacyInfoCollect />
@@ -64,7 +68,6 @@ export default function PrivacyPage() {
       <PrivacyChildren />
       <PrivacyChanges />
       <PrivacyContact />
-
       {/* Footer Notice */}
       <section className="bg-[#ededed] border-t-[3px] border-black">
         <div className="max-w-7xl mx-auto px-6 py-12">

@@ -1,3 +1,13 @@
+
+import PropTypes from 'prop-types';
+PrivacySection.propTypes = {
+  number: PropTypes.string.isRequired,
+  title: PropTypes.string.isRequired,
+  children: PropTypes.node.isRequired,
+  bg: PropTypes.string,
+  reverse: PropTypes.bool,
+};
+
 export default function PrivacySection({
   number,
   title,

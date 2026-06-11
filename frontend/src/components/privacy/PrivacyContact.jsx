@@ -10,7 +10,7 @@ export default function PrivacyContact() {
       </p>
 
       <div className="inline-block border-[3px] border-black px-5 py-3 font-black">
-        [Insert Your Email Address Here]
+        codelens@gmail.com
       </div>
     </PrivacySection>
   );
