@@ -3,14 +3,14 @@ import { Star, GitFork, Bug } from "lucide-react";
 
 function AvailabilityCard() {
   return (
-    <div className="rounded-xl border border-neutral-200 bg-white p-5">
+    <div className="border border-neutral-200 bg-white p-5">
       <p className="font-mono text-xs font-medium uppercase tracking-widest text-neutral-400 mb-3">
         Availability
       </p>
       <div className="flex items-start gap-3">
         <span className="relative flex h-3 w-3 mt-0.5 shrink-0">
-          <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75 motion-reduce:animate-none" />
-          <span className="relative inline-flex h-3 w-3 rounded-full bg-emerald-500" />
+          <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-500 opacity-75 motion-reduce:animate-none" />
+          <span className="relative inline-flex h-3 w-3 rounded-full bg-emerald-600" />
         </span>
         <p className="text-sm text-neutral-600 leading-relaxed">
           Open for feedback and project discussions.
@@ -22,7 +22,7 @@ function AvailabilityCard() {
 
 function TimezoneCard() {
   return (
-    <div className="rounded-xl border border-neutral-200 bg-white p-5">
+    <div className="border border-neutral-200 bg-white p-5">
       <p className="font-mono text-xs font-medium uppercase tracking-widest text-neutral-400 mb-3">
         Timezone
       </p>
@@ -99,7 +99,7 @@ function GitHubStats() {
 
   if (error) {
     return (
-      <div className="rounded-xl border border-neutral-200 bg-white p-5">
+      <div className="border border-neutral-200 bg-white p-5">
         <p className="font-mono text-xs font-medium uppercase tracking-widest text-neutral-400 mb-3">
           GitHub
         </p>
@@ -109,15 +109,15 @@ function GitHubStats() {
   }
 
   return (
-    <div className="rounded-xl border border-neutral-200 bg-white p-5">
+    <div className="border border-neutral-200 bg-white p-5">
       <p className="font-mono text-xs font-medium uppercase tracking-widest text-neutral-400 mb-3">
         GitHub
       </p>
       {loading ? (
         <div className="space-y-3">
-          <div className="h-4 w-24 bg-neutral-100 rounded animate-pulse" />
-          <div className="h-4 w-20 bg-neutral-100 rounded animate-pulse" />
-          <div className="h-4 w-16 bg-neutral-100 rounded animate-pulse" />
+          <div className="h-4 w-24 bg-neutral-100 animate-pulse" />
+          <div className="h-4 w-20 bg-neutral-100 animate-pulse" />
+          <div className="h-4 w-16 bg-neutral-100 animate-pulse" />
         </div>
       ) : (
         <div className="space-y-2.5">
@@ -150,12 +150,12 @@ function GitHubStats() {
 
 function BuilderCard() {
   return (
-    <div className="rounded-xl border border-neutral-200 bg-white p-5">
+    <div className="border border-neutral-200 bg-white p-5">
       <p className="font-mono text-xs font-medium uppercase tracking-widest text-neutral-400 mb-4">
         Built by
       </p>
       <div className="flex items-center gap-3">
-        <div className="h-10 w-10 rounded-full bg-neutral-200 flex items-center justify-center text-sm font-medium text-neutral-600 shrink-0">
+        <div className="h-10 w-10 bg-neutral-200 flex items-center justify-center text-sm font-medium text-neutral-600 shrink-0">
           KV
         </div>
         <div>
@@ -171,13 +171,13 @@ function BuilderCard() {
 
 export default function ContactSidebar() {
   return (
-    <aside className="w-full lg:sticky lg:top-24 lg:self-start">
-      <div className="space-y-4">
+    <div className="w-full">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <AvailabilityCard />
         <TimezoneCard />
         <GitHubStats />
         <BuilderCard />
       </div>
-    </aside>
+    </div>
   );
 }

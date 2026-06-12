@@ -19,7 +19,7 @@ export default function ContactSuccessState({ category, onReset }) {
         initial={{ scale: 0 }}
         animate={{ scale: 1 }}
         transition={{ type: "spring", stiffness: 260, damping: 20 }}
-        className="flex h-14 w-14 items-center justify-center rounded-full bg-emerald-50 mb-6"
+        className="flex h-14 w-14 items-center justify-center bg-neutral-100 mb-6"
       >
         <motion.svg
           width="24"
@@ -30,7 +30,7 @@ export default function ContactSuccessState({ category, onReset }) {
           strokeWidth="3"
           strokeLinecap="round"
           strokeLinejoin="round"
-          className="text-emerald-600"
+          className="text-neutral-900"
           initial={{ pathLength: 0 }}
           animate={{ pathLength: 1 }}
           transition={{ duration: 0.5, delay: 0.2, ease: "easeOut" }}
@@ -44,12 +44,11 @@ export default function ContactSuccessState({ category, onReset }) {
         </motion.svg>
       </motion.div>
 
-      <h3 className="text-2xl font-bold tracking-tight text-neutral-900">
-        Thank you!
+      <h3 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-neutral-900">
+        Message sent!
       </h3>
       <p className="mt-2 text-neutral-500 leading-relaxed max-w-sm">
-        Your message has been submitted successfully. We&apos;ll review it and
-        get back to you as soon as possible.
+        We&apos;ve got your message and we&apos;re on it. You&apos;ll hear from us sooner than you think.
       </p>
 
       <div className="mt-6 flex flex-wrap gap-6">
@@ -73,7 +72,7 @@ export default function ContactSuccessState({ category, onReset }) {
         <button
           type="button"
           onClick={() => navigate("/dashboard")}
-          className="inline-flex items-center gap-2 rounded-xl bg-neutral-900 px-5 py-2.5 text-sm font-medium text-white shadow-sm transition-all duration-200 hover:bg-neutral-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2"
+          className="inline-flex items-center gap-2 bg-neutral-900 px-5 py-2.5 text-sm font-medium text-white shadow-sm transition-all duration-200 hover:bg-neutral-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neutral-900 focus-visible:ring-offset-2"
         >
           Explore Dashboard
           <ArrowRight className="h-4 w-4" />
@@ -83,7 +82,7 @@ export default function ContactSuccessState({ category, onReset }) {
           href="https://github.com/kunalverma2512/CodeLens/issues"
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex items-center gap-2 rounded-xl border border-neutral-200 bg-white px-5 py-2.5 text-sm font-medium text-neutral-700 shadow-sm transition-all duration-200 hover:border-neutral-300 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2"
+          className="inline-flex items-center gap-2 border border-neutral-200 bg-white px-5 py-2.5 text-sm font-medium text-neutral-700 shadow-sm transition-all duration-200 hover:border-neutral-300 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neutral-900 focus-visible:ring-offset-2"
         >
           Check GitHub Issues
           <svg
@@ -101,7 +100,7 @@ export default function ContactSuccessState({ category, onReset }) {
         <button
           type="button"
           onClick={onReset}
-          className="inline-flex items-center gap-2 rounded-xl border border-neutral-200 bg-white px-5 py-2.5 text-sm font-medium text-neutral-600 shadow-sm transition-all duration-200 hover:border-neutral-300 hover:text-neutral-900 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2"
+          className="inline-flex items-center gap-2 border border-neutral-200 bg-white px-5 py-2.5 text-sm font-medium text-neutral-600 shadow-sm transition-all duration-200 hover:border-neutral-300 hover:text-neutral-900 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neutral-900 focus-visible:ring-offset-2"
         >
           Send Another Message
         </button>

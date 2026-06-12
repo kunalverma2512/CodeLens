@@ -4,23 +4,23 @@ import { ChevronDown } from "lucide-react";
 const FAQS = [
   {
     q: "Is CodeLens free to use?",
-    a: "Yes, CodeLens is completely free and open source. You can use it without any restrictions. We believe in making developer tools accessible to everyone.",
+    a: "Yes — 100% free and open source. No hidden fees, no restrictions. Developer tools should be accessible to everyone, period.",
   },
   {
     q: "How do I report a security vulnerability?",
-    a: "Please report security vulnerabilities privately by emailing security@codelens.dev or opening a GitHub Security Advisory. Do not post security vulnerabilities publicly.",
+    a: "Found a flaw? Email security@codelens.dev or open a GitHub Security Advisory. Keep vulnerabilities private until we fix them.",
   },
   {
     q: "Can I contribute?",
-    a: "Absolutely! CodeLens is open source and we welcome contributions. Check out our GitHub repository for contributing guidelines, open issues, and the project roadmap.",
+    a: "Absolutely. CodeLens is open source and we welcome contributors with open arms. Head to our GitHub repo for guidelines, open issues, and the roadmap.",
   },
   {
     q: "How do I request new integrations?",
-    a: "You can request new integrations by opening a feature request on GitHub or reaching out via our Discord community. We prioritize integrations based on community demand.",
+    a: "Open a feature request on GitHub. We listen to the community and prioritize what matters most to you.",
   },
   {
     q: "Where is my data stored?",
-    a: "Your data is stored securely on our servers. We follow industry best practices for data encryption and privacy. For detailed information, please refer to our privacy policy.",
+    a: "On secure servers with enterprise-grade encryption. Your data stays yours. Check our privacy policy for the full breakdown.",
   },
 ];
 
@@ -36,12 +36,12 @@ export default function ContactFAQ() {
 
   return (
     <section className="w-full px-6 sm:px-10 lg:px-16 py-20 lg:py-28">
-      <div className="mx-auto max-w-7xl">
+      <div className="mx-auto max-w-7xl w-full">
         <div className="max-w-2xl mx-auto text-center mb-12">
           <p className="font-mono text-xs font-medium uppercase tracking-widest text-neutral-400 mb-4">
             FAQ
           </p>
-          <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-neutral-900">
+          <h2 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-neutral-900">
             Frequently asked questions
           </h2>
         </div>
@@ -55,13 +55,13 @@ export default function ContactFAQ() {
             return (
               <div
                 key={index}
-                className="rounded-xl border border-neutral-200 bg-white overflow-hidden transition-shadow duration-200 hover:shadow-sm"
+                className="border border-neutral-200 bg-white overflow-hidden transition-shadow duration-200 hover:shadow-sm"
               >
                 <button
                   type="button"
                   id={buttonId}
                   onClick={() => toggle(index)}
-                  className="flex w-full items-center justify-between gap-4 px-5 py-4 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-inset"
+                  className="flex w-full items-center justify-between gap-4 px-5 py-4 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neutral-900 focus-visible:ring-inset"
                   aria-expanded={isOpen}
                   aria-controls={panelId}
                 >

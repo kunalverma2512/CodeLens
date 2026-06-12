@@ -134,12 +134,12 @@ function AutoTextarea({ value, onChange, onBlur, maxLength, id, name, required, 
       required={required}
       placeholder={placeholder}
       rows={3}
-      className={`block w-full rounded-xl border bg-white px-4 py-3 text-sm text-neutral-900 placeholder-neutral-400 transition-all duration-200 resize-none focus:outline-none focus:ring-2 focus:ring-offset-0 ${
+      className={`block w-full border bg-white px-4 py-3 text-sm text-neutral-900 placeholder-neutral-400 transition-all duration-200 resize-none focus:outline-none focus:ring-2 focus:ring-offset-0 ${
         hasError
           ? "border-red-400 focus:ring-red-400"
           : hasSuccess
-          ? "border-emerald-400 focus:ring-emerald-400"
-          : "border-neutral-200 focus:ring-emerald-500"
+          ? "border-neutral-400 focus:ring-neutral-400"
+          : "border-neutral-200 focus:ring-neutral-900"
       }`}
       aria-invalid={hasError || undefined}
       aria-describedby={hasError ? `${id}-error` : undefined}
@@ -159,18 +159,18 @@ function TextInput({ value, onChange, onBlur, type, id, name, required, placehol
         onBlur={onBlur}
         required={required}
         placeholder={placeholder}
-        className={`block w-full rounded-xl border bg-white px-4 py-3 text-sm text-neutral-900 placeholder-neutral-400 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-0 pr-10 ${
+        className={`block w-full border bg-white px-4 py-3 text-sm text-neutral-900 placeholder-neutral-400 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-0 pr-10 ${
           hasError
             ? "border-red-400 focus:ring-red-400"
             : hasSuccess
-            ? "border-emerald-400 focus:ring-emerald-400"
-            : "border-neutral-200 focus:ring-emerald-500"
+            ? "border-neutral-400 focus:ring-neutral-400"
+            : "border-neutral-200 focus:ring-neutral-900"
         }`}
         aria-invalid={hasError || undefined}
         aria-describedby={hasError ? `${id}-error` : undefined}
       />
       {name === "email" && value && validateEmail(value) && (
-        <Check className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-emerald-500" />
+        <Check className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-neutral-900" />
       )}
     </div>
   );
@@ -273,9 +273,9 @@ export default function ContactForm() {
                   key={cat}
                   type="button"
                   onClick={() => switchCategory(cat)}
-                  className={`px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 ${
+                  className={`px-4 py-2 text-sm font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neutral-900 focus-visible:ring-offset-2 ${
                     category === cat
-                      ? "bg-emerald-600 text-white shadow-sm"
+                      ? "bg-neutral-900 text-white shadow-sm"
                       : "bg-white text-neutral-600 border border-neutral-200 hover:border-neutral-300 hover:text-neutral-900"
                   }`}
                 >
@@ -371,7 +371,7 @@ export default function ContactForm() {
               <button
                 type="submit"
                 disabled={!valid || submitting}
-                className="inline-flex items-center justify-center gap-2 rounded-xl bg-emerald-600 px-8 py-3 text-sm font-semibold text-white shadow-sm transition-all duration-200 hover:bg-emerald-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-40"
+                className="inline-flex items-center justify-center gap-2 bg-neutral-900 px-8 py-3 text-sm font-semibold text-white shadow-sm transition-all duration-200 hover:bg-neutral-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neutral-900 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-40"
               >
                 {submitting ? (
                   <>

@@ -1,37 +1,31 @@
-import { Mail, Bug, Lightbulb, MessageCircle, ArrowUpRight } from "lucide-react";
+import { Mail, Bug, Lightbulb, ArrowUpRight } from "lucide-react";
 
 const channels = [
   {
     icon: Mail,
     title: "Email",
-    description: "Send us an email directly for inquiries and support.",
+    description: "Fire off an email and we&apos;ll get back to you — fast.",
     href: "mailto:hello@codelens.dev",
   },
   {
     icon: Bug,
     title: "GitHub Issues",
-    description: "Report bugs and track progress on existing issues.",
+    description: "Found a bug? Report it and we&apos;ll squash it.",
     href: "https://github.com/kunalverma2512/CodeLens/issues",
   },
   {
     icon: Lightbulb,
     title: "Feature Request",
-    description: "Suggest new features and help shape the roadmap.",
+    description: "Got an idea? Drop it and help us shape the future.",
     href: "https://github.com/kunalverma2512/CodeLens/discussions",
-  },
-  {
-    icon: MessageCircle,
-    title: "Discord Community",
-    description: "Join our community for real-time discussions and help.",
-    href: "#",
   },
 ];
 
 export default function ContactChannelCards() {
   return (
-    <section className="w-full px-6 sm:px-10 lg:px-16 pb-12">
-      <div className="mx-auto max-w-7xl">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-5">
+    <section className="w-full px-6 sm:px-10 lg:px-16 pb-16 lg:pb-24">
+      <div className="mx-auto max-w-7xl w-full">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-5">
           {channels.map((channel) => {
             const Icon = channel.icon;
             return (
@@ -40,10 +34,10 @@ export default function ContactChannelCards() {
                 href={channel.href}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="group relative flex flex-col rounded-xl border border-neutral-200 bg-white p-5 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:scale-[1.01] hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2"
+                className="group relative flex flex-col border border-neutral-200 bg-white p-5 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:scale-[1.01] hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neutral-900 focus-visible:ring-offset-2"
               >
                 <div className="flex items-start justify-between">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-neutral-100 text-neutral-600 transition-colors duration-200 group-hover:bg-emerald-50 group-hover:text-emerald-600">
+                  <div className="flex h-10 w-10 items-center justify-center bg-neutral-100 text-neutral-600 transition-colors duration-200 group-hover:bg-neutral-200 group-hover:text-neutral-900">
                     <Icon className="h-5 w-5" />
                   </div>
                   <ArrowUpRight className="h-4 w-4 text-neutral-300 transition-all duration-200 group-hover:text-neutral-600 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
