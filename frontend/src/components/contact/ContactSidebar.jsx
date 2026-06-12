@@ -32,30 +32,60 @@ function TimezoneCard() {
   );
 }
 
+const STATS_CACHE = new Map();
+const CACHE_TTL = 300_000;
+
 function GitHubStats() {
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(false);
+  const [error, setError] = useState("");
 
   useEffect(() => {
     let cancelled = false;
 
     async function fetchStats() {
+      const repo = "kunalverma2512/CodeLens";
+
+      const cached = STATS_CACHE.get(repo);
+      if (cached && Date.now() - cached.timestamp < CACHE_TTL) {
+        if (!cancelled) {
+          setStats(cached.stats);
+          setLoading(false);
+        }
+        return;
+      }
+
       try {
         const res = await fetch(
-          "https://api.github.com/repos/kunalverma2512/CodeLens",
+          `https://api.github.com/repos/${repo}`,
         );
-        if (!res.ok) throw new Error("Failed to fetch");
+
+        const rateLimitRemaining = res.headers.get("X-RateLimit-Remaining");
+
+        if (!res.ok) {
+          if (rateLimitRemaining === "0") {
+            throw new Error("Rate limit exceeded. Please try again later.");
+          }
+          throw new Error(`GitHub API responded with ${res.status}`);
+        }
+
         const data = await res.json();
+
         if (!cancelled) {
-          setStats({
+          const statsData = {
             stars: data.stargazers_count,
             forks: data.forks_count,
             openIssues: data.open_issues_count,
-          });
+          };
+          STATS_CACHE.set(repo, { stats: statsData, timestamp: Date.now() });
+          setStats(statsData);
+          setError("");
         }
-      } catch {
-        if (!cancelled) setError(true);
+      } catch (err) {
+        console.error("[GitHubStats]", err.message);
+        if (!cancelled) {
+          setError(err.message || "Unable to load stats");
+        }
       } finally {
         if (!cancelled) setLoading(false);
       }
@@ -73,7 +103,7 @@ function GitHubStats() {
         <p className="font-mono text-xs font-medium uppercase tracking-widest text-neutral-400 mb-3">
           GitHub
         </p>
-        <p className="text-xs text-neutral-400">Unable to load stats</p>
+        <p className="text-xs text-neutral-400">{error}</p>
       </div>
     );
   }
