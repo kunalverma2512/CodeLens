@@ -18,32 +18,30 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            const commentBody = `## 🚀 PR Received Successfully
+            const commentBody = `## 🎉 Welcome to CodeLens — Thank You for Your Contribution!
 
-            Hello @${context.payload.pull_request.user.login},
+            Hey @${context.payload.pull_request.user.login}! 👋
 
-            Thank you for taking the initiative to contribute to this project.
+            We are genuinely excited to have you here. Every single PR — big or small — makes CodeLens better, and yours is no exception. Take a moment to review the checklist below to help us merge your work quickly and smoothly.
 
-            Please ensure that your PR follows all project guidelines properly before requesting review.
+            ### ✅ Before Requesting a Review
+            - Keep code clean, readable, and consistent with the existing codebase
+            - Avoid unrelated or unnecessary file changes
+            - Make sure the UI is fully responsive across all device sizes
+            - Attach screenshots or a short screen recording for any UI changes
+            - Resolve all merge conflicts before marking the PR as ready
+            - Do not submit AI-generated, copy-pasted, or low-effort implementations
 
-            ### ⚠️ Important Instructions
-            - Maintain proper code quality and structure
-            - Do not make unnecessary changes/files
-            - Ensure responsiveness across devices
-            - Follow existing project conventions strictly
-            - Attach screenshots/videos for UI-related changes
-            - Resolve merge conflicts before requesting review
-            - Avoid AI-generated low quality PRs or copied implementations
+            ### 💬 Join Our Community Channel — This is Mandatory
+            Being part of our communication channel is **compulsory for all contributors**, not optional.
 
-            ### 📌 Mandatory for GSSoC'26 Participants
-            Joining the community group and announcement channel is compulsory for all contributors participating through GSSoC'26.
+            > 📡 **[Join the CodeLens Matrix Channel](https://matrix.to/#/#codelensx:matrix.org)**
 
-            - Telegram Group: [https://t.me/c/3991077814/1](https://t.me/c/3991077814/1)
-            - Telegram Channel: [https://t.me/+g4esQdo-DyNlZWE1](https://t.me/+g4esQdo-DyNlZWE1)
+            **Why join?** This is where all important announcements, PR review updates, contribution discussions, and maintainer decisions happen in real time. Contributors who are not in the channel regularly miss critical context and updates, which often leads to duplicated or misaligned work. Staying connected here is what keeps the community strong and your contributions impactful.
 
-            Failure to follow contribution guidelines may lead to PR rejection.
+            ---
 
-            We appreciate your effort and wish you a great open-source journey ahead. ✨`;
+            We are rooting for you! If you have any questions, drop them in the channel or comment right here on this PR. Let's build something great together. 🚀✨`;
 
             await github.rest.issues.createComment({
               owner: context.repo.owner,
