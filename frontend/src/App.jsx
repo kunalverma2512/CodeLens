@@ -8,7 +8,7 @@ import DashboardPage from "./pages/DashboardPage";
 import ExplorePage from "./pages/ExplorePage";
 import CodeforcesPage from "./pages/CodeforcesPage";
 import PracticePage from "./pages/PracticePage";
-
+import AboutCodeLensPage from "./pages/AboutCodeLensPage";
 import ApexAIPage from "./pages/ApexAIPage";
 import ApexWorkspacePage from "./pages/ApexWorkspacePage";
 import AlgoVersePage from "./pages/AlgoVersePage";
@@ -115,6 +115,7 @@ export default function App() {
             <Route path="/bug-reports" element={<BugReportsPage />} />
             <Route path="/faq" element={<FAQPage />} />
             <Route path="/contact" element={<Contact />} />
+            <Route path="/about" element={<AboutCodeLensPage />} />
             <Route path="*" element={<NotFoundPage />} />
           </Routes>
         </MainLayout>
