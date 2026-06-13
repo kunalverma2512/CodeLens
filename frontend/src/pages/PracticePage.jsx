@@ -144,12 +144,18 @@ function ProblemRow({ problem, stats, index }) {
         )}
       </span>
 
-      {/* Difficulty badge */}
-      <span className={`w-20 text-center flex-shrink-0 hidden lg:block`}>
-        <span className={`text-[10px] font-black uppercase tracking-widest border-2 px-2 py-0.5 group-hover:border-white group-hover:bg-transparent ${diffCls}`}>
-          {diffLabel}
-        </span>
+
+
+            {/* Difficulty badge */}
+    <span className="w-20 text-center flex-shrink-0 hidden lg:block">
+      <span className={`text-[10px] font-black uppercase tracking-widest border-2 px-2 py-0.5
+      group-hover:text-white
+      group-hover:bg-black
+      group-hover:border-white
+          ${diffCls}`}>
+        {diffLabel}
       </span>
+    </span>
 
       {/* Solved count */}
       <span className="w-20 text-right flex-shrink-0">

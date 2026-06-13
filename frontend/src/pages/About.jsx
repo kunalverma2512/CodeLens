@@ -14,17 +14,19 @@ import AboutCTA from '../components/about/AboutCTA.jsx'
 const About = () => {
   return (
     <>
-    <Hero/>
-    <Problem/>
-    <WhyCodelens/>
-    <Growth/>
-    <Ecosystem/>
-    <Commitment/>
-    <Community/>
-    <Working/>
-    <Privacy/>
-    <FAQSection/>
-    <AboutCTA/>
+      <title>About — CodeLens</title>
+      <meta name="description" content="Learn about CodeLens — the unified developer telemetry engine that aggregates GitHub, LeetCode, and Codeforces data into a single AI-powered command center." />
+      <Hero />
+      <Problem />
+      <WhyCodelens />
+      <Growth />
+      <Ecosystem />
+      <Commitment />
+      <Community />
+      <Working />
+      <Privacy />
+      <FAQSection />
+      <AboutCTA />
     </>
   )
 }

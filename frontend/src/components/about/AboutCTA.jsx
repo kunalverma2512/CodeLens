@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 
-export default function FinalCTA() {
+export default function AboutCTA() {
   return (
     <div className="w-full px-4 sm:px-6 py-16 sm:py-20 md:py-32 min-h-screen border-b-4 border-black bg-black text-center text-white flex flex-col items-center justify-center overflow-hidden">
       <h2 className="text-3xl sm:text-5xl md:text-7xl lg:text-9xl font-black uppercase tracking-tighter mb-8 sm:mb-12 md:mb-16 leading-none max-w-6xl break-words w-full">
