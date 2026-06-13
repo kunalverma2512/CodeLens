@@ -6,6 +6,12 @@ const Spinner = () => {
       className="min-h-screen flex items-center justify-center bg-white"
     >
       <span className="sr-only">Loading, please wait...</span>
+      {/* CodeLens Logo */}
+      <img
+         src="/favicon.png"
+         alt="CodeLens"
+         className="h-12 w-12 mb-8"
+      />
       <div className="grid grid-cols-2 gap-3">
         {[...Array(4)].map((_, i) => (
           <div
