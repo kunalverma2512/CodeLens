@@ -54,16 +54,16 @@ const Ecosystem = () => {
                     <path
                         d="M20 10V60"
                         stroke="black"
-                        stroke-width="4"
-                        stroke-dasharray="8 8"
-                        stroke-linecap="round"
+                        strokeWidth="4"
+                        strokeDasharray="8 8"
+                        strokeLinecap="round"
                     />
                     <path
                         d="M10 50L20 60L30 50"
                         stroke="black"
-                        stroke-width="4"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
+                        strokeWidth="4"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
                     />
                 </svg>
                 <div className='flex flex-col justify-center items-center border-4 border-black bg-black text-white p-10 gap-2 shadow-[10px_10px_0_0_rgba(0,0,0,1)]'>
@@ -120,16 +120,16 @@ const Ecosystem = () => {
                     <path
                         d="M20 10V60"
                         stroke="black"
-                        stroke-width="4"
-                        stroke-dasharray="8 8"
-                        stroke-linecap="round"
+                        strokeWidth="4"
+                        strokeDasharray="8 8"
+                        strokeLinecap="round"
                     />
                     <path
                         d="M10 50L20 60L30 50"
                         stroke="black"
-                        stroke-width="4"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
+                        strokeWidth="4"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
                     />
                 </svg>
                 <div className='border-2 border-black p-5 flex flex-col gap-5'>
