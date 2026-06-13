@@ -8,7 +8,6 @@ import DashboardPage from "./pages/DashboardPage";
 import ExplorePage from "./pages/ExplorePage";
 import CodeforcesPage from "./pages/CodeforcesPage";
 import PracticePage from "./pages/PracticePage";
-import AboutCodeLensPage from "./pages/AboutCodeLensPage";
 import ApexAIPage from "./pages/ApexAIPage";
 import ApexWorkspacePage from "./pages/ApexWorkspacePage";
 import AlgoVersePage from "./pages/AlgoVersePage";

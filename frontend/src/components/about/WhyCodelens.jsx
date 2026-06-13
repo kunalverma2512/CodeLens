@@ -5,7 +5,7 @@ const WhyCodelens = () => {
     return (
         <div className='w-full min-h-screen border-b-4 px-4 sm:px-6 py-16 sm:py-20 md:py-32'>
             <div className='flex flex-col justify-center items-center gap-5'>
-                <h1 className="text-4xl font-black uppercase leading-none tracking-tight text-black sm:text-7xl lg:text-8xl text-center">Why we built Codelens</h1>
+                <h2 className="text-4xl font-black uppercase leading-none tracking-tight text-black sm:text-7xl lg:text-8xl text-center">Why we built Codelens</h2>
                 <p className='text-2xl sm:text-3xl font-bold leading-none tracking-tight text-black text-center  max-w-3xl'>We were developers who faced same problems. Multiple platforms, scattered progress, unclear next steps.</p>
                 <div className='sm:flex sm:flex-col bg-black p-5 px-10 lg:px-32 justify-center items-center gap-3'>
                     <p className='text-2xl sm:text-3xl font-bold leading-none tracking-tight text-white text-center'>Codelens was created to unify everything and give developers a single source of clarity.</p>

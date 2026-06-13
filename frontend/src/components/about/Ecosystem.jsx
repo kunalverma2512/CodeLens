@@ -1,11 +1,11 @@
 import React from 'react'
-import { BadgeCheck, ChartNoAxesCombined, Route, Lightbulb, MoveRight, Zap } from "lucide-react";
+import { BadgeCheck, ChartNoAxesCombined, Route, Lightbulb, Zap } from "lucide-react";
 import { LeetCodeIcon, CodeforcesIcon, GitHubIcon } from '../icons/PlatformIcons';
 
 const Ecosystem = () => {
     return (
         <div className='w-full min-h-screen border-b-4 px-4 sm:px-6 py-16 sm:py-20 md:py-32 flex flex-col justify-center items-center gap-10'>
-            <h1 className="text-4xl font-black uppercase leading-none tracking-tight text-black sm:text-7xl lg:text-8xl text-center">One ecosystem. Complete visibility.</h1>
+            <h2 className="text-4xl font-black uppercase leading-none tracking-tight text-black sm:text-7xl lg:text-8xl text-center">One ecosystem. Complete visibility.</h2>
             <div className='flex flex-col min-[1250px]:flex-row justify-center items-center gap-5'>
                 <div className='border-2 border-black '>
                     <div className='border-b p-3 px-10 flex items-center gap-5'>
@@ -81,10 +81,10 @@ const Ecosystem = () => {
                             x="40"
                             y="40"
                             fill="#FFF"
-                            font-size="38"
-                            font-family="Inter, Arial, sans-serif"
-                            font-weight="800"
-                            text-anchor="middle"
+                            fontSize="38"
+                            fontFamily="Inter, Arial, sans-serif"
+                            fontWeight="800"
+                            textAnchor="middle"
                             dominant-baseline="middle"
                         >
                             CL

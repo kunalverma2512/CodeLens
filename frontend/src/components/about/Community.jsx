@@ -5,7 +5,7 @@ const Community = () => {
     return (
         <div className='w-full min-h-screen border-b-4 px-4 sm:px-6 py-16 sm:py-20 md:py-32 flex flex-col lg:flex-row justify-center items-center gap-20'>
             <div className='flex flex-col gap-10 justify-center items-center lg:items-start'>
-                    <h1 className="text-4xl font-black uppercase leading-none tracking-tight text-black sm:text-7xl lg:text-8xl text-center lg:text-start max-w-3xl">A community that builds together</h1>
+                    <h2 className="text-4xl font-black uppercase leading-none tracking-tight text-black sm:text-7xl lg:text-8xl text-center lg:text-start max-w-3xl">A community that builds together</h2>
                     <p className='text-2xl sm:text-3xl font-bold leading-none tracking-tight text-black text-center lg:text-start max-w-2xl'>CodeLens is more than a platform - it's a community of builders, learners, and problem solvers.</p>
                 <button onClick={() => { const win = window.open("https://github.com/kunalverma2512/CodeLens", "_blank"); if (win) win.opener = null;}} className='cursor-pointer w-full sm:w-auto px-8 sm:px-12 py-4 sm:py-3 bg-white text-black text-lg font-black uppercase hover:bg-gray-300 transition-colors border-4 border-black rounded-none shadow-[4px_4px_0_0_rgba(0,0,0,1)] sm:shadow-[8px_8px_0_0_rgba(0,0,0,1)] sm:shadow-none sm:hover:-translate-y-1 sm:hover:shadow-[8px_8px_0_0_rgba(0,0,0,1)]'>Join Community ➜</button>
             </div>
