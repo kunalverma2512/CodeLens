@@ -85,7 +85,7 @@ const Ecosystem = () => {
                             fontFamily="Inter, Arial, sans-serif"
                             fontWeight="800"
                             textAnchor="middle"
-                            dominant-baseline="middle"
+                            dominantBaseline="middle"
                         >
                             CL
                         </text>
