@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import * as authService from "../services/authService";
+import { validatePassword } from "../utils/passwordPolicy";
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL;
 
@@ -19,15 +20,8 @@ export default function SignupPage() {
   const { login, isAuthenticated } = useAuth();
   const navigate                   = useNavigate();
   const [searchParams] = useSearchParams();
-  const passwordChecks = {
-    length: password.length >= 8,
-    uppercase: /[A-Z]/.test(password),
-    lowercase: /[a-z]/.test(password),
-    number: /\d/.test(password),
-    special: /[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/.test(password),
-  };
-
-  const isPasswordValid = Object.values(passwordChecks).every(Boolean);
+  const { checks: passwordChecks, isValid: isPasswordValid } =
+     validatePassword(password);
   // Show GitHub OAuth errors forwarded from the callback
   useEffect(() => {
     const ghError = searchParams.get("githubAuthError") || searchParams.get("error");

@@ -1,6 +1,10 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import * as authService from '../../services/authService';
+import {
+  validatePassword,
+  validateOtp,
+} from "../../utils/passwordPolicy";
 
 export default function ForgotPassword() {
   const [step, setStep] = useState(1);
@@ -15,11 +19,10 @@ export default function ForgotPassword() {
 
   const navigate = useNavigate();
 
-  const passwordRegex =
-  /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]).{8,}$/;
+  const { checks: passwordChecks, isValid: isPasswordValid } =
+  validatePassword(newPassword);
 
-  const isPasswordValid = passwordRegex.test(newPassword);
-  const isOtpValid = otp.trim().length === 6;
+  const isOtpValid = validateOtp(otp);
 
   const doPasswordsMatch =
     confirmPassword.length > 0 && newPassword === confirmPassword;
@@ -125,9 +128,19 @@ export default function ForgotPassword() {
   return (
     <div className="w-full flex-1 flex flex-col items-center justify-center px-4 sm:px-6 md:px-8 py-12 sm:py-20 bg-white">
       <div className="w-full max-w-md border-4 border-black p-6 sm:p-8 md:p-12 bg-white shadow-[8px_8px_0_0_rgba(0,0,0,1)] md:shadow-[16px_16px_0_0_rgba(0,0,0,1)]">
-        <h2 className="text-3xl sm:text-4xl md:text-5xl font-black uppercase tracking-tighter text-black mb-8 sm:mb-12">
-          RESET PASSWORD
-        </h2>
+
+      {/* CodeLens Logo */}
+      <div className="flex justify-center mb-8">
+        <img
+          src="/varaint3 transparant logo.png"
+          alt="CodeLens"
+          className="h-12 sm:h-14 w-auto"
+        />
+      </div>
+
+      <h2 className="text-3xl sm:text-4xl md:text-5xl font-black uppercase tracking-tighter text-black mb-8 sm:mb-12">
+        RESET PASSWORD
+      </h2>
 
         {error && (
           <div className="mb-8 border-4 border-red-600 bg-red-50 p-4">
@@ -280,13 +293,27 @@ export default function ForgotPassword() {
               </div>
             </div>
 
-            <div className="text-xs text-gray-600 space-y-1">
-              <p>✓ Minimum 8 characters</p>
-              <p>✓ One uppercase letter (A-Z)</p>
-              <p>✓ One lowercase letter (a-z)</p>
-              <p>✓ One number (0-9)</p>
-              <p>✓ One special character (!@#$%^&*)</p>
-            </div>
+            <ul className="text-xs space-y-1">
+              <li className={passwordChecks.length ? "text-green-600" : "text-gray-500"}>
+                {passwordChecks.length ? "✓" : "✗"} Minimum 8 characters
+              </li>
+
+              <li className={passwordChecks.uppercase ? "text-green-600" : "text-gray-500"}>
+                {passwordChecks.uppercase ? "✓" : "✗"} One uppercase letter (A-Z)
+              </li>
+
+              <li className={passwordChecks.lowercase ? "text-green-600" : "text-gray-500"}>
+                {passwordChecks.lowercase ? "✓" : "✗"} One lowercase letter (a-z)
+              </li>
+
+              <li className={passwordChecks.number ? "text-green-600" : "text-gray-500"}>
+                {passwordChecks.number ? "✓" : "✗"} One number (0-9)
+              </li>
+
+              <li className={passwordChecks.special ? "text-green-600" : "text-gray-500"}>
+                {passwordChecks.special ? "✓" : "✗"} One special character (!@#$%^&*)
+              </li>
+            </ul>
 
             <div className="flex flex-col space-y-3">
               <label

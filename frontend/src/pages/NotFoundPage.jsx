@@ -29,8 +29,15 @@ export default function NotFoundPage() {
           <div className="relative z-10 flex h-full flex-col justify-between">
             {/* Label */}
             <div>
+              {/* CodeLens Logo */}
+              <img
+                src="/varaint3 transparant logo.png"
+                alt="CodeLens"
+                className="h-12 sm:h-14 w-auto mb-8"
+              />
+
               <p className="text-xs font-black uppercase tracking-[0.35em] text-black sm:text-sm">
-                Error / Route Unavailable
+                  Error / Route Unavailable
               </p>
             </div>
 
