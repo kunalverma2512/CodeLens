@@ -220,7 +220,6 @@ export default function ContactForm() {
     (e) => {
       e.preventDefault();
       if (!valid) return;
-      alert("Your message has been sent! We'll get back to you soon.");
       setSubmitted(true);
     },
     [valid],
