@@ -1,4 +1,3 @@
-// eslint-disable-next-line no-unused-vars
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { ArrowRight } from "lucide-react";

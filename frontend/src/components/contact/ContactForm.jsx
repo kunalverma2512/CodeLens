@@ -1,7 +1,6 @@
 import { useState, useRef, useCallback, useMemo } from "react";
-// eslint-disable-next-line no-unused-vars
 import { AnimatePresence, motion } from "framer-motion";
-import { Check, Loader2 } from "lucide-react";
+import { Check } from "lucide-react";
 import ContactSuccessState from "./ContactSuccessState";
 
 const CATEGORIES = ["Bug Report", "Feature Request", "Partnership", "General"];
@@ -181,7 +180,6 @@ export default function ContactForm() {
   const [values, setValues] = useState(FIELD_DEFAULTS["General"]);
   const [errors, setErrors] = useState({});
   const [touched, setTouched] = useState({});
-  const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
 
   const validate = useMemo(() => buildValidator(), []);
@@ -221,14 +219,11 @@ export default function ContactForm() {
   const handleSubmit = useCallback(
     (e) => {
       e.preventDefault();
-      if (!valid || submitting) return;
-      setSubmitting(true);
-      setTimeout(() => {
-        setSubmitting(false);
-        setSubmitted(true);
-      }, 1500);
+      if (!valid) return;
+      alert("Your message has been sent! We'll get back to you soon.");
+      setSubmitted(true);
     },
-    [valid, submitting],
+    [valid],
   );
 
   const handleReset = useCallback(() => {
@@ -370,17 +365,10 @@ export default function ContactForm() {
             <div className="mt-8">
               <button
                 type="submit"
-                disabled={!valid || submitting}
+                disabled={!valid}
                 className="inline-flex items-center justify-center gap-2 bg-neutral-900 px-8 py-3 text-sm font-semibold text-white shadow-sm transition-all duration-200 hover:bg-neutral-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neutral-900 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-40"
               >
-                {submitting ? (
-                  <>
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                    Sending...
-                  </>
-                ) : (
-                  "Send Message"
-                )}
+                Send Message
               </button>
             </div>
           </form>

@@ -4,13 +4,13 @@ const channels = [
   {
     icon: Mail,
     title: "Email",
-    description: "Fire off an email and we&apos;ll get back to you — fast.",
+    description: "Fire off an email and we'll get back to you — fast.",
     href: "mailto:hello@codelens.dev",
   },
   {
     icon: Bug,
     title: "GitHub Issues",
-    description: "Found a bug? Report it and we&apos;ll squash it.",
+    description: "Found a bug? Report it and we'll squash it.",
     href: "https://github.com/kunalverma2512/CodeLens/issues",
   },
   {
