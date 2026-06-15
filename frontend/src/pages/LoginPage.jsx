@@ -66,6 +66,15 @@ export default function LoginPage() {
   return (
     <div className="w-full flex-1 flex flex-col items-center justify-center px-4 sm:px-6 md:px-8 py-12 sm:py-20 bg-white">
       <div className="w-full max-w-md border-4 border-black p-6 sm:p-8 md:p-12 bg-white shadow-[8px_8px_0_0_rgba(0,0,0,1)] md:shadow-[16px_16px_0_0_rgba(0,0,0,1)]">
+        {/* Logo */}
+        <div className="flex justify-center mb-8">
+          <img
+            src="/logo.png"
+            alt="CodeLens"
+            className="h-12 sm:h-14 w-auto"
+          />
+        </div>
+
         <h2 className="text-3xl sm:text-4xl md:text-5xl font-black uppercase tracking-tighter text-black mb-8 sm:mb-12">
           LOGIN
         </h2>
