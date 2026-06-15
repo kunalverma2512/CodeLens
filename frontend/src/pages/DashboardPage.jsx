@@ -46,19 +46,42 @@ export default function DashboardPage() {
         {/* Metrics Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-10 mb-12 sm:mb-16">
           {/* GitHub Stats */}
-          <div className="border-4 border-black p-6 sm:p-8 bg-white shadow-[8px_8px_0_0_rgba(0,0,0,1)] hover:-translate-y-1 transition-transform duration-300">
-            <h3 className="text-2xl sm:text-3xl font-black uppercase tracking-tighter text-black mb-6 border-b-4 border-black pb-4">GitHub</h3>
-            <div className="flex flex-col space-y-6">
-              <div className="flex justify-between items-center">
-                <span className="font-black text-black uppercase tracking-widest text-sm">Commits</span>
-                <span className="font-black text-3xl">—</span>
+          {user?.handles?.github || user?.oauth?.github?.username ? (
+            <Link
+              to="/github-intelligence"
+              className="border-4 border-black p-6 sm:p-8 bg-white shadow-[8px_8px_0_0_rgba(0,0,0,1)] hover:-translate-y-1 transition-transform duration-300 block"
+            >
+              <h3 className="text-2xl sm:text-3xl font-black uppercase tracking-tighter text-black mb-6 border-b-4 border-black pb-4">GitHub</h3>
+              <div className="flex flex-col space-y-4">
+                <div className="flex justify-between items-center">
+                  <span className="font-black text-black uppercase tracking-widest text-sm">Username</span>
+                  <span className="font-black text-xl">@{user.handles.github || user.oauth.github.username}</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="font-black text-black uppercase tracking-widest text-sm">Status</span>
+                  <span className="font-black text-sm text-green-600 uppercase tracking-widest">Connected</span>
+                </div>
+                <div className="pt-2 text-xs font-black uppercase text-gray-500 hover:underline">
+                  View Repository Insights →
+                </div>
               </div>
-              <div className="flex justify-between items-center">
-                <span className="font-black text-black uppercase tracking-widest text-sm">Active PRs</span>
-                <span className="font-black text-3xl">—</span>
+            </Link>
+          ) : (
+            <Link
+              to="/account-center"
+              className="border-4 border-black p-6 sm:p-8 bg-white shadow-[8px_8px_0_0_rgba(0,0,0,1)] hover:-translate-y-1 transition-transform duration-300 flex flex-col justify-between"
+            >
+              <div>
+                <h3 className="text-2xl sm:text-3xl font-black uppercase tracking-tighter text-black mb-4 border-b-4 border-black pb-4">GitHub</h3>
+                <p className="font-bold uppercase tracking-widest text-xs text-gray-500 mb-6">
+                  No GitHub account connected. Link your profile to view metrics.
+                </p>
               </div>
-            </div>
-          </div>
+              <button className="w-full py-3 bg-black text-white font-black uppercase tracking-widest text-sm hover:bg-gray-800 transition-colors border-2 border-black">
+                Connect →
+              </button>
+            </Link>
+          )}
 
           {/* Codeforces Widget */}
           {cfLoading ? (
