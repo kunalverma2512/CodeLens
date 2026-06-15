@@ -28,6 +28,7 @@ import ProtectedRoute from "./components/shared/ProtectedRoute";
 import PublicRoute from "./components/shared/PublicRoute";
 import BugReportsPage from "./pages/BugReportsPage";
 import Contact from "./pages/Contact";
+import BackToTop from './components/shared/Backtotop';
 export default function App() {
   return (
     <AuthProvider>
@@ -119,6 +120,7 @@ export default function App() {
             <Route path="*" element={<NotFoundPage />} />
           </Routes>
         </MainLayout>
+        <BackToTop/>
       </BrowserRouter>
     </AuthProvider>
     
