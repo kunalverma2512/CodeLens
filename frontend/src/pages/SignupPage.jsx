@@ -18,9 +18,16 @@ export default function SignupPage() {
 
   const { login, isAuthenticated } = useAuth();
   const navigate                   = useNavigate();
-  const [searchParams]             = useSearchParams();
-  const isPasswordValid            = password.length >= 6;
+  const [searchParams] = useSearchParams();
+  const passwordChecks = {
+    length: password.length >= 8,
+    uppercase: /[A-Z]/.test(password),
+    lowercase: /[a-z]/.test(password),
+    number: /\d/.test(password),
+    special: /[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/.test(password),
+  };
 
+  const isPasswordValid = Object.values(passwordChecks).every(Boolean);
   // Show GitHub OAuth errors forwarded from the callback
   useEffect(() => {
     const ghError = searchParams.get("githubAuthError") || searchParams.get("error");
@@ -59,7 +66,9 @@ export default function SignupPage() {
       return;
     }
     if (!isPasswordValid) {
-      setError("Password must be at least 6 characters");
+      setError(
+        "Password must be at least 8 characters long and contain an uppercase letter, lowercase letter, number, and special character."
+      );
       return;
     }
 
@@ -201,17 +210,27 @@ export default function SignupPage() {
               <input
                 type="password"
                 value={password}
-                minLength={6}
+                minLength={8}
                 onChange={(e) => setPassword(e.target.value)}
                 aria-invalid={password.length > 0 && !isPasswordValid}
                 className="w-full p-5 border-4 border-black rounded-none text-black font-bold focus:outline-none focus:ring-0 focus:border-gray-500"
                 placeholder="••••••••"
                 required
               />
+
+              <ul className="text-xs font-bold space-y-1 text-gray-600">
+                <li>{passwordChecks.length ? "✓" : "✗"} Minimum 8 characters</li>
+                <li>{passwordChecks.uppercase ? "✓" : "✗"} One uppercase letter</li>
+                <li>{passwordChecks.lowercase ? "✓" : "✗"} One lowercase letter</li>
+                <li>{passwordChecks.number ? "✓" : "✗"} One number</li>
+                <li>{passwordChecks.special ? "✓" : "✗"} One special character</li>
+              </ul>
+              
               <div className="min-h-[16px]">
                 {password && !isPasswordValid && (
                   <p role="alert" className="text-xs font-black uppercase tracking-widest text-red-600">
-                    Password must be at least 6 characters
+                    Password must be at least 8 characters and include uppercase,
+                    lowercase, number, and special character
                   </p>
                 )}
               </div>

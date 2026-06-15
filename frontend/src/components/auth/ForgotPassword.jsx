@@ -15,7 +15,10 @@ export default function ForgotPassword() {
 
   const navigate = useNavigate();
 
-  const isPasswordValid = newPassword.length >= 6;
+  const passwordRegex =
+  /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]).{8,}$/;
+
+  const isPasswordValid = passwordRegex.test(newPassword);
   const isOtpValid = otp.trim().length === 6;
 
   const doPasswordsMatch =
@@ -80,7 +83,9 @@ export default function ForgotPassword() {
     }
 
     if (!isPasswordValid) {
-      setError("Password must be at least 6 characters");
+      setError(
+        "Password must be at least 8 characters long and include an uppercase letter, lowercase letter, number, and special character."
+      );
       return;
     }
 
@@ -253,7 +258,7 @@ export default function ForgotPassword() {
               <input
                 type="password"
                 autoComplete="new-password"
-                minLength={6}
+                minLength={8}
                 aria-invalid={newPassword.length > 0 && !isPasswordValid}
                 value={newPassword}
                 id="new-password"
@@ -268,10 +273,19 @@ export default function ForgotPassword() {
                     role="alert"
                     className="text-xs font-black uppercase tracking-widest text-red-600"
                   >
-                    Password must be at least 6 characters
+                    Password must be at least 8 characters and contain uppercase,
+                    lowercase, number, and special character
                   </p>
                 )}
               </div>
+            </div>
+
+            <div className="text-xs text-gray-600 space-y-1">
+              <p>✓ Minimum 8 characters</p>
+              <p>✓ One uppercase letter (A-Z)</p>
+              <p>✓ One lowercase letter (a-z)</p>
+              <p>✓ One number (0-9)</p>
+              <p>✓ One special character (!@#$%^&*)</p>
             </div>
 
             <div className="flex flex-col space-y-3">
