@@ -3,7 +3,7 @@ const Spinner = () => {
     <div
       role="status"
       aria-live="polite"
-      className="min-h-screen flex items-center justify-center bg-white"
+      className="min-h-screen flex flex-col items-center justify-center bg-white"
     >
       <span className="sr-only">Loading, please wait...</span>
 
