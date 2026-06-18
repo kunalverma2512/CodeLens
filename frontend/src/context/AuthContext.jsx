@@ -1,7 +1,26 @@
+/* eslint-disable react-refresh/only-export-components */
 import { createContext, useContext, useState, useEffect, useCallback } from "react";
 import { getMe, logoutApi } from "../services/authService";
 
 const AuthContext = createContext(null);
+const AUTH_SESSION_HINT_KEY = "codelens.auth.sessionHint";
+
+const readSessionHint = () => {
+  if (typeof window === "undefined") return false;
+  return window.sessionStorage.getItem(AUTH_SESSION_HINT_KEY) === "true";
+};
+
+const writeSessionHint = () => {
+  if (typeof window !== "undefined") {
+    window.sessionStorage.setItem(AUTH_SESSION_HINT_KEY, "true");
+  }
+};
+
+const clearSessionHint = () => {
+  if (typeof window !== "undefined") {
+    window.sessionStorage.removeItem(AUTH_SESSION_HINT_KEY);
+  }
+};
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
@@ -12,28 +31,40 @@ export const useAuth = () => {
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [authError, setAuthError] = useState("");
+  const [authUnknown, setAuthUnknown] = useState(readSessionHint);
 
   /**
-   * isAuthenticated: true only when we have a confirmed user object from the server.
-   * We do NOT rely on localStorage or any client-side token — the server's HttpOnly
-   * cookie is the single source of truth.
+   * isAuthenticated remains true for a previously confirmed session when the
+   * bootstrap profile call hits a transient failure. The server's HttpOnly
+   * cookie is still the source of truth; authUnknown only prevents route guards
+   * from treating temporary API downtime as a logout.
    */
-  const isAuthenticated = !!user;
+  const isAuthenticated = !!user || authUnknown;
 
   /**
    * On mount: ask the server "who am I?" using the HttpOnly cookie.
-   * If the cookie is valid, the server returns the user object.
-   * If not (cookie expired/missing), server returns 401 and we stay logged out.
+   * A real auth failure clears the user; transient failures preserve current
+   * state so temporary API issues do not force a logout.
    */
   useEffect(() => {
     const initAuth = async () => {
       try {
         const response = await getMe();
-        // response.data is the user object from GET /api/auth/me
         setUser(response.data);
-      } catch {
-        // 401 = not logged in (cookie missing/expired) — this is normal, not an error
-        setUser(null);
+        setAuthUnknown(false);
+        setAuthError("");
+        writeSessionHint();
+      } catch (err) {
+        if ([401, 403].includes(err?.response?.status)) {
+          setUser(null);
+          setAuthUnknown(false);
+          setAuthError("");
+          clearSessionHint();
+        } else {
+          setAuthUnknown(readSessionHint());
+          setAuthError("We could not refresh your session. Please retry when the connection is stable.");
+        }
       } finally {
         setLoading(false);
       }
@@ -48,6 +79,9 @@ export const AuthProvider = ({ children }) => {
    */
   const login = useCallback((userData) => {
     setUser(userData);
+    setAuthUnknown(false);
+    setAuthError("");
+    writeSessionHint();
   }, []);
 
   /**
@@ -63,21 +97,33 @@ export const AuthProvider = ({ children }) => {
       // Even if the API call fails, clear local state
     } finally {
       setUser(null);
+      setAuthUnknown(false);
+      setAuthError("");
+      clearSessionHint();
     }
   }, []);
 
   /**
    * Call this to refresh the user object from the server after profile changes
-   * (e.g., after connecting GitHub, updating Codeforces handle, etc.)
+   * (e.g., after connecting GitHub, updating Codeforces handle, etc.).
+   * Only confirmed auth failures clear the current user.
    */
   const refreshUser = useCallback(async () => {
     try {
       const response = await getMe();
       setUser(response.data);
+      setAuthUnknown(false);
+      setAuthError("");
+      writeSessionHint();
       return response.data;
     } catch (err) {
-      if (err?.response?.status === 401) {
+      if ([401, 403].includes(err?.response?.status)) {
         setUser(null);
+        setAuthUnknown(false);
+        setAuthError("");
+        clearSessionHint();
+      } else {
+        setAuthError("We could not refresh your session. Please retry when the connection is stable.");
       }
       return null;
     }
@@ -88,6 +134,8 @@ export const AuthProvider = ({ children }) => {
     setUser,
     isAuthenticated,
     loading,
+    authError,
+    authUnknown,
     login,
     logout,
     refreshUser
