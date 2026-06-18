@@ -792,8 +792,9 @@ cd CodeLens/frontend
 # 2. Install dependencies
 npm install
 
-# 3. Create environment file
-echo "VITE_API_BASE_URL=http://localhost:5000/api" > .env
+# 3. Create environment file (Remove quotes to ensure cross-platform compatibility for Windows users)
+echo VITE_API_BASE_URL=http://localhost:5000/api > .env
+
 
 # 4. Start the development server
 npm run dev
