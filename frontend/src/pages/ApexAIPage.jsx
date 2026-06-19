@@ -59,7 +59,13 @@ export default function ApexAIPage() {
   const typedText = useTypewriter("Stop guessing. Start executing.", 40, 500);
 
   return (
-    <div ref={containerRef} className="min-h-screen bg-white text-black selection:bg-black selection:text-white overflow-hidden">
+  <>
+    <title>Apex AI - CodeLens</title>
+
+    <div
+      ref={containerRef}
+      className="min-h-screen bg-white text-black selection:bg-black selection:text-white overflow-hidden"
+    >
       
       {/* ───── SECTION 1: HERO (100vh) ───── */}
       <section className="relative min-h-[calc(100vh-80px)] pt-24 pb-16 px-6 sm:px-8 lg:px-12 flex flex-col items-center justify-center text-center border-b-4 border-black bg-white overflow-hidden">
@@ -299,6 +305,8 @@ export default function ApexAIPage() {
         </motion.div>
       </section>
 
-    </div>
+       </div>
+  </>
   );
 }
+

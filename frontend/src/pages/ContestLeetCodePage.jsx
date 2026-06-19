@@ -34,6 +34,9 @@ export default function ContestLeetCodePage() {
   ];
 
   return (
+  <>
+    <title>LeetCode Contests - CodeLens</title>
+
     <div className="w-full min-h-screen bg-white">
       {/* Hero Section */}
       <section className="w-full border-b-4 border-black px-4 sm:px-6 md:px-8 py-16 sm:py-20 md:py-24 bg-gradient-to-br from-yellow-50 to-white">
@@ -192,5 +195,6 @@ export default function ContestLeetCodePage() {
         </div>
       </section>
     </div>
+   </>
   );
 }

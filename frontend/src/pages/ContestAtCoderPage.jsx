@@ -33,9 +33,11 @@ export default function ContestAtCoderPage() {
     },
   ];
 
-  return (
-    <div className="w-full min-h-screen bg-white">
-      {/* Hero Section */}
+return (
+  <>
+    <title>AtCoder Contests - CodeLens</title>
+
+    <div className="w-full min-h-screen bg-white">      {/* Hero Section */}
       <section className="w-full border-b-4 border-black px-4 sm:px-6 md:px-8 py-16 sm:py-20 md:py-24 bg-gradient-to-br from-gray-50 to-white">
         <div className="max-w-7xl mx-auto">
           <div className="text-center space-y-6 sm:space-y-8">
@@ -191,6 +193,7 @@ export default function ContestAtCoderPage() {
           </div>
         </div>
       </section>
-    </div>
+        </div>
+  </>
   );
 }

@@ -57,6 +57,9 @@ const problems = [
 ];
 export default function AboutCodeLensPage() {
   return (
+    <>
+    <title>About CodeLens - CodeLens</title>
+
     <div className="w-full overflow-hidden">
 
       {/* HERO */}
@@ -373,6 +376,7 @@ export default function AboutCodeLensPage() {
 
       </section>
 
-    </div>
+        </div>
+  </>
   );
 }

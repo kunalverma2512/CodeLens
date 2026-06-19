@@ -1,4 +1,5 @@
 import { useRef, useEffect, useState } from "react";
+import { Helmet } from "react-helmet-async";
 import { Link, useLocation } from "react-router-dom";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { ArrowRight, Code, BrainCircuit, Activity, Layers } from "lucide-react";
@@ -59,7 +60,25 @@ export default function LandingPage() {
   const currentWord = useWordCycle(cycleWords);
 
   return (
-    <div ref={containerRef} className="min-h-screen bg-white text-black selection:bg-black selection:text-white overflow-hidden font-sans">
+  <>
+    <Helmet>
+      <title>CodeLens — Track, Analyze, Grow</title>
+
+      <meta
+        name="description"
+        content="Track coding progress, analyze performance, and grow as a developer with CodeLens."
+      />
+
+      <meta
+        name="keywords"
+        content="CodeLens, coding dashboard, developer analytics, GitHub analytics, LeetCode tracker"
+      />
+    </Helmet>
+
+    <div
+      ref={containerRef}
+      className="min-h-screen bg-white text-black selection:bg-black selection:text-white overflow-hidden font-sans"
+    >
       
       {/* ───── 1. HERO SECTION ───── */}
       <section className="relative min-h-[calc(100vh-64px)] pt-8 sm:pt-12 lg:pt-16 pb-16 sm:pb-24 px-4 sm:px-8 lg:px-24 flex items-start border-b-4 border-black bg-white">
@@ -238,6 +257,7 @@ export default function LandingPage() {
         </motion.div>
       </section>
 
-    </div>
-  );
+        </div>
+  </>
+);
 }

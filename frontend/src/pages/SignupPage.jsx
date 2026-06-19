@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import * as authService from "../services/authService";
@@ -20,7 +21,9 @@ export default function SignupPage() {
   const navigate                   = useNavigate();
   const [searchParams]             = useSearchParams();
   const isPasswordValid            = password.length >= 6;
-
+  useEffect(() => {
+  document.title = "Sign Up - CodeLens";
+  }, []);
   // Show GitHub OAuth errors forwarded from the callback
   useEffect(() => {
     const ghError = searchParams.get("githubAuthError") || searchParams.get("error");

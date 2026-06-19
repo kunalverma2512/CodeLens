@@ -368,6 +368,9 @@ export default function AccountCenterPage() {
   }, [searchParams]);
 
   return (
+    <>
+    <title>Account Center - CodeLens</title>
+
     <div className="w-full flex-1 bg-white px-4 sm:px-6 md:px-8 py-12 sm:py-16">
       <div className="max-w-5xl mx-auto">
 
@@ -433,6 +436,7 @@ export default function AccountCenterPage() {
         </div>
 
       </div>
-    </div>
+        </div>
+  </>
   );
 }

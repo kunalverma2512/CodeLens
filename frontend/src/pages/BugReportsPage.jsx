@@ -32,7 +32,13 @@ const BugReportsPage = () => {
   };
 
   return (
-    <div ref={containerRef} className="min-h-screen bg-white text-black selection:bg-black selection:text-white overflow-hidden">
+  <>
+    <title>Bug Reports - CodeLens</title>
+
+    <div
+      ref={containerRef}
+      className="min-h-screen bg-white text-black selection:bg-black selection:text-white overflow-hidden"
+    >
       
       {/* ───── Dynamic Hero Section ───── */}
       <section className="relative pt-16 pb-20 px-6 sm:px-8 lg:px-12 flex flex-col items-center text-center border-b-4 border-black bg-white overflow-hidden">
@@ -341,9 +347,10 @@ const BugReportsPage = () => {
           </motion.div>
         </motion.div>
       </section>
-
     </div>
+  </>
   );
 };
 
 export default BugReportsPage;
+
