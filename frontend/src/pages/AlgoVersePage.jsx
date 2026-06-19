@@ -80,7 +80,19 @@ export default function AlgoVersePage() {
       description: "Stable divide-and-conquer sorting with guaranteed performance",
       tags: ["Divide & Conquer", "Stable", "External Sorting"],
     },
+    
   ];
+  const filteredAlgorithms = featuredAlgorithms.filter((algo) => {
+  const matchesSearch =
+    algo.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    algo.description.toLowerCase().includes(searchQuery.toLowerCase());
+
+  const matchesCategory =
+    selectedCategory === "all" ||
+    algo.category.toLowerCase() === selectedCategory;
+
+  return matchesSearch && matchesCategory;
+});
 
   const getDifficultyColor = (difficulty) => {
     switch (difficulty.toLowerCase()) {
@@ -151,9 +163,9 @@ export default function AlgoVersePage() {
               />
             </div>
             {/* Filter Button */}
-            <button className="px-8 py-4 border-4 border-black bg-black text-white font-black uppercase tracking-widest hover:bg-white hover:text-black transition-colors">
-              Filter Results
-            </button>
+            <div className="px-8 py-4 border-4 border-black bg-black text-white font-black uppercase tracking-widest">
+  {filteredAlgorithms.length} Results
+</div>
           </div>
         </div>
       </section>
@@ -199,7 +211,7 @@ export default function AlgoVersePage() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {featuredAlgorithms.map((algo) => (
+            {filteredAlgorithms.map((algo) => (
               <div
                 key={algo.id}
                 className="border-4 border-black bg-white p-6 hover:shadow-[12px_12px_0_0_rgba(0,0,0,1)] hover:-translate-x-2 hover:-translate-y-2 transition-all cursor-pointer group"

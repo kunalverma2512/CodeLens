@@ -239,6 +239,9 @@ export default function GitHubIntelligencePage() {
   } = data;
 
   return (
+  <>
+    <title>GitHub Intelligence - CodeLens</title>
+
     <div className="w-full flex-1 bg-white px-4 sm:px-6 md:px-8 py-12 sm:py-16 relative">
       {/* Sync Notification Banner */}
       {syncMsg && (
@@ -311,6 +314,7 @@ export default function GitHubIntelligencePage() {
         )}
 
       </div>
-    </div>
+       </div>
+  </>
   );
 }

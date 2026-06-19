@@ -1,3 +1,4 @@
+import { Helmet } from "react-helmet-async";
 import { useState, useEffect, useMemo, useCallback, useRef } from "react";
 import useDebounce from "../hooks/useDebounce";
 
@@ -343,6 +344,21 @@ export default function PracticePage() {
 
   // ── Render ─────────────────────────────────────────────────────────────────
   return (
+  <>
+    <Helmet>
+      <title>Practice - CodeLens</title>
+
+      <meta
+        name="description"
+        content="Browse and solve Codeforces problems with advanced filters, ratings, tags, sorting, and practice tools on CodeLens."
+      />
+
+      <meta
+        name="keywords"
+        content="Codeforces practice, competitive programming, CP problems, coding practice, CodeLens, algorithm problems"
+      />
+    </Helmet>
+
     <div className="min-h-screen bg-white text-black">
 
       {/* ── Hero Header ─────────────────────────────────────────────────── */}
@@ -696,6 +712,7 @@ export default function PracticePage() {
           </p>
         </div>
       </div>
-    </div>
+       </div>
+  </>
   );
 }

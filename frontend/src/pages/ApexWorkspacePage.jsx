@@ -427,6 +427,9 @@ export default function ApexWorkspacePage() {
 
   // ── Render ──────────────────────────────────────────────────────────────────
   return (
+  <>
+    <title>Apex Workspace - CodeLens</title>
+
     <div
       className="flex bg-zinc-950 text-white overflow-hidden"
       style={{
@@ -435,6 +438,7 @@ export default function ApexWorkspacePage() {
         position: "relative",
       }}
     >
+    
       {/* ── MOBILE SIDEBAR BACKDROP ──────────────────────────────────────── */}
       <AnimatePresence>
         {sidebarOpen && (
@@ -681,7 +685,7 @@ export default function ApexWorkspacePage() {
             </div>
           </div>
 
-          <div className="flex items-center justify-between mt-1.5 px-0.5">
+          <div className="flex items-cent  er justify-between mt-1.5 px-0.5">
             <span className="text-[10px] text-zinc-700">
               <kbd className="text-zinc-600">↵</kbd> send &nbsp;·&nbsp; <kbd className="text-zinc-600">⇧↵</kbd> newline
             </span>
@@ -693,6 +697,7 @@ export default function ApexWorkspacePage() {
           </div>
         </div>
       </div>
-    </div>
+      </div>
+  </>
   );
 }

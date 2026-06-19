@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Helmet } from "react-helmet-async";
 
 export default function PrivacyPage() {
   const [openSection, setOpenSection] = useState(null);
@@ -143,6 +144,15 @@ export default function PrivacyPage() {
   ];
 
   return (
+  <>
+    <Helmet>
+      <title>Privacy Policy - CodeLens</title>
+      <meta
+        name="description"
+        content="Read CodeLens Privacy Policy. Learn how we collect, use, protect, and manage your data."
+      />
+    </Helmet>
+
     <section className="max-w-4xl mx-auto px-6 py-12 text-black">
       <div className="text-center mb-10">
         <h1 className="text-3xl font-black uppercase tracking-widest underline underline-offset-8 decoration-[3px]">
@@ -218,6 +228,7 @@ export default function PrivacyPage() {
         By using CodeLens, you acknowledge that you have read and understood
         this Privacy Policy.
       </div>
-    </section>
+       </section>
+  </>
   );
 }

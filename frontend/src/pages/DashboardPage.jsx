@@ -27,6 +27,8 @@ export default function DashboardPage() {
   }
 
   return (
+  <>
+    <title>Dashboard - CodeLens</title>
     <div className="w-full flex-1 flex flex-col px-4 sm:px-6 md:px-8 py-12 sm:py-16 bg-white overflow-hidden">
       <div className="max-w-7xl mx-auto w-full">
         <header className="mb-12 sm:mb-16 border-b-4 border-black pb-6 sm:pb-8 flex flex-col md:flex-row md:items-end md:justify-between gap-4 sm:gap-6">
@@ -142,7 +144,7 @@ export default function DashboardPage() {
       </div>
 
       {/* Verify Modal */}
-      <VerifyModal
+            <VerifyModal
         isOpen={modalOpen}
         onClose={() => setModalOpen(false)}
         initiateConnect={initiateConnect}
@@ -152,5 +154,6 @@ export default function DashboardPage() {
         connectError={connectError}
       />
     </div>
+  </>
   );
 }

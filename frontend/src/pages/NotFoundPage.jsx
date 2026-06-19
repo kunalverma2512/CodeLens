@@ -1,7 +1,23 @@
+import { Helmet } from "react-helmet-async";
 import { Link } from "react-router-dom";
 
 export default function NotFoundPage() {
   return (
+  <>
+    <Helmet>
+      <title>Page Not Found - CodeLens</title>
+
+      <meta
+        name="description"
+        content="The page you are looking for could not be found. Return to CodeLens and continue your developer journey."
+      />
+
+      <meta
+        name="robots"
+        content="noindex,nofollow"
+      />
+    </Helmet>
+
     <main
       className="relative min-h-screen overflow-hidden border-t-4 border-black bg-white"
       aria-label="404 Not Found Page"
@@ -89,6 +105,7 @@ export default function NotFoundPage() {
           </div>
         </div>
       </div>
-    </main>
-  );
+        </main>
+  </>
+);
 }

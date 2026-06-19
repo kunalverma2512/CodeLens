@@ -43,6 +43,9 @@ export default function ExplorePage() {
     });
   };
   return (
+    <>
+    <title>Explore - CodeLens</title>
+
     <div className="w-full bg-white flex flex-col">
       <ExploreHero />
       <AIExplanation />
@@ -82,6 +85,7 @@ export default function ExplorePage() {
           </svg>
         </button>
       )}
-    </div>
+      </div>
+    </>
   );
 }

@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { Helmet } from "react-helmet-async";
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import * as authService from '../services/authService';
@@ -64,6 +65,21 @@ export default function LoginPage() {
   };
 
   return (
+  <>
+    <Helmet>
+      <title>Login - CodeLens</title>
+
+      <meta
+        name="description"
+        content="Login to CodeLens and track your coding progress, analytics, rankings, and developer growth."
+      />
+
+      <meta
+        name="keywords"
+        content="CodeLens login, developer dashboard login, coding analytics, GitHub tracker"
+      />
+    </Helmet>
+
     <div className="w-full flex-1 flex flex-col items-center justify-center px-4 sm:px-6 md:px-8 py-12 sm:py-20 bg-white">
       <div className="w-full max-w-md border-4 border-black p-6 sm:p-8 md:p-12 bg-white shadow-[8px_8px_0_0_rgba(0,0,0,1)] md:shadow-[16px_16px_0_0_rgba(0,0,0,1)]">
         <h2 className="text-3xl sm:text-4xl md:text-5xl font-black uppercase tracking-tighter text-black mb-8 sm:mb-12">
@@ -153,6 +169,7 @@ export default function LoginPage() {
           </p>
         </div>
       </div>
-    </div>
-  );
+        </div>
+  </>
+);
 }
