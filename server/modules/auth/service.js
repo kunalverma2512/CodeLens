@@ -36,7 +36,7 @@ class AuthService {
     const hashedOtp = await bcrypt.hash(plainOtp, 4);
 
     await AuthRepository.createOtp({ email, otp: hashedOtp, purpose: "signup" });
-    sendVerificationOTP(email, plainOtp).catch(err => console.error("Background email error (register):", err));
+    await sendVerificationOTP(email, plainOtp);
 
     return {
       message: "Registration successful. Please check your email for OTP verification.",
@@ -132,7 +132,7 @@ class AuthService {
     const hashedOtp = await bcrypt.hash(plainOtp, 4);
 
     await AuthRepository.createOtp({ email, otp: hashedOtp, purpose: "forgot-password" });
-    sendPasswordResetOTP(email, plainOtp).catch(err => console.error("Background email error (forgotPassword):", err));
+    await sendPasswordResetOTP(email, plainOtp);
 
     return { message: "Password reset OTP sent to your email" };
   }
@@ -176,9 +176,9 @@ class AuthService {
     await AuthRepository.createOtp({ email, otp: hashedOtp, purpose });
 
     if (purpose === "signup") {
-      sendVerificationOTP(email, plainOtp).catch(err => console.error("Background email error (resend/signup):", err));
+      await sendVerificationOTP(email, plainOtp);
     } else {
-      sendPasswordResetOTP(email, plainOtp).catch(err => console.error("Background email error (resend/forgot):", err));
+      await sendPasswordResetOTP(email, plainOtp);
     }
 
     return { message: "OTP resent successfully" };
