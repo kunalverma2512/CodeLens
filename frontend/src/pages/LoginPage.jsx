@@ -3,19 +3,25 @@ import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import * as authService from '../services/authService';
 
-const API_BASE = import.meta.env.VITE_API_BASE_URL; // e.g. http://localhost:8000/api
+const API_BASE = import.meta.env.VITE_API_BASE_URL;
 
 export default function LoginPage() {
-  const [email, setEmail]       = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError]       = useState('');
-  const [loading, setLoading]   = useState(false);
+  const [email, setEmail]               = useState('');
+  const [password, setPassword]         = useState('');
+  const [error, setError]               = useState('');
+  const [loading, setLoading]           = useState(false);
+
+  // ── Unverified-email recovery state ────────────────────────────────────────
+  const [isUnverified, setIsUnverified]     = useState(false);
+  const [resendLoading, setResendLoading]   = useState(false);
+  const [resendSuccess, setResendSuccess]   = useState(false);
+  const [cooldown, setCooldown]             = useState(0);
 
   const { login, isAuthenticated } = useAuth();
   const navigate                   = useNavigate();
   const [searchParams]             = useSearchParams();
 
-  // Show GitHub OAuth errors forwarded from the callback
+  // Show GitHub OAuth errors forwarded via query param from the callback
   useEffect(() => {
     const ghError = searchParams.get('githubAuthError') || searchParams.get('error');
     if (ghError) {
@@ -30,13 +36,22 @@ export default function LoginPage() {
     }
   }, [isAuthenticated, navigate]);
 
+  // 60-second resend cooldown timer
+  useEffect(() => {
+    let timer;
+    if (cooldown > 0) {
+      timer = setInterval(() => setCooldown((prev) => prev - 1), 1000);
+    }
+    return () => clearInterval(timer);
+  }, [cooldown]);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+    setIsUnverified(false);
+    setResendSuccess(false);
     setLoading(true);
     try {
-      // Server sets HttpOnly cookies on success.
-      // Response body: { success, message, data: { user } }
       const response = await authService.login(email, password);
       const userData = response.data?.user;
       if (!userData) {
@@ -45,10 +60,43 @@ export default function LoginPage() {
       login(userData);
       navigate('/dashboard', { replace: true });
     } catch (err) {
+      const status = err.response?.status;
       const msg = err.response?.data?.message || 'Login failed. Please check your credentials.';
       setError(msg);
+
+      // 403 = email registered but OTP verification never completed
+      // Show a resend path so user is not stuck on a dead screen
+      if (status === 403) {
+        setIsUnverified(true);
+      }
     } finally {
       setLoading(false);
+    }
+  };
+
+  /**
+   * Resend verification OTP then navigate to SignupPage Step 2.
+   * The user already has an account — they just never verified.
+   * We send a fresh OTP and drop them directly on the OTP entry screen
+   * with their email pre-filled via router state.
+   */
+  const handleResendVerification = async () => {
+    if (cooldown > 0 || resendLoading) return;
+    setResendLoading(true);
+    setError('');
+    try {
+      await authService.resendOtp(email, 'signup');
+      // Navigate to SignupPage Step 2 with email pre-filled.
+      // SignupPage reads location.state and skips Step 1 registration form.
+      navigate('/signup', {
+        state: { email, skipToStep2: true }
+      });
+    } catch (err) {
+      const msg = err.response?.data?.message || 'Failed to send verification email. Please try again.';
+      setError(msg);
+      setCooldown(30); // short cooldown even on failure to prevent spam
+    } finally {
+      setResendLoading(false);
     }
   };
 
@@ -59,7 +107,6 @@ export default function LoginPage() {
    * which sets cookies and redirects to /auth/github/callback (frontend).
    */
   const handleGitHubLogin = () => {
-    // Pass redirectPath so after GitHub auth the user lands on /dashboard
     window.location.href = `${API_BASE}/auth/github/start?redirectPath=${encodeURIComponent('/dashboard')}`;
   };
 
@@ -70,10 +117,41 @@ export default function LoginPage() {
           LOGIN
         </h2>
 
+        {/* ── Error / Unverified recovery block ── */}
         {error && (
-          <div className="mb-8 border-4 border-black bg-black p-4">
+          <div className={`mb-8 border-4 p-4 ${isUnverified ? 'border-black bg-black' : 'border-black bg-black'}`}>
             <p className="text-sm font-black uppercase tracking-widest text-white">
               {error}
+            </p>
+
+            {/* Only shown when the error is a 403 unverified-email response */}
+            {isUnverified && (
+              <div className="mt-4 pt-4 border-t-2 border-white/30">
+                <p className="text-xs font-black uppercase tracking-widest text-white/70 mb-3">
+                  Didn't receive a code or it expired?
+                </p>
+                <button
+                  type="button"
+                  onClick={handleResendVerification}
+                  disabled={cooldown > 0 || resendLoading}
+                  className="text-sm font-black uppercase tracking-widest text-white underline underline-offset-4 decoration-[2px] hover:text-white/80 disabled:opacity-50 disabled:cursor-not-allowed disabled:no-underline transition-colors"
+                >
+                  {resendLoading
+                    ? 'SENDING...'
+                    : cooldown > 0
+                    ? `RESEND VERIFICATION EMAIL (${cooldown}s)`
+                    : 'RESEND VERIFICATION EMAIL →'}
+                </button>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Success confirmation after resend */}
+        {resendSuccess && (
+          <div className="mb-8 border-4 border-black bg-white p-4">
+            <p className="text-sm font-black uppercase tracking-widest text-black">
+              ✓ VERIFICATION EMAIL SENT — CHECK YOUR INBOX
             </p>
           </div>
         )}

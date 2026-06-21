@@ -116,6 +116,18 @@ class AuthService {
       throw new ApiError(404, "User not found");
     }
 
+    // Forgot password is only meaningful for users who have completed
+    // email verification. An unverified user should complete their signup
+    // first — they have an OTP flow for that, not a password reset flow.
+    if (!user.isVerified) {
+      throw new ApiError(403, "Please verify your email before resetting your password. Check your inbox for the original verification code or request a new one.");
+    }
+
+    // GitHub-only accounts have no password to reset.
+    if (user.authProvider === "github") {
+      throw new ApiError(400, "This account uses GitHub login. Password reset is not available.");
+    }
+
     const plainOtp = generateOTP();
     const hashedOtp = await bcrypt.hash(plainOtp, 4);
 
@@ -124,6 +136,7 @@ class AuthService {
 
     return { message: "Password reset OTP sent to your email" };
   }
+
 
   static async resetPassword({ email, otp, newPassword }) {
     const otpRecord = await AuthRepository.findOtp(email, "forgot-password");

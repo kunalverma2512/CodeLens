@@ -12,6 +12,7 @@ export default function ForgotPassword() {
   const [loading, setLoading] = useState(false);
   const [cooldown, setCooldown] = useState(0);
   const [isEmailValid, setIsEmailValid] = useState(true);
+  const [isUnverifiedError, setIsUnverifiedError] = useState(false);
 
   const navigate = useNavigate();
 
@@ -42,6 +43,7 @@ export default function ForgotPassword() {
   const handleSendResetCode = async (e) => {
     e.preventDefault();
     setError('');
+    setIsUnverifiedError(false);
 
     const trimmedEmail = email.trim();
 
@@ -57,7 +59,14 @@ export default function ForgotPassword() {
       setStep(2);
       setCooldown(60);
     } catch (err) {
-      setError(err.response?.data?.message || 'Failed to send reset code');
+      const status = err.response?.status;
+      const msg = err.response?.data?.message || 'Failed to send reset code';
+      setError(msg);
+      // 403 = user exists but is not yet verified
+      // Guide them to complete signup verification instead
+      if (status === 403) {
+        setIsUnverifiedError(true);
+      }
     } finally {
       setLoading(false);
     }
@@ -129,6 +138,17 @@ export default function ForgotPassword() {
             <p className="text-sm font-black uppercase tracking-widest text-red-600">
               {error}
             </p>
+            {/* If unverified, guide them to complete signup instead */}
+            {isUnverifiedError && (
+              <div className="mt-3 pt-3 border-t border-red-300">
+                <Link
+                  to="/signup"
+                  className="text-xs font-black uppercase tracking-widest text-red-600 underline underline-offset-4 decoration-[2px] hover:text-red-800"
+                >
+                  Go back to verify your email →
+                </Link>
+              </div>
+            )}
           </div>
         )}
 

@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Link, useNavigate, useSearchParams } from "react-router-dom";
+import { Link, useNavigate, useSearchParams, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import * as authService from "../services/authService";
 
@@ -18,6 +18,7 @@ export default function SignupPage() {
 
   const { login, isAuthenticated } = useAuth();
   const navigate                   = useNavigate();
+  const location                   = useLocation();
   const [searchParams]             = useSearchParams();
   const isPasswordValid            = password.length >= 6;
 
@@ -33,6 +34,22 @@ export default function SignupPage() {
       navigate('/dashboard', { replace: true });
     }
   }, [isAuthenticated, navigate]);
+
+  // Handle redirect from LoginPage when user is unverified.
+  // LoginPage sends: navigate('/signup', { state: { email, skipToStep2: true } })
+  // We jump directly to Step 2 (OTP entry) with their email pre-filled.
+  // The OTP was already re-sent by LoginPage before navigating here.
+  useEffect(() => {
+    const state = location.state;
+    if (state?.skipToStep2 && state?.email) {
+      setEmail(state.email);
+      setStep(2);
+      setCooldown(60); // OTP was just sent — enforce cooldown immediately
+      // Clear router state so browser back/forward doesn't replay this
+      window.history.replaceState({}, document.title);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     let timer;
