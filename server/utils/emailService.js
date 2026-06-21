@@ -1,20 +1,62 @@
-import nodemailer from "nodemailer";
+import axios from "axios";
 import "dotenv/config";
 
-// SMTP_PORT must be parsed as an integer — env vars are always strings.
-// Port 465 uses SSL directly (secure: true).
-// Port 587 uses STARTTLS (secure: false, then upgrades) — this is Gmail's standard.
-const SMTP_PORT = parseInt(process.env.SMTP_PORT, 10) || 587;
+// ── Brevo Transactional Email API ─────────────────────────────────────────────
+//
+// Why API instead of SMTP?
+//   - No SMTP credentials to manage or rotate
+//   - Immune to IPv6 ENETUNREACH errors that plagued the nodemailer setup
+//   - No connection pooling, greylisting, or port-blocking issues
+//   - Single HTTP POST — simpler, faster, and more reliable on any host
+//
+// Required env vars:
+//   BREVO_API_KEY      — from Brevo dashboard → SMTP & API → Generate API key
+//   BREVO_SENDER_EMAIL — verified sender address in your Brevo account
+//   BREVO_SENDER_NAME  — display name shown in recipient's inbox (optional, defaults to "CodeLens")
+//
+// Brevo API reference: https://developers.brevo.com/reference/send-transac-email
 
-const transporter = nodemailer.createTransport({
-  host: process.env.SMTP_HOST,
-  port: SMTP_PORT,
-  secure: SMTP_PORT === 465,  // true for 465, false for 587 (STARTTLS)
-  auth: {
-    user: process.env.SMTP_USER,
-    pass: process.env.SMTP_PASS
+const BREVO_API_URL = "https://api.brevo.com/v3/smtp/email";
+
+// Read once at startup — avoids repeated process.env lookups per request
+const BREVO_API_KEY     = process.env.BREVO_API_KEY;
+const BREVO_SENDER_EMAIL = process.env.BREVO_SENDER_EMAIL;
+const BREVO_SENDER_NAME  = process.env.BREVO_SENDER_NAME || "CodeLens";
+
+// ── Internal helper — all sends go through here ───────────────────────────────
+const sendEmail = async ({ to, subject, htmlContent }) => {
+  // Guard: fail fast with readable messages if env is missing
+  if (!BREVO_API_KEY) {
+    throw new Error("[emailService] BREVO_API_KEY is not set. Add it to server/.env");
   }
-});
+  if (!BREVO_SENDER_EMAIL) {
+    throw new Error("[emailService] BREVO_SENDER_EMAIL is not set. Add it to server/.env");
+  }
+
+  // Brevo API payload — matches POST /v3/smtp/email schema exactly
+  const payload = {
+    sender: {
+      name:  BREVO_SENDER_NAME,
+      email: BREVO_SENDER_EMAIL
+    },
+    to: [{ email: to }],   // 'to' must be an array of objects per Brevo docs
+    subject,
+    htmlContent
+  };
+
+  console.log(`[emailService] Sending "${subject}" to ${to} via Brevo API`);
+
+  await axios.post(BREVO_API_URL, payload, {
+    headers: {
+      "api-key":      BREVO_API_KEY,   // Brevo auth header — NOT "Authorization: Bearer"
+      "Content-Type": "application/json"
+    }
+  });
+
+  console.log(`[emailService] Email delivered successfully to ${to}`);
+};
+
+// ── Public exports (same signatures as before — auth/service.js unchanged) ────
 
 export const sendVerificationOTP = async (email, otp) => {
   const htmlContent = `
@@ -70,14 +112,11 @@ export const sendVerificationOTP = async (email, otp) => {
     </html>
   `;
 
-  const mailOptions = {
-    from: `"CodeLens" <${process.env.SMTP_USER}>`,
+  await sendEmail({
     to: email,
     subject: "Verify Your CodeLens Account",
-    html: htmlContent
-  };
-
-  await transporter.sendMail(mailOptions);
+    htmlContent
+  });
 };
 
 export const sendPasswordResetOTP = async (email, otp) => {
@@ -134,12 +173,9 @@ export const sendPasswordResetOTP = async (email, otp) => {
     </html>
   `;
 
-  const mailOptions = {
-    from: `"CodeLens" <${process.env.SMTP_USER}>`,
+  await sendEmail({
     to: email,
     subject: "Reset Your CodeLens Password",
-    html: htmlContent
-  };
-
-  await transporter.sendMail(mailOptions);
+    htmlContent
+  });
 };

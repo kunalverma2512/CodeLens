@@ -13,10 +13,8 @@ const requiredEnvVars = [
   "GEMINI_API_KEY",
   "CLIENT_URL",
   "NODE_ENV",
-  "SMTP_HOST",
-  "SMTP_PORT",
-  "SMTP_USER",
-  "SMTP_PASS"
+  "BREVO_API_KEY",
+  "BREVO_SENDER_EMAIL"
 ];
 
 const missingEnvVars = requiredEnvVars.filter(envVar => !process.env[envVar]);
@@ -35,10 +33,9 @@ export const env = {
   GEMINI_API_KEY: process.env.GEMINI_API_KEY,
   CLIENT_URL: process.env.CLIENT_URL,
   NODE_ENV: process.env.NODE_ENV,
-  SMTP_HOST: process.env.SMTP_HOST,
-  SMTP_PORT: parseInt(process.env.SMTP_PORT, 10),
-  SMTP_USER: process.env.SMTP_USER,
-  SMTP_PASS: process.env.SMTP_PASS
+  BREVO_API_KEY: process.env.BREVO_API_KEY,
+  BREVO_SENDER_EMAIL: process.env.BREVO_SENDER_EMAIL,
+  BREVO_SENDER_NAME: process.env.BREVO_SENDER_NAME || "CodeLens"
 };
 
 export default env;
