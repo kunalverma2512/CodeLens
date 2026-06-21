@@ -7,12 +7,6 @@ import "dotenv/config";
 const SMTP_PORT = parseInt(process.env.SMTP_PORT, 10) || 587;
 
 const transporter = nodemailer.createTransport({
-  pool: true, // Use pooled connections to avoid Gmail TLS handshake rate limits
-  maxConnections: 3,
-  maxMessages: 100,
-  connectionTimeout: 10000, // 10 seconds (don't hang forever)
-  greetingTimeout: 10000,
-  socketTimeout: 15000,
   host: process.env.SMTP_HOST,
   port: SMTP_PORT,
   secure: SMTP_PORT === 465,  // true for 465, false for 587 (STARTTLS)
