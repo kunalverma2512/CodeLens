@@ -27,10 +27,11 @@
 - [Backend Modules](#backend-modules)
   - [Auth Module](#auth-module)
   - [User Module](#user-module)
-  - [AI Module (Planned)](#ai-module-planned)
-  - [CP Module (Planned)](#cp-module-planned)
-  - [GitHub Module (Planned)](#github-module-planned)
-  - [Tasks Module (Planned)](#tasks-module-planned)
+  - [AI Module (APEX AI)](#ai-module-apex-ai)
+  - [Codeforces Module](#codeforces-module)
+  - [GitHub Module](#github-module)
+  - [CP Module](#cp-module)
+  - [Tasks Module](#tasks-module)
 - [Middleware & Utilities](#middleware--utilities)
 - [Email Service](#email-service)
 - [Environment Variables](#environment-variables)
@@ -86,42 +87,54 @@ Existing tools are single-dimensional and leave developers with:
 ### Backend
 | Technology | Version | Purpose |
 |---|---|---|
-| Node.js (ESM) | — | Runtime |
+| Node.js (ESM) | v20+ | Runtime |
 | Express | ^5.2.1 | Web framework |
 | MongoDB / Mongoose | ^9.3.3 | Database & ODM |
-| JSON Web Token (JWT) | ^9.0.3 | Authentication |
-| bcryptjs | ^3.0.3 | Password hashing |
-| Nodemailer | ^8.0.4 | Email/OTP service |
+| JSON Web Token (JWT) | ^9.0.3 | Access & refresh token auth |
+| bcryptjs | ^3.0.3 | Password & OTP hashing |
+| axios | ^1.14.0 | Brevo API calls & GitHub OAuth |
 | Zod | ^4.3.6 | Request validation |
-| @google/generative-ai | ^0.24.1 | Google Gemini AI integration |
+| @google/generative-ai | ^0.24.1 | Google Gemini AI (APEX AI) |
 | dotenv | ^17.3.1 | Environment management |
 | cors | ^2.8.6 | Cross-origin resource sharing |
+| express-rate-limit | — | Multi-layer rate limiting |
+
+> **Email:** CodeLens uses the [Brevo Transactional Email API](https://www.brevo.com/) — no SMTP, no Nodemailer. Pure HTTPS POST via axios. See [Email Service](#email-service) for setup.
 
 ---
 
 ## Features
 
 ### ✅ Implemented
-- **User Registration** with email OTP verification
-- **User Login** with JWT-based authentication
+- **User Registration** with email OTP verification (6-digit, 10-min TTL)
+- **User Login** with JWT access token (15 min) + refresh token (30 days)
+- **GitHub OAuth 2.0** — login, signup, and connect-to-existing-account flows
 - **Forgot Password** via OTP email flow
 - **Password Reset** with OTP verification
-- **OTP Resend** with 60 second cooldown
-- **Protected Routes** — client-side route guards
+- **OTP Resend** with 60-second cooldown
+- **Token Refresh** — silent access token renewal via refresh token in HttpOnly cookie
+- **Logout** — server-side refresh token revocation
+- **Protected Routes** — client-side route guards (`ProtectedRoute` / `PublicRoute`)
 - **Persistent Sessions** — token stored in `localStorage`, re-validated on app load
+- **5-Layer Rate Limiting** — global, auth, OTP, API, and per-user limits
 - **Responsive Navbar** — mobile hamburger menu + desktop navigation
 - **User Profile** management (get, update, delete)
+- **Codeforces Integration** — rating history, submission sync, problem stats
+- **GitHub Intelligence** — repository data, contribution graph via REST + GraphQL APIs
+- **APEX AI** — Google Gemini-powered AI chat with SSE streaming, 20 msg/hr per-user rate limit, context compiled from real platform data
+- **Dashboard** — Executive summary with aggregated stats from all connected platforms
 - **Explore Page** — 14-section informational landing showcasing platform features
-- **Dashboard** — "Command Center" with placeholder stats layout
+- **FAQ Page** — 13 categorized FAQ sections
+- **Contact Page** — User contact and feedback form
+- **About Page** — Project and team information
+- **Bug Reports Page** — Structured bug reporting interface
 - **Global Error Handling** — centralized middleware for all error types
 - **Input Validation** — Zod schemas for all API endpoints
-- **Structured Email Templates** — styled HTML emails for OTP verification and password reset
+- **Structured Email Templates** — styled HTML emails for OTP verification and password reset, sent via Brevo API
 
-### 🚧 Planned / Scaffolded (Modules Present, Logic Pending)
-- **AI Module** — Gemini-powered analysis and roadmap generation
-- **CP Module** — Codeforces & LeetCode data aggregation
-- **GitHub Module** — Repository and commit data fetching
-- **Tasks Module** — Personalized task/challenge tracking
+### 🚧 In Progress / Scaffolded
+- **CP Module** — LeetCode data aggregation (Codeforces done, LeetCode pending)
+- **Tasks Module** — Personalized AI-generated task and challenge tracking
 
 ---
 
@@ -136,29 +149,55 @@ CodeLens/
 │   ├── src/
 │   │   ├── assets/                  # Images and SVGs
 │   │   ├── components/
-│   │   │   ├── ai/                  # AI insight components
+│   │   │   ├── about/               # About page components
+│   │   │   │   └── AboutCarousel.jsx
 │   │   │   ├── auth/                # Authentication components
+│   │   │   │   └── ForgotPassword.jsx
 │   │   │   ├── codeforces/          # Codeforces specific components
-│   │   │   ├── explore/             # Explore page sections
-│   │   │   ├── github/              # GitHub data visualization components
-│   │   │   ├── shared/              # Reusable UI components
+│   │   │   │   ├── ConnectBanner.jsx
+│   │   │   │   └── VerifyModal.jsx
+│   │   │   ├── dashboard/           # Dashboard widgets
+│   │   │   │   └── DashboardExecutiveSummary.jsx
+│   │   │   ├── explore/             # Explore page sections (14 components)
+│   │   │   ├── faq/                 # FAQ accordion components (13 categories)
+│   │   │   ├── github/              # GitHub data visualization
+│   │   │   │   └── GitHubComponents.jsx
+│   │   │   ├── shared/              # Reusable application shell
+│   │   │   │   ├── Footer.jsx
+│   │   │   │   ├── Navbar.jsx
+│   │   │   │   ├── ProtectedRoute.jsx
+│   │   │   │   ├── PublicRoute.jsx
+│   │   │   │   └── loaders/
+│   │   │   │       ├── LoaderAlt.jsx
+│   │   │   │       ├── LoaderPrimary.jsx
+│   │   │   │       └── LoaderSwitcher.jsx
 │   │   │   └── ui/                  # Generic UI components
+│   │   │       └── Hero.jsx
 │   │   ├── context/
 │   │   │   └── AuthContext.jsx      # Global auth state (React Context)
-│   │   ├── hooks/                   # Custom React hooks
+│   │   ├── data/
+│   │   │   └── faqs/                # FAQ data (13 category files)
+│   │   ├── hooks/
+│   │   │   ├── useCodeforces.js     # Codeforces data hook
+│   │   │   └── useDebounce.js       # Debounce utility hook
 │   │   ├── layouts/
 │   │   │   └── MainLayout.jsx       # Navbar + Footer wrapper
-│   │   ├── pages/                   # Application routes
+│   │   ├── pages/                   # Application routes (24 pages)
+│   │   │   ├── AboutCodeLensPage.jsx
 │   │   │   ├── AccountCenterPage.jsx
 │   │   │   ├── AlgoVersePage.jsx
 │   │   │   ├── ApexAIPage.jsx
+│   │   │   ├── ApexWorkspacePage.jsx
+│   │   │   ├── BugReportsPage.jsx
 │   │   │   ├── CodeforcesPage.jsx
+│   │   │   ├── Contact.jsx
 │   │   │   ├── ContestAtCoderPage.jsx
 │   │   │   ├── ContestCodeChefPage.jsx
 │   │   │   ├── ContestCodeforcesPage.jsx
 │   │   │   ├── ContestLeetCodePage.jsx
 │   │   │   ├── DashboardPage.jsx
 │   │   │   ├── ExplorePage.jsx
+│   │   │   ├── FAQPage.jsx
 │   │   │   ├── GitHubCallbackPage.jsx
 │   │   │   ├── GitHubIntelligencePage.jsx
 │   │   │   ├── LandingPage.jsx
@@ -168,51 +207,81 @@ CodeLens/
 │   │   │   ├── PrivacyPage.jsx
 │   │   │   ├── SignupPage.jsx
 │   │   │   └── TermsPage.jsx
-│   │   ├── services/                # API integration
+│   │   ├── services/
 │   │   │   ├── api.js               # Axios instance with interceptors
-│   │   │   ├── authService.js
-│   │   │   ├── codeforcesService.js
-│   │   │   ├── githubService.js
-│   │   │   └── userService.js
+│   │   │   ├── aiService.js         # AI/Gemini API calls
+│   │   │   ├── apexService.js       # APEX AI chat service
+│   │   │   ├── authService.js       # Auth API calls
+│   │   │   ├── codeforcesService.js # Codeforces API calls
+│   │   │   ├── githubService.js     # GitHub API calls
+│   │   │   └── userService.js       # User profile API calls
 │   │   ├── App.jsx                  # Root component + routing
 │   │   ├── index.css                # Global styles
 │   │   └── main.jsx                 # React DOM entry point
-│   ├── index.html                   # HTML entry point
+│   ├── index.html
 │   ├── package.json
 │   └── vite.config.js
 │
 └── server/                          # Node.js + Express (ESM)
     ├── config/
     │   ├── db.js                    # MongoDB connection
-    │   ├── env.js                   # Environment variable validation
-    │   ├── gemini.js                # Gemini AI client
-    │   └── nvidia.js                # Nvidia NIM / AI integrations
+    │   ├── env.js                   # Startup environment variable validation
+    │   ├── gemini.js                # Google Gemini AI client
+    │   └── nvidia.js                # NVIDIA NIM AI client (optional)
     ├── middlewares/
-    │   ├── authMiddleware.js        # JWT verification middleware
-    │   └── errorHandler.js          # Global error handler
+    │   ├── authMiddleware.js        # JWT access token verification
+    │   ├── errorHandler.js          # Global error handler (4-arg Express)
+    │   └── rateLimiter.js           # Multi-layer rate limiting
     ├── models/
-    │   ├── CodeforcesProfile.js
-    │   ├── CodeforcesRatingHistory.js
-    │   ├── CodeforcesSubmission.js
-    │   ├── Otp.js                   # OTP schema (10-min TTL)
+    │   ├── ApexConversation.js      # APEX AI conversation history
+    │   ├── CodeforcesProfile.js     # Codeforces user profile
+    │   ├── CodeforcesRatingHistory.js # Rating history over time
+    │   ├── CodeforcesSubmission.js  # Submission records
+    │   ├── GithubData.js            # GitHub telemetry data
+    │   ├── Otp.js                   # OTP schema (10-min TTL index)
     │   └── User.js                  # User schema (full telemetry model)
     ├── modules/
-    │   ├── ai/                      # AI integration module
-    │   ├── auth/                    # Authentication module
-    │   ├── codeforces/              # Codeforces stats and synchronization
-    │   ├── cp/                      # Competitive programming module
+    │   ├── ai/                      # APEX AI module (Gemini SSE streaming)
+    │   │   ├── controller.js
+    │   │   ├── repository.js
+    │   │   ├── routes.js
+    │   │   ├── service.js
+    │   │   └── validation.js
+    │   ├── auth/                    # Authentication module (email + GitHub OAuth)
+    │   │   ├── controller.js
+    │   │   ├── repository.js
+    │   │   ├── routes.js
+    │   │   ├── service.js
+    │   │   └── validation.js
+    │   ├── codeforces/              # Codeforces data sync module
+    │   │   ├── controller.js
+    │   │   ├── repository.js
+    │   │   ├── routes.js
+    │   │   ├── service.js
+    │   │   └── validation.js
+    │   ├── cp/                      # Competitive programming module (scaffolded)
     │   ├── github/                  # GitHub telemetry module
-    │   ├── tasks/                   # Task tracking module
+    │   │   ├── controller.js
+    │   │   ├── repository.js
+    │   │   ├── routes.js
+    │   │   ├── service.js
+    │   │   └── validation.js
+    │   ├── tasks/                   # Task tracking module (scaffolded)
     │   └── user/                    # User profile module
+    │       ├── controller.js
+    │       ├── repository.js
+    │       ├── routes.js
+    │       ├── service.js
+    │       └── validation.js
     ├── utils/
-    │   ├── ApiError.js             # Custom error class
-    │   ├── ApiResponse.js          # Standardized response class
-    │   ├── codeforcesApi.js        # Codeforces API wrapper
-    │   ├── emailService.js         # Nodemailer OTP email templates
-    │   ├── otpHelper.js            # OTP generation utility
-    │   └── tokenHelper.js          # JWT sign & verify utilities
-    ├── app.js                       # Express app config (CORS, routes)
-    ├── server.js                    # Entry point (DB connect + listen)
+    │   ├── ApiError.js              # Custom error class
+    │   ├── ApiResponse.js           # Standardized response factory
+    │   ├── codeforcesApi.js         # Codeforces public API wrapper
+    │   ├── emailService.js          # Brevo API email (OTP templates)
+    │   ├── otpHelper.js             # 6-digit OTP generator
+    │   └── tokenHelper.js           # JWT sign & verify utilities
+    ├── app.js                       # Express app config (CORS, routes, middleware)
+    ├── server.js                    # Entry point (DB connect + HTTP listen)
     └── package.json
 ```
 
@@ -234,14 +303,18 @@ The frontend is a **React 19 SPA** built with Vite and styled exclusively using 
 /forgot-password       → ForgotPassword (PublicRoute)
 /dashboard             → DashboardPage (ProtectedRoute)
 /explore               → ExplorePage (public)
+/about                 → AboutCodeLensPage (public)
+/faq                   → FAQPage (public)
+/contact               → Contact (public)
 /terms                 → TermsPage (public)
 /privacy               → PrivacyPage (public)
-/account               → AccountCenterPage (ProtectedRoute)
+/bug-reports           → BugReportsPage (public)
+/account-center        → AccountCenterPage (ProtectedRoute)
 /codeforces            → CodeforcesPage (ProtectedRoute)
 /github                → GitHubIntelligencePage (ProtectedRoute)
 /practice              → PracticePage (ProtectedRoute)
-
 /apex                  → ApexAIPage (ProtectedRoute)
+/apex/workspace        → ApexWorkspacePage (ProtectedRoute)
 /algoverse             → AlgoVersePage (ProtectedRoute)
 /contests/codeforces   → ContestCodeforcesPage (ProtectedRoute)
 /contests/leetcode     → ContestLeetCodePage (ProtectedRoute)
@@ -276,9 +349,9 @@ module/
 
 **Request Lifecycle:**
 ```
-Request → CORS → express.json() → Route → Zod Validation → Auth Middleware (if protected) → Controller → Service → Repository → MongoDB
-                                                                                                    ↓ (any error)
-                                                                                              Global Error Handler
+Request → CORS → Rate Limiter → express.json() → Route → Zod Validation → Auth Middleware (if protected) → Controller → Service → Repository → MongoDB
+                                                                                                                ↓ (any error)
+                                                                                                          Global Error Handler
 ```
 
 ---
@@ -291,12 +364,17 @@ Base path: `/api/auth`
 
 | Method | Endpoint | Description | Auth Required | Body |
 |---|---|---|---|---|
-| `POST` | `/register` | Register new user, sends OTP | No | `{ name, email, password }` |
-| `POST` | `/verify-otp` | Verify signup OTP, returns JWT | No | `{ email, otp }` |
-| `POST` | `/login` | Login with credentials, returns JWT | No | `{ email, password }` |
-| `POST` | `/forgot-password` | Sends password reset OTP | No | `{ email }` |
+| `POST` | `/register` | Register new user, sends OTP via Brevo | No | `{ name, email, password }` |
+| `POST` | `/verify-otp` | Verify signup OTP, returns JWT pair | No | `{ email, otp }` |
+| `POST` | `/login` | Login with credentials, returns JWT pair | No | `{ email, password }` |
+| `POST` | `/logout` | Revoke refresh token (server-side) | No | `{ refreshToken }` |
+| `POST` | `/refresh` | Exchange refresh token for new access token | No | `{ refreshToken }` |
+| `POST` | `/forgot-password` | Sends password reset OTP via Brevo | No | `{ email }` |
 | `POST` | `/reset-password` | Resets password using OTP | No | `{ email, otp, newPassword }` |
 | `POST` | `/resend-otp` | Resend OTP for signup or password reset | No | `{ email, purpose }` |
+| `GET` | `/github` | Redirect to GitHub OAuth authorization | No | — |
+| `GET` | `/github/callback` | GitHub OAuth callback handler | No | `?code&state` (query) |
+| `GET` | `/github/connect-init` | Get GitHub connect URL for existing user | ✅ Cookie | — |
 
 **OTP `purpose` values:** `"signup"` \| `"forgot-password"`
 
@@ -332,8 +410,9 @@ POST /api/auth/login
   "success": true,
   "message": "Login successful",
   "data": {
-    "token": "<jwt>",
-    "user": { "id": "...", "name": "Kunal Verma", "email": "...", "role": "user", "handles": {...} }
+    "accessToken": "<15min-jwt>",
+    "refreshToken": "<30day-jwt>",
+    "user": { "id": "...", "name": "Kunal Verma", "email": "...", "role": "user", "isVerified": true }
   }
 }
 ```
@@ -349,24 +428,6 @@ Base path: `/api/user` — All endpoints require `Authorization: Bearer <token>`
 | `GET` | `/profile` | Get current user's profile | — |
 | `PUT` | `/profile` | Update profile fields | `{ name?, profile?, handles?, preferences? }` |
 | `DELETE` | `/profile` | Delete account permanently | — |
-
-#### Example: Update Profile
-```json
-PUT /api/user/profile
-Authorization: Bearer <token>
-{
-  "handles": {
-    "github": "kunalverma2512",
-    "leetcode": "kunalverma",
-    "codeforces": "kunalv"
-  },
-  "profile": {
-    "bio": "Full-stack developer",
-    "college": "BITS Pilani",
-    "location": "India"
-  }
-}
-```
 
 ---
 
@@ -399,19 +460,17 @@ GET /api/health
 | `handles.codeforces` | String | Codeforces username |
 | `handles.leetcode` | String | LeetCode username |
 | `handles.github` | String | GitHub username |
-| `stats.cpStats` | ObjectId → CPStats | Reference to CP stats (future) |
-| `stats.githubStats` | ObjectId → GithubStats | Reference to GitHub stats (future) |
-| `stats.analytics` | ObjectId → Analytics | Reference to analytics (future) |
+| `oauth.github.id` | String | GitHub user ID |
+| `oauth.github.username` | String | GitHub login handle |
+| `oauth.github.profileUrl` | String | GitHub profile URL |
+| `oauth.github.accessToken` | String (select: false) | GitHub OAuth access token |
 | `goals` | `[{ title, type, target, progress, deadline }]` | User-defined goals |
 | `activity.lastActive` | Date | Timestamp of last login |
 | `activity.streak.current` | Number | Current coding streak (days) |
 | `activity.streak.longest` | Number | Longest streak ever |
 | `preferences.theme` | Enum: `light` \| `dark` | UI theme preference |
 | `preferences.emailNotifications` | Boolean | Email notifications toggle |
-| `security.resetPasswordToken` | String | Token for password reset |
-| `security.resetPasswordExpiry` | Date | Token expiry |
 | `metadata.onboardingCompleted` | Boolean | First-time setup flag |
-| `metadata.tags` | `[String]` | Arbitrary metadata tags |
 | `createdAt` / `updatedAt` | Date | Mongoose timestamps |
 
 ---
@@ -429,19 +488,54 @@ GET /api/health
 
 ---
 
+### `ApexConversation` Model
+
+Stores APEX AI chat history per user. Each document links to a `User` and contains a messages array with `role` (`user`/`model`) and `content` fields.
+
+---
+
+### `GithubData` Model
+
+Stores aggregated GitHub telemetry: repositories, languages, contribution graph, pinned repos, and profile stats. Linked to `User` by userId.
+
+---
+
+### `CodeforcesProfile`, `CodeforcesRatingHistory`, `CodeforcesSubmission` Models
+
+Three models store the full Codeforces telemetry: current rating, max rating, rank, rating history over time, and problem submission records (verdict, tags, difficulty).
+
+---
+
 ## Frontend Pages & Components
 
 ### Pages
 
 | Page | Route | Access | Description |
 |---|---|---|---|
-| `LandingPage` | `/` | Public | Hero landing (currently minimal wrapper) |
+| `LandingPage` | `/` | Public | Hero landing page |
 | `LoginPage` | `/login` | PublicRoute | Email/password form, JWT login |
-| `SignupPage` | `/signup` | PublicRoute | Two-step form: registration → OTP verification with 60s resend cooldown |
-| `DashboardPage` | `/dashboard` | ProtectedRoute | Command Center with GitHub/LeetCode/CF stat cards + Gemini AI insight panel |
-| `ExplorePage` | `/explore` | Public | 14-section platform showcase page |
+| `SignupPage` | `/signup` | PublicRoute | Two-step: registration → OTP verification with 60s resend cooldown |
+| `DashboardPage` | `/dashboard` | ProtectedRoute | Executive summary with GitHub/LeetCode/CF stat cards |
+| `AccountCenterPage` | `/account-center` | ProtectedRoute | Profile settings, handle management, GitHub connect |
+| `CodeforcesPage` | `/codeforces` | ProtectedRoute | Codeforces stats, rating graph, submission history |
+| `GitHubIntelligencePage` | `/github` | ProtectedRoute | GitHub repos, languages, contribution data |
+| `ApexAIPage` | `/apex` | ProtectedRoute | APEX AI entry — Gemini-powered chat |
+| `ApexWorkspacePage` | `/apex/workspace` | ProtectedRoute | Full APEX AI chat workspace with SSE streaming |
+| `AlgoVersePage` | `/algoverse` | ProtectedRoute | Algorithm practice area |
+| `PracticePage` | `/practice` | ProtectedRoute | Problem practice interface |
+| `ContestCodeforcesPage` | `/contests/codeforces` | ProtectedRoute | Codeforces contest schedule |
+| `ContestLeetCodePage` | `/contests/leetcode` | ProtectedRoute | LeetCode contest schedule |
+| `ContestCodeChefPage` | `/contests/codechef` | ProtectedRoute | CodeChef contest schedule |
+| `ContestAtCoderPage` | `/contests/atcoder` | ProtectedRoute | AtCoder contest schedule |
+| `ExplorePage` | `/explore` | Public | 14-section platform showcase |
+| `FAQPage` | `/faq` | Public | 13-category FAQ accordion |
+| `AboutCodeLensPage` | `/about` | Public | Project and team info |
+| `Contact` | `/contact` | Public | Contact and feedback form |
+| `BugReportsPage` | `/bug-reports` | Public | Bug reporting interface |
 | `PrivacyPage` | `/privacy` | Public | Privacy policy |
 | `TermsPage` | `/terms` | Public | Terms of service |
+| `GitHubCallbackPage` | `/auth/github/callback` | Public | GitHub OAuth callback handler |
+| `NotFoundPage` | `/*` | Public | 404 fallback |
 
 #### SignupPage — Two-Step Flow
 1. **Step 1:** Collects `name`, `email`, `password`. On submit, calls `POST /api/auth/register`. Advances to Step 2.
@@ -456,10 +550,12 @@ GET /api/health
 | Component | Description |
 |---|---|
 | `Navbar.jsx` | Sticky top nav. Responsive with hamburger menu on mobile. Shows Login/Signup for guests; Dashboard link + user avatar initial + Logout for authenticated users. Reads from `AuthContext`. |
-| `Footer.jsx` | Full-width footer with Platform links (Dashboard, Explore), Integrations (GitHub Sync, LeetCode Auth, Codeforces API), Legal links (Privacy, Terms), and social links. |
-| `ProtectedRoute.jsx` | Renders `<Loader>` while auth is initializing; redirects to `/login` if not authenticated. |
+| `Footer.jsx` | Full-width footer with Platform links, Integrations, Legal links, and social links. |
+| `ProtectedRoute.jsx` | Renders loader while auth is initializing; redirects to `/login` if not authenticated. |
 | `PublicRoute.jsx` | Redirects authenticated users away from auth pages (to `/dashboard`). |
-| `Loader.jsx` | Full-screen loading spinner component. |
+| `loaders/LoaderPrimary.jsx` | Primary full-screen loading spinner. |
+| `loaders/LoaderAlt.jsx` | Alternate loader style. |
+| `loaders/LoaderSwitcher.jsx` | Switches between loader variants based on context. |
 
 #### `auth/`
 
@@ -467,29 +563,38 @@ GET /api/health
 |---|---|
 | `ForgotPassword.jsx` | Multi-step forgot password flow: email input → OTP verification → new password entry. |
 
+#### `codeforces/`
+
+| Component | Description |
+|---|---|
+| `ConnectBanner.jsx` | Banner prompting user to connect their Codeforces handle. |
+| `VerifyModal.jsx` | Modal for verifying Codeforces handle ownership. |
+
+#### `dashboard/`
+
+| Component | Description |
+|---|---|
+| `DashboardExecutiveSummary.jsx` | Aggregated stats card shown at the top of the Dashboard. |
+
+#### `github/`
+
+| Component | Description |
+|---|---|
+| `GitHubComponents.jsx` | Reusable GitHub data display components (repos, language bars, contribution graph). |
+
+#### `about/`
+
+| Component | Description |
+|---|---|
+| `AboutCarousel.jsx` | Image/info carousel for the About page. |
+
+#### `faq/` — 13 Categorized FAQ Components
+
+Each file corresponds to a FAQ category: Getting Started, Platform Integration, Analytics Dashboard, Roadmap, Account Management, Open Source Contribution, Data Privacy, Community, Performance, Accessibility, Legal Compliance, Troubleshooting, and a shared `FAQAccordion` component.
+
 #### `explore/` — 14 Modular Sections
 
-| Component | Description |
-|---|---|
-| `ExploreHero.jsx` | Full-width hero banner for the Explore page |
-| `AIExplanation.jsx` | Explains the Gemini AI synthesis engine |
-| `FeatureGrid.jsx` | Grid of platform features |
-| `PlatformSync.jsx` | Showcases GitHub, LeetCode, Codeforces sync |
-| `ArchitectureDeepDive.jsx` | Technical breakdown of the platform architecture |
-| `RoadmapVisualizer.jsx` | Visual representation of AI-generated learning roadmaps |
-| `DailyChallenge.jsx` | Daily problem challenge feature preview |
-| `Leaderboard.jsx` | Community leaderboard preview |
-| `Testimonials.jsx` | User testimonials section |
-| `DataPrivacy.jsx` | Data privacy and security commitment section |
-| `OpenSourceVision.jsx` | Open-source mission and community vision |
-| `FAQSection.jsx` | Frequently Asked Questions accordion |
-| `SubscribeNewsletter.jsx` | Newsletter subscription form |
-| `FinalCTA.jsx` | Final call-to-action to sign up |
-
-#### `ui/`
-| Component | Description |
-|---|---|
-| `Hero.jsx` | Generic hero component (used in the UI component library) |
+`ExploreHero`, `AIExplanation`, `FeatureGrid`, `PlatformSync`, `ArchitectureDeepDive`, `RoadmapVisualizer`, `DailyChallenge`, `Leaderboard`, `Testimonials`, `DataPrivacy`, `OpenSourceVision`, `FAQSection`, `SubscribeNewsletter`, `FinalCTA`.
 
 ---
 
@@ -501,10 +606,10 @@ GET /api/health
 - **Response interceptor:** Catches `401` errors globally, clears `localStorage`, and redirects to `/login`.
 
 #### `authService.js`
-Wraps all `POST /api/auth/*` endpoints:
 - `register(name, email, password)`
 - `verifyOtp(email, otp)`
 - `login(email, password)`
+- `logout(refreshToken)`
 - `forgotPassword(email)`
 - `resetPassword(email, otp, newPassword)`
 - `resendOtp(email, purpose)`
@@ -512,6 +617,15 @@ Wraps all `POST /api/auth/*` endpoints:
 #### `userService.js`
 - `getProfile()` → `GET /api/user/profile`
 - `updateProfile(data)` → `PUT /api/user/profile`
+
+#### `codeforcesService.js`
+Wraps all Codeforces sync and data fetch endpoints.
+
+#### `githubService.js`
+Wraps GitHub data fetch endpoints (REST + GraphQL via backend proxy).
+
+#### `aiService.js` / `apexService.js`
+Wraps APEX AI chat endpoints including SSE streaming connection management.
 
 ---
 
@@ -525,7 +639,7 @@ Provides global auth state using React Context API.
 | Value | Type | Description |
 |---|---|---|
 | `user` | Object \| null | Current authenticated user object |
-| `token` | String \| null | JWT token from localStorage |
+| `token` | String \| null | JWT access token from localStorage |
 | `isAuthenticated` | Boolean | True if both token and user are set |
 | `loading` | Boolean | True while initial auth check is in progress |
 
@@ -545,15 +659,15 @@ Provides global auth state using React Context API.
 
 **Path:** `server/modules/auth/`
 
-Implements complete email-based authentication:
+Implements complete dual-authentication: email OTP and GitHub OAuth 2.0.
 
 | File | Responsibility |
 |---|---|
 | `routes.js` | Mounts Zod validation middleware and delegates to controller methods |
-| `controller.js` | Extracts request body, calls `AuthService`, returns `ApiResponse` or forwards errors to global handler |
-| `service.js` | All business logic: hashing passwords/OTPs, generating tokens, orchestrating email sends |
-| `repository.js` | All Mongoose queries: create/find/update users, OTP CRUD |
-| `validation.js` | Zod schemas for all 6 auth endpoints + reusable `validate()` middleware factory |
+| `controller.js` | Extracts request body, calls `AuthService`, returns `ApiResponse` or forwards errors |
+| `service.js` | All business logic: hashing, token generation, OTP flow, GitHub OAuth |
+| `repository.js` | All Mongoose queries: create/find/update users, OTP CRUD, GitHub identity |
+| `validation.js` | Zod schemas for all auth endpoints + reusable `validate()` middleware factory |
 
 **Auth Flow — Registration:**
 ```
@@ -565,7 +679,7 @@ POST /register → validate(registerSchema) → AuthController.register
   4. Generate 6-digit plain OTP
   5. Hash OTP (bcrypt cost 4)
   6. Store hashed OTP to MongoDB (TTL 10 min)
-  7. Send styled HTML verification email
+  7. Send styled HTML verification email via Brevo API
 → Return user object (201)
 ```
 
@@ -577,8 +691,37 @@ POST /verify-otp → validate(verifyOtpSchema) → AuthController.verifyOtp
   2. bcrypt.compare(plain, hashed) — throw 400 if mismatch
   3. Mark user isVerified: true
   4. Delete OTP record
-  5. Generate JWT access token
-→ Return { token, user } (200)
+  5. Generate JWT access token (15 min) + refresh token (30 days)
+→ Return { accessToken, refreshToken, user } (200)
+```
+
+**Auth Flow — GitHub OAuth (Login / Signup):**
+```
+GET /github → build GitHub authorization URL → redirect
+↓ (user approves on GitHub)
+GET /github/callback?code&state
+→ AuthService.handleGithubCallback():
+  1. Verify state JWT (anti-CSRF)
+  2. Exchange code for GitHub access token
+  3. Fetch GitHub profile + email
+  4. Case 1: GitHub ID exists in DB → update lastActive, return tokens
+  5. Case 2: Email exists (local account) → merge GitHub identity, return tokens
+  6. Case 3: Brand new user → create account (isVerified: true), return tokens
+→ Redirect to frontend with tokens in query params
+```
+
+**Auth Flow — GitHub Connect (link to existing account):**
+```
+GET /github/connect-init (requires auth cookie)
+→ Build connect URL with mode="connect" + userId in state JWT
+↓ (user approves on GitHub)
+GET /github/callback?code&state (mode=connect)
+→ AuthService.handleGithubCallback():
+  1. Verify state JWT, extract userId
+  2. Exchange code for GitHub token
+  3. Check no other user has this GitHub ID (throw 409 if so)
+  4. Update existing user's oauth.github fields
+→ Redirect to /account-center?githubStatus=connected
 ```
 
 ---
@@ -599,41 +742,58 @@ Manages authenticated user profile operations.
 
 ---
 
-### AI Module (Planned)
+### AI Module (APEX AI)
 
-**Path:** `server/modules/ai/`  
-Folder scaffolded. Intended integration with `@google/generative-ai` to:
-- Accept normalized platform stats payload
-- Construct a prompt instructing Gemini to act as a Staff Engineer
-- Return a deterministic JSON roadmap
+**Path:** `server/modules/ai/`
+
+Fully implemented. Powers the APEX AI chat system.
+
+- Accepts user messages with a compiled context payload (Codeforces stats, GitHub data, platform handles)
+- Constructs a Gemini prompt instructing the model to act as a Staff Engineer / personalized mentor
+- Streams responses to the frontend using **Server-Sent Events (SSE)**
+- Per-user rate limit: **20 messages per hour**
+- Conversation history stored in `ApexConversation` MongoDB model
 - Config: `server/config/gemini.js`
 
 ---
 
-### CP Module (Planned)
+### Codeforces Module
+
+**Path:** `server/modules/codeforces/`
+
+Fully implemented. Handles all Codeforces data synchronization.
+
+- Fetches user rating, rank, max rating from the Codeforces public API
+- Syncs full rating history (all contests participated)
+- Syncs problem submission records (verdict, tags, difficulty rating)
+- Stores data in `CodeforcesProfile`, `CodeforcesRatingHistory`, `CodeforcesSubmission` models
+- Wrapper utility: `server/utils/codeforcesApi.js`
+
+---
+
+### GitHub Module
+
+**Path:** `server/modules/github/`
+
+Fully implemented. Fetches and stores GitHub telemetry via REST and GraphQL APIs.
+
+- Fetches public profile, repository list, pinned repos, language breakdown
+- Uses the GitHub GraphQL API for contribution graph data
+- Stores aggregated data in `GithubData` model linked to the user
+
+---
+
+### CP Module
 
 **Path:** `server/modules/cp/`  
-Folder scaffolded. Intended to:
-- Fetch and store Codeforces rating, contest history, problem-solving stats
-- Fetch and store LeetCode solved problem counts by difficulty
+Scaffolded. Intended to aggregate LeetCode solved problem counts by difficulty. Codeforces data is handled by the dedicated Codeforces Module.
 
 ---
 
-### GitHub Module (Planned)
-
-**Path:** `server/modules/github/`  
-Folder scaffolded. Intended to:
-- Fetch GitHub commit history, repository count, contribution graph
-- Store aggregated stats linked to the User document
-
----
-
-### Tasks Module (Planned)
+### Tasks Module
 
 **Path:** `server/modules/tasks/`  
-Folder scaffolded. Intended to:
-- Store AI-generated task items and learning milestones
-- Track user task completion progress
+Scaffolded. Intended to store AI-generated task items and track user completion progress.
 
 ---
 
@@ -647,10 +807,19 @@ JWT authentication guard applied to all protected routes.
 3. Extracts `userId` from decoded payload.
 4. Fetches user from DB (excludes password).
 5. Attaches `user` to `req.user` for downstream handlers.
-6. Returns `401` on any failure without forwarding to global handler.
+6. Returns `401` on any failure.
+
+### `rateLimiter.js`
+Multi-layer rate limiting applied at different granularities:
+
+- **Global limiter** — caps total requests per IP across all routes
+- **Auth limiter** — strict limit on `/api/auth/*` to prevent brute force
+- **OTP limiter** — extra-strict limit on OTP send/resend endpoints
+- **API limiter** — applied to data-fetch routes
+- **Per-user APEX limiter** — 20 messages/hour per authenticated user
 
 ### `errorHandler.js`
-Centralized Express error-handling middleware (4-arg signature). Handles:
+Centralized Express error-handling middleware (4-arg signature).
 
 | Error Type | HTTP Status | Handling |
 |---|---|---|
@@ -679,8 +848,9 @@ ApiResponse.error("message", data)    // { success: false, message, data }
 
 ### `tokenHelper.js`
 ```js
-generateAccessToken(payload)  // Signs JWT with JWT_SECRET + JWT_EXPIRES_IN
-verifyToken(token)             // Verifies and decodes JWT
+generateAccessToken(payload)   // Signs JWT with JWT_SECRET, expires in JWT_ACCESS_EXPIRES_IN
+generateRefreshToken(payload)  // Signs JWT with JWT_REFRESH_SECRET, expires in JWT_REFRESH_EXPIRES_IN
+verifyToken(token)             // Verifies and decodes a JWT (access token)
 ```
 
 ### `otpHelper.js`
@@ -694,7 +864,25 @@ generateOTP()  // Returns a 6-digit numeric string OTP
 
 **Path:** `server/utils/emailService.js`
 
-Uses **Nodemailer** with SMTP transport. Two styled HTML email templates:
+CodeLens uses the **[Brevo Transactional Email API](https://www.brevo.com/)** — a professional email infrastructure service. No SMTP, no Nodemailer. Email is sent via a single HTTPS POST to `https://api.brevo.com/v3/smtp/email` using `axios`.
+
+### Why Brevo instead of Gmail/SMTP?
+
+**1. Gmail throttles automated emails from datacenter IPs like Render**
+OTPs arrived 10–15 minutes late or went straight to Spam.
+
+**2. Gmail App Passwords caused `535 Authentication Failed` errors on shared hosting**
+Users saw "Invalid login" on the signup page with no way to fix it themselves.
+
+**3. `smtp.gmail.com` resolved to IPv6 addresses that Render and macOS couldn't route**
+Emails silently failed with `ENETUNREACH` in the server logs — no useful error shown to the user.
+
+**4. Required 5 fragile SMTP environment variables just to send a single email**
+Complex and error-prone local setup for every contributor joining the project.
+
+Brevo requires only **3 environment variables** and works reliably on any hosting platform.
+
+### Email Templates
 
 #### `sendVerificationOTP(email, otp)`
 - Subject: *"Verify Your CodeLens Account"*
@@ -708,6 +896,30 @@ Uses **Nodemailer** with SMTP transport. Two styled HTML email templates:
 - Same OTP display format
 - Warning: expires in 10 minutes, security advisory not to share
 
+### Brevo Setup for Contributors
+
+1. **Create a free account** at [brevo.com](https://www.brevo.com/pricing/) — the Free plan gives 300 emails/day, no credit card needed.
+
+2. **Generate an API key:**
+   - Log in → click your profile icon → **Settings** → **SMTP & API**
+   - Click the **API Keys** tab → **Generate a new API key**
+   - Copy the full key immediately — it is shown only once
+   - Check that its status shows **Active** (green) in the keys list
+
+3. **Add a verified sender email:**
+   - Go to **Senders, Domains & IPs** → **Senders** tab
+   - Click **Add a new sender** → enter your name and Gmail address
+   - Verify it via the confirmation email Brevo sends you
+
+4. **Add to `server/.env`:**
+   ```env
+   BREVO_API_KEY=your_api_key_here
+   BREVO_SENDER_EMAIL=yourname@gmail.com
+   BREVO_SENDER_NAME=CodeLens
+   ```
+
+> **Never commit your `BREVO_API_KEY` to Git.** `server/.env` is in `.gitignore`. Each contributor uses their own free Brevo account for local development.
+
 ---
 
 ## Environment Variables
@@ -716,31 +928,31 @@ Uses **Nodemailer** with SMTP transport. Two styled HTML email templates:
 
 | Variable | Required | Description |
 |---|---|---|
-| `PORT` | ✅ | Server port (e.g., `5000`) |
-| `MONGO_URI` | ✅ | MongoDB connection string |
-| `JWT_SECRET` | ✅ | Secret key for JWT signing |
-| `JWT_EXPIRES_IN` | ✅ | JWT expiry duration (e.g., `7d`) |
-| `GEMINI_API_KEY` | ✅ | Google Gemini API key |
-| `CLIENT_URL` | ✅ | Frontend origin for CORS |
+| `PORT` | ✅ | Server port (default: `8000`) |
 | `NODE_ENV` | ✅ | `development` \| `production` |
-| `SMTP_HOST` | ✅ | SMTP server hostname |
-| `SMTP_PORT` | ✅ | SMTP server port (e.g., `587`) |
-| `SMTP_USER` | ✅ | SMTP sender email |
-| `SMTP_PASS` | ✅ | SMTP sender password |
+| `MONGO_URI` | ✅ | MongoDB Atlas connection string |
+| `JWT_SECRET` | ✅ | Secret key for access token signing (min 64 chars) |
+| `JWT_ACCESS_EXPIRES_IN` | ✅ | Access token expiry (e.g., `15m`) |
+| `JWT_REFRESH_SECRET` | ✅ | Separate secret for refresh token signing (never reuse JWT_SECRET) |
+| `JWT_REFRESH_EXPIRES_IN` | ✅ | Refresh token expiry (e.g., `30d`) |
+| `CLIENT_URL` | ✅ | Frontend origin for CORS + OAuth redirects |
+| `GITHUB_CLIENT_ID` | ✅ | GitHub OAuth App client ID |
+| `GITHUB_CLIENT_SECRET` | ✅ | GitHub OAuth App client secret |
+| `GITHUB_CALLBACK_URL` | ✅ | GitHub OAuth callback URL |
+| `GITHUB_STATE_SECRET` | Optional | JWT secret for OAuth state token (falls back to `JWT_SECRET`) |
+| `GEMINI_API_KEY` | ✅ | Google Gemini API key (from [Google AI Studio](https://aistudio.google.com/)) |
+| `NVIDIA_API_KEY` | Optional | NVIDIA NIM API key (only if NVIDIA AI features are used) |
+| `BREVO_API_KEY` | ✅ | Brevo Transactional Email API key |
+| `BREVO_SENDER_EMAIL` | ✅ | Verified sender email address in your Brevo account |
+| `BREVO_SENDER_NAME` | Optional | Display name in recipient's inbox (default: `CodeLens`) |
 
-> **Startup validation:** `config/env.js` checks for all required variables at startup and throws immediately if any are missing.
-
-**Template (`server/.env.example`):**
-```env
-PORT=
-MONGO_URI=
-```
+> **Startup validation:** `config/env.js` checks for all required variables at startup and throws immediately if any are missing — the server will not start with incomplete configuration.
 
 ### Frontend (`frontend/.env`)
 
 | Variable | Description |
 |---|---|
-| `VITE_API_BASE_URL` | Backend API base URL (e.g., `http://localhost:5000/api`) |
+| `VITE_API_BASE_URL` | Backend API base URL (e.g., `http://localhost:8000/api`) |
 
 ---
 
@@ -748,11 +960,12 @@ MONGO_URI=
 
 ### Prerequisites
 
-- **Node.js** v18+ (recommend v20 LTS)
-- **MongoDB** (local instance or MongoDB Atlas)
+- **Node.js** v20+ (LTS recommended)
+- **MongoDB** — local instance or [MongoDB Atlas](https://www.mongodb.com/cloud/atlas) free tier
 - **npm** v9+
-- SMTP credentials (Gmail, Mailtrap, or similar)
-- Google Gemini API key (from [Google AI Studio](https://aistudio.google.com/))
+- **Brevo account** — [register free](https://www.brevo.com/pricing/) for transactional email (300 emails/day)
+- **Google Gemini API key** — from [Google AI Studio](https://aistudio.google.com/)
+- **GitHub OAuth App** — create one at [github.com/settings/developers](https://github.com/settings/developers)
 
 ---
 
@@ -765,19 +978,19 @@ cd CodeLens/server
 # 2. Install dependencies
 npm install
 
-# 3. Create environment file
+# 3. Create environment file from template
 cp .env.example .env
-# Fill in all required variables in .env
+# Fill in all required variables — see Environment Variables section above
 
 # 4. Start the development server
-node server.js
+npm run dev
 ```
 
-The API will be available at `http://localhost:5000`.
+The API will be available at `http://localhost:8000`.
 
 **Health check:**
 ```bash
-curl http://localhost:5000/api/health
+curl http://localhost:8000/api/health
 # → { "status": "ok", "message": "CodeLens API is running" }
 ```
 
@@ -793,7 +1006,7 @@ cd CodeLens/frontend
 npm install
 
 # 3. Create environment file
-echo "VITE_API_BASE_URL=http://localhost:5000/api" > .env
+echo "VITE_API_BASE_URL=http://localhost:8000/api" > .env
 
 # 4. Start the development server
 npm run dev
@@ -823,8 +1036,7 @@ CodeLens enforces a strict **Brutalist** design aesthetic across all UI:
 | **Header scale** | `text-5xl` to `text-9xl` — dramatically large headings |
 | **Shadows** | Offset box shadows (`shadow-[16px_16px_0_0_rgba(0,0,0,1)]`) — no blurred shadows |
 | **Spacing** | Extremely generous padding (`py-20`, `py-32`) |
-| **Disabled states** | `opacity-50` with grayscale fallbacks |
-| **Hover effects** | Color inversion (white bg → black, black bg → white) or underline with thick `decoration-[3px]` |
+| **Hover effects** | Color inversion (white bg → black, black bg → white) or underline with `decoration-[3px]` |
 
 **Tailwind CSS version:** v4 (via `@tailwindcss/vite` plugin).
 
@@ -839,7 +1051,8 @@ Please read [CONTRIBUTING.md](./CONTRIBUTING.md) before submitting issues or PRs
 **Branch naming:**
 - `feat/feature-name` — new features
 - `fix/bug-description` — bug fixes
-- `chore/task-name` — docs, dependencies, tooling
+- `docs/description` — documentation updates
+- `chore/task-name` — dependencies, tooling
 
 **Frontend rules:**
 - No `rounded-*` classes (except `rounded-none`)
@@ -851,11 +1064,13 @@ Please read [CONTRIBUTING.md](./CONTRIBUTING.md) before submitting issues or PRs
 - All local imports **must** include `.js` extension
 - Follow the Controller → Service → Repository pattern
 - All request bodies must have a Zod validation schema
+- Never expose secrets or API keys in responses
 
 **PR checklist:**
 - [ ] Code passes `npm run lint`
 - [ ] UI tested on mobile and desktop viewports
 - [ ] PR description maps solution to the original GitHub issue
+- [ ] No secrets or `.env` values committed
 
 ---
 
