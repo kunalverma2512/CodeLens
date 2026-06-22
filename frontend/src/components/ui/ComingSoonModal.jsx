@@ -1,12 +1,21 @@
+import { useEffect } from "react";
 import { Link } from "react-router-dom";
 
 export default function ComingSoonModal({ isOpen, onClose, featureName }) {
-  if (!isOpen) return null;
+  useEffect(() => {
+    if (!isOpen) return;
 
-  const handleNavClick = () => {
-    onClose();
-    window.scrollTo({ top: 0, behavior: "instant" });
-  };
+    const handleKeyDown = (e) => {
+      if (e.key === "Escape") {
+        onClose();
+      }
+    };
+
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [isOpen, onClose]);
+
+  if (!isOpen) return null;
 
   return (
     <div
@@ -66,7 +75,7 @@ export default function ComingSoonModal({ isOpen, onClose, featureName }) {
               <Link
                 key={l.to}
                 to={l.to}
-                onClick={handleNavClick}
+                onClick={onClose}
                 className="text-sm font-black uppercase tracking-widest text-black hover:underline underline-offset-8 decoration-[3px] hover:opacity-60 transition-opacity"
               >
                 {l.label} →

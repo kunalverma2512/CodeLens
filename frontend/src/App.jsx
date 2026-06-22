@@ -1,4 +1,5 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import ScrollToTop from "./components/ui/ScrollToTop";
 import { AuthProvider } from "./context/AuthContext";
 import MainLayout from "./layouts/MainLayout";
 import LandingPage from "./pages/LandingPage";
@@ -32,6 +33,7 @@ export default function App() {
   return (
     <AuthProvider>
       <BrowserRouter>
+        <ScrollToTop />
         <MainLayout>
           <Routes>
             <Route path="/" element={<LandingPage />} />
