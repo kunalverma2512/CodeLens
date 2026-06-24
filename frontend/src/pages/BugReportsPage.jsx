@@ -38,7 +38,7 @@ const BugReportsPage = () => {
       <section className="relative pt-16 pb-20 px-6 sm:px-8 lg:px-12 flex flex-col items-center text-center border-b-4 border-black bg-white overflow-hidden">
         
         {/* Professional, Colorful Dynamic Aurora Background */}
-        <motion.div
+        {/* <motion.div
           animate={{
             background: [
               "radial-gradient(120% 120% at 0% 0%, #e0f2fe 0%, #ffffff 100%)", // Sky Blue 100
@@ -49,7 +49,9 @@ const BugReportsPage = () => {
           }}
           transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
           className="absolute inset-0 pointer-events-none z-0"
-        />
+        /> */}
+
+        <div className="absolute inset-0 bg-white pointer-events-none z-0" />
 
         {/* Extremely faint, professional dot matrix overlay */}
         <div className="absolute inset-0 bg-[radial-gradient(#94a3b8_1px,transparent_1px)] [background-size:32px_32px] opacity-[0.15] pointer-events-none z-0"></div>
@@ -282,7 +284,7 @@ const BugReportsPage = () => {
       </section>
 
       {/* ───── Giant CTA Section ───── */}
-      <section className="relative px-6 sm:px-8 lg:px-12 py-40 bg-[#fffbcc] overflow-hidden">
+      <section className="relative px-6 sm:px-8 lg:px-12 py-40 bg-white overflow-hidden">
         {/* Large decorative floating elements */}
         <motion.div 
           animate={{ y: [-20, 20, -20], rotate: [0, 15, 0] }} 
