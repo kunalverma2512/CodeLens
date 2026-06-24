@@ -64,7 +64,7 @@ const BugReportsPage = () => {
         >
           <motion.div variants={popIn} className="flex justify-center mb-8">
             <div className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full border border-black/10 bg-white/60 backdrop-blur-xl shadow-sm text-xs font-black uppercase tracking-[0.2em] text-gray-800">
-              <ShieldCheck className="w-4 h-4 text-blue-500" />
+              <ShieldCheck className="w-4 h-4 text-zinc-500" />
               Quality Assurance
             </div>
           </motion.div>
@@ -77,14 +77,14 @@ const BugReportsPage = () => {
                 initial={{ pathLength: 0 }}
                 animate={{ pathLength: 1 }}
                 transition={{ duration: 1.5, ease: "easeInOut", delay: 0.5 }}
-                className="absolute -bottom-6 left-0 w-full h-6 text-blue-500 opacity-80" viewBox="0 0 100 10" preserveAspectRatio="none"
+                className="absolute -bottom-6 left-0 w-full h-6 text-zinc-400 opacity-80" viewBox="0 0 100 10" preserveAspectRatio="none"
               >
                 <path d="M0 5 Q 50 10 100 5" stroke="currentColor" strokeWidth="6" fill="transparent" />
               </motion.svg>
             </span>
           </motion.h1>
           
-          <motion.p variants={popIn} className="text-lg md:text-xl font-bold tracking-widest uppercase text-gray-600 max-w-3xl mx-auto leading-relaxed mt-16 mb-10 bg-white/40 backdrop-blur-sm p-4 rounded-xl border border-white/50 shadow-sm">
+          <motion.p variants={popIn} className="text-lg md:text-xl font-bold tracking-widest uppercase text-gray-600 max-w-3xl mx-auto leading-relaxed mt-16 mb-10 bg-white/40 backdrop-blur-sm p-4 rounded-xl border border-gray-600 shadow-sm">
             Found a glitch in the matrix? Let us know. Your detailed reports directly empower our engineering team to ship a flawless experience.
           </motion.p>
           
@@ -126,7 +126,7 @@ const BugReportsPage = () => {
               Read The Guide
             </a>
             <a href="https://github.com/kunalverma2512/CodeLens/issues" target="_blank" rel="noopener noreferrer" className="px-8 py-4 bg-white border-4 border-black text-black text-sm font-black uppercase tracking-widest hover:bg-gray-100 transition-colors flex items-center gap-3 group shadow-[8px_8px_0px_0px_rgba(0,0,0,0.1)] hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,0.1)] hover:translate-x-[4px] hover:translate-y-[4px] duration-200">
-              <Bug className="w-5 h-5 group-hover:-rotate-12 transition-transform text-red-500" /> View Issues Page
+              <Bug className="w-5 h-5 group-hover:-rotate-12 transition-transform text-black" /> View Issues Page
             </a>
           </motion.div>
         </motion.div>
