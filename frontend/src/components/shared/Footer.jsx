@@ -83,12 +83,17 @@ export default function Footer() {
                 { label: "LeetCode Auth", status: "SOON" },
               ].map((item) => (
                 <div key={item.label} className="flex items-center justify-between gap-4">
-                  <a
-                    href="#"
-                    className="text-sm font-black uppercase tracking-widest text-black hover:underline underline-offset-8 decoration-[3px] hover:opacity-60 transition-opacity"
-                  >
-                    {item.label}
-                  </a>
+                  
+                    <Link
+  to={
+    item.label === "Codeforces API"
+      ? "/codeforces-integration"
+      : "#"
+  }
+  className="text-sm font-black uppercase tracking-widest text-black hover:underline underline-offset-8 decoration-[3px] hover:opacity-60 transition-opacity"
+>
+  {item.label}
+</Link>
                   <span
                     className={`text-[9px] font-black tracking-widest border-2 px-[6px] py-[2px] leading-tight flex-shrink-0 ${
                       item.status === "LIVE"

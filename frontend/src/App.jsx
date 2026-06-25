@@ -1,3 +1,4 @@
+import ScrollToTop from "./components/ui/ScrollToTop";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "./context/AuthContext";
 import MainLayout from "./layouts/MainLayout";
@@ -28,11 +29,13 @@ import ProtectedRoute from "./components/shared/ProtectedRoute";
 import PublicRoute from "./components/shared/PublicRoute";
 import BugReportsPage from "./pages/BugReportsPage";
 import Contact from "./pages/Contact";
+import CodeforcesIntegration from "./pages/CodeforcesIntegration";
 export default function App() {
   return (
     <AuthProvider>
       <BrowserRouter>
         <MainLayout>
+          <ScrollToTop />
           <Routes>
             <Route path="/" element={<LandingPage />} />
             <Route 
@@ -116,6 +119,7 @@ export default function App() {
             <Route path="/faq" element={<FAQPage />} />
             <Route path="/contact" element={<Contact />} />
             <Route path="/about" element={<AboutCodeLensPage />} />
+            <Route path="/codeforces-integration" element={<CodeforcesIntegration />} />
             <Route path="*" element={<NotFoundPage />} />
           </Routes>
         </MainLayout>
