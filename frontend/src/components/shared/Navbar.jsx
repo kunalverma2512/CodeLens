@@ -402,6 +402,9 @@ export default function Navbar() {
           <Link to="/faq" className={navLinkCls("/faq")}>
             FAQ
           </Link>
+          <Link to="/docs" className={navLinkCls("/docs")}>
+            Docs
+          </Link>
           
           <Link to="/about" className={navLinkCls("/about")}>
             About
@@ -594,6 +597,9 @@ export default function Navbar() {
             </Link>
             <Link to="/faq" onClick={closeMenu} className={mobileLinkCls}>
               FAQ <span className="text-zinc-300 text-sm">→</span>
+            </Link>
+            <Link to="/docs" onClick={closeMenu} className={mobileLinkCls}>
+              Docs <span className="text-zinc-300 text-sm">→</span>
             </Link>
             <Link to="/about" onClick={closeMenu} className={mobileLinkCls}>
               About <span className="text-zinc-300 text-sm">→</span>
