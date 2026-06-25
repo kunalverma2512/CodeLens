@@ -29,6 +29,7 @@ import ProtectedRoute from "./components/shared/ProtectedRoute";
 import PublicRoute from "./components/shared/PublicRoute";
 import BugReportsPage from "./pages/BugReportsPage";
 import Contact from "./pages/Contact";
+import DocsPage from "./pages/DocsPage";
 export default function App() {
   return (
     <AuthProvider>
@@ -116,6 +117,7 @@ export default function App() {
             <Route path="/privacy" element={<PrivacyPage/>} />
             <Route path="/bug-reports" element={<BugReportsPage />} />
             <Route path="/faq" element={<FAQPage />} />
+            <Route path="/docs" element={<DocsPage />} />
             <Route path="/contact" element={<Contact />} />
             <Route path="/about" element={<AboutCodeLensPage />} />
             <Route path="*" element={<NotFoundPage />} />

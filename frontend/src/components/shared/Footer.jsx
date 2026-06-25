@@ -56,10 +56,10 @@ export default function Footer() {
             </h3>
             <div className="flex flex-col gap-4">
               {[
-  { label: "Documentation", comingSoon: true },
-{ label: "Changelog", comingSoon: true },
-{ label: "Bug Reports", to: "/bug-reports" }
-].map((l) =>
+                { label: "Documentation", to: "/docs" },
+                { label: "Changelog", comingSoon: true },
+                { label: "Bug Reports", to: "/bug-reports" }
+              ].map((l) =>
   l.comingSoon ? (
     <button
       key={l.label}
