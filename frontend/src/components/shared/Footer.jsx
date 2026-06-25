@@ -39,12 +39,13 @@ export default function Footer() {
                 { to: "/codeforces", label: "Codeforces" },
               ].map((l) => (
                 <Link
-                  key={l.to}
-                  to={l.to}
-                  className="text-sm font-black uppercase tracking-widest text-black hover:underline underline-offset-8 decoration-[3px] hover:opacity-60 transition-opacity"
-                >
-                  {l.label}
-                </Link>
+  to={item.label === "Codeforces API" ? "/codeforces-integration" : "#"}
+  onClick={item.label === "Codeforces API" ? undefined : (e) => e.preventDefault()}
+  aria-disabled={item.label === "Codeforces API" ? undefined : true}
+  className="text-sm font-black uppercase tracking-widest text-black hover:underline underline-offset-8 decoration-[3px] hover:opacity-60 transition-opacity"
+>
+  {item.label}
+</Link>
               ))}
             </div>
 
