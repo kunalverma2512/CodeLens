@@ -81,6 +81,8 @@ export default function DocsSidebar({ sections = [] }) {
       <div className="lg:hidden w-full sticky top-[57px] z-30 bg-white border-b-4 border-black px-4 py-3">
         <button
           onClick={() => setIsOpen(!isOpen)}
+          aria-expanded={isOpen}
+          aria-controls="mobile-nav-list"
           className="w-full flex items-center justify-between border-4 border-black px-4 py-3 bg-white hover:bg-zinc-50 font-black text-xs uppercase tracking-widest text-black transition-colors"
         >
           <span>
@@ -92,7 +94,10 @@ export default function DocsSidebar({ sections = [] }) {
         </button>
 
         {isOpen && (
-          <ul className="mt-2 border-4 border-black bg-white shadow-[4px_4px_0_0_rgba(0,0,0,1)] divide-y-2 divide-black">
+          <ul
+            id="mobile-nav-list"
+            className="mt-2 border-4 border-black bg-white shadow-[4px_4px_0_0_rgba(0,0,0,1)] divide-y-2 divide-black"
+          >
             {visibleSections.map((sec) => (
               <li key={sec.id}>
                 <button
