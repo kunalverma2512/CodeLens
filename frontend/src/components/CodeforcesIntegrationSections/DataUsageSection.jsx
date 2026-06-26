@@ -1,3 +1,5 @@
+import { X } from "lucide-react";
+
 export default function DataUsageSection() {
   return (
     <section className="bg-gray-50 border-b-[4px] border-black px-6 sm:px-12 lg:px-24 py-20">
@@ -69,7 +71,7 @@ export default function DataUsageSection() {
                   key={item}
                   className="flex items-start gap-4 border-[3px] border-black bg-white p-5"
                 >
-                  <span className="text-lg font-black flex-shrink-0">✕</span>
+                  <X size={18} strokeWidth={2.5} className="flex-shrink-0 mt-0.5" />
                   <p className="text-xs font-bold uppercase tracking-widest text-gray-600 leading-relaxed">
                     {item}
                   </p>

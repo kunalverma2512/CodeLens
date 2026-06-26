@@ -94,14 +94,21 @@ export default function Footer() {
               ].map((item) => (
                 <div key={item.label} className="flex items-center justify-between gap-4">
                   
-                    <Link
-  to={item.label === "Codeforces API" ? "/codeforces-integration" : "#"}
-  onClick={item.label === "Codeforces API" ? undefined : (e) => e.preventDefault()}
-  aria-disabled={item.label === "Codeforces API" ? undefined : true}
-  className="text-sm font-black uppercase tracking-widest text-black hover:underline underline-offset-8 decoration-[3px] hover:opacity-60 transition-opacity"
->
-  {item.label}
-</Link>
+                {item.label === "Codeforces API" ? (
+  <Link
+    to="/codeforces-integration"
+    className="text-sm font-black uppercase tracking-widest text-black hover:underline underline-offset-8 decoration-[3px] hover:opacity-60 transition-opacity"
+  >
+    {item.label}
+  </Link>
+) : (
+  <span
+    aria-disabled="true"
+    className="text-sm font-black uppercase tracking-widest text-black opacity-40 cursor-not-allowed"
+  >
+    {item.label}
+  </span>
+)}
                   <span
                     className={`text-[9px] font-black tracking-widest border-2 px-[6px] py-[2px] leading-tight flex-shrink-0 ${
                       item.status === "LIVE"

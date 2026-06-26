@@ -8,9 +8,8 @@ export default function HeroSection() {
         </span>
 
         {/* Title */}
-        <h1 className="text-5xl sm:text-7xl lg:text-[7rem] font-black uppercase tracking-tighter leading-none mb-8">
-          Codeforces<br />
-          <span className="text-gray-400">× CodeLens</span>
+        <h1 className="text-4xl sm:text-6xl lg:text-[5rem] font-black uppercase tracking-tighter leading-none mb-8">
+          Codeforces <span className="text-gray-400">× CodeLens</span>
         </h1>
 
         {/* Description */}
