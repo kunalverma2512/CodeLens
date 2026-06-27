@@ -29,27 +29,21 @@ export default function OpenSourceSection() {
           {/* Right — stats */}
           <div className="grid grid-cols-2 gap-4">
             {[
-              { value: "1B+", label: "Commits in 2025" },
-              { value: "255K+", label: "First-Time Contributors (1 Month)" },
-              { value: "36M+", label: "New Developers in 2025" },
-              { value: "180+", label: "Countries Represented" },
-            ].map(({ value, label }) => (
+              "Billions of commits every year",
+              "Hundreds of thousands of new contributors monthly",
+              "Millions of new developers joining every year",
+              "Contributors from nearly every country in the world",
+            ].map((phrase) => (
               <div
-                key={label}
+                key={phrase}
                 className="border-2 border-gray-700 p-6"
               >
-                <p className="text-2xl sm:text-3xl font-black tracking-tighter leading-none mb-1">
-                  {value}
-                </p>
-                <p className="text-xs font-black uppercase tracking-widest text-gray-500">
-                  {label}
+                <p className="text-sm sm:text-base font-black uppercase tracking-widest text-gray-300 leading-snug">
+                  {phrase}
                 </p>
               </div>
             ))}
           </div>
-          <p className="text-[10px] font-bold uppercase tracking-widest text-gray-600 mt-4 col-span-2">
-            Source: GitHub, 2025
-          </p>
         </div>
       </div>
     </section>

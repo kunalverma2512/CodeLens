@@ -22,29 +22,24 @@ export default function HeroSection() {
         </p>
 
         {/* Stats row */}
+        {/* Stats row */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-8">
           {[
-            { value: "180M+", label: "Developers" },
-            { value: "630M+", label: "Repositories" },
-            { value: "4M+", label: "Organizations" },
-            { value: "90%", label: "Fortune 100 Adoption" },
-          ].map(({ value, label }) => (
+            "Millions of developers worldwide",
+            "Hundreds of millions of repositories",
+            "Used by organizations of every size",
+            "Trusted by startups and large enterprises alike",
+          ].map((phrase) => (
             <div
-              key={label}
+              key={phrase}
               className="border-2 border-gray-700 p-6"
             >
-              <p className="text-2xl sm:text-3xl font-black tracking-tighter leading-none mb-1">
-                {value}
-              </p>
-              <p className="text-xs font-black uppercase tracking-widest text-gray-500">
-                {label}
+              <p className="text-sm sm:text-base font-black uppercase tracking-widest text-gray-300 leading-snug">
+                {phrase}
               </p>
             </div>
           ))}
         </div>
-        <p className="text-[10px] font-black uppercase tracking-widest text-gray-600 mt-4">
-          Source: GitHub, 2025
-        </p>
       </div>
     </section>
   );
