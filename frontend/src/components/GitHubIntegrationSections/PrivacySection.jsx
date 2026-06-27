@@ -27,9 +27,11 @@ export default function PrivacySection() {
               data-retention policy.
             </p>
             <p className="text-sm font-bold uppercase tracking-widest text-gray-400 leading-relaxed">
-              We do not sell, share, or monetise your data in any way. CodeLens
-              exists to help you grow as a developer — not to profit from your
-              personal information.
+              We do not sell your GitHub data. Any handling or
+              sharing of data is limited to what is described in
+              our Privacy Policy. CodeLens exists to help you grow
+              as a developer — not to profit from your personal
+              information.
             </p>
           </div>
           {/* Right — key points */}
