@@ -30,6 +30,7 @@ import PublicRoute from "./components/shared/PublicRoute";
 import BugReportsPage from "./pages/BugReportsPage";
 import Contact from "./pages/Contact";
 import CodeforcesIntegration from "./pages/CodeforcesIntegration";
+import GitHubIntegration from "./pages/GitHubIntegration";
 export default function App() {
   return (
     <AuthProvider>
@@ -120,6 +121,7 @@ export default function App() {
             <Route path="/contact" element={<Contact />} />
             <Route path="/about" element={<AboutCodeLensPage />} />
             <Route path="/codeforces-integration" element={<CodeforcesIntegration />} />
+            <Route path="/github-integration" element={<GitHubIntegration />} />
             <Route path="*" element={<NotFoundPage />} />
           </Routes>
         </MainLayout>

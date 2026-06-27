@@ -94,9 +94,16 @@ export default function Footer() {
               ].map((item) => (
                 <div key={item.label} className="flex items-center justify-between gap-4">
                   
-                {item.label === "Codeforces API" ? (
+              {item.label === "Codeforces API" ? (
   <Link
     to="/codeforces-integration"
+    className="text-sm font-black uppercase tracking-widest text-black hover:underline underline-offset-8 decoration-[3px] hover:opacity-60 transition-opacity"
+  >
+    {item.label}
+  </Link>
+) : item.label === "GitHub Sync" ? (
+  <Link
+    to="/github-integration"
     className="text-sm font-black uppercase tracking-widest text-black hover:underline underline-offset-8 decoration-[3px] hover:opacity-60 transition-opacity"
   >
     {item.label}
