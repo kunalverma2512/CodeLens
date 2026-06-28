@@ -36,87 +36,75 @@ const BugReportsPage = () => {
       
       {/* ───── Dynamic Hero Section ───── */}
       <section className="relative pt-16 pb-20 px-6 sm:px-8 lg:px-12 flex flex-col items-center text-center border-b-4 border-black bg-white overflow-hidden">
-        
-        {/* Professional, Colorful Dynamic Aurora Background */}
-        {/* <motion.div
-          animate={{
-            background: [
-              "radial-gradient(120% 120% at 0% 0%, #e0f2fe 0%, #ffffff 100%)", // Sky Blue 100
-              "radial-gradient(120% 120% at 100% 0%, #f3e8ff 0%, #ffffff 100%)", // Purple 100
-              "radial-gradient(120% 120% at 50% 100%, #ccfbf1 0%, #ffffff 100%)", // Teal 100
-              "radial-gradient(120% 120% at 0% 0%, #e0f2fe 0%, #ffffff 100%)"
-            ]
-          }}
-          transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-          className="absolute inset-0 pointer-events-none z-0"
-        /> */}
-
         <div className="absolute inset-0 bg-white pointer-events-none z-0" />
 
         {/* Extremely faint, professional dot matrix overlay */}
         <div className="absolute inset-0 bg-[radial-gradient(#94a3b8_1px,transparent_1px)] [background-size:32px_32px] opacity-[0.15] pointer-events-none z-0"></div>
 
         <motion.div 
-          className="relative z-20 max-w-5xl w-full mx-auto"
+          className="relative z-20 max-w-5xl w-full mx-autot"
           initial="hidden"
           animate="visible"
           variants={staggerContainer}
         >
-          <motion.div variants={popIn} className="flex justify-center mb-8">
-            <div className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full border border-black/10 bg-white/60 backdrop-blur-xl shadow-sm text-xs font-black uppercase tracking-[0.2em] text-gray-800">
-              <ShieldCheck className="w-4 h-4 text-zinc-500" />
-              Quality Assurance
-            </div>
-          </motion.div>
+          <div className="flex flex-col lg:flex-row gap-24 justify-between items-center">
+            {/* LEFT: Title */}
+            <motion.h1 variants={popIn} className="flex-1 text-5xl md:text-7xl lg:text-[90px] font-black tracking-tighter uppercase leading-[0.9] relative text-left">
+              <span className="block text-transparent bg-clip-text bg-gradient-to-r from-black via-gray-700 to-black">Help Us Build</span>
+              <span className="block relative inline-block mt-2">
+                Perfection
+                <motion.svg 
+                  initial={{ pathLength: 0 }}
+                  animate={{ pathLength: 1 }}
+                  transition={{ duration: 1.5, ease: "easeInOut", delay: 0.5 }}
+                  className="absolute -bottom-6 left-0 w-full h-6 text-zinc-400 opacity-80" viewBox="0 0 100 10" preserveAspectRatio="none"
+                >
+                  <path d="M0 5 Q 50 10 100 5" stroke="currentColor" strokeWidth="6" fill="transparent" />
+                </motion.svg>
+              </span>
+            </motion.h1>
           
-          <motion.h1 variants={popIn} className="text-6xl md:text-8xl lg:text-[100px] font-black tracking-tighter uppercase leading-[0.9] mb-8 relative">
-            <span className="block text-transparent bg-clip-text bg-gradient-to-r from-black via-gray-700 to-black">Help Us Build</span>
-            <span className="block relative inline-block mt-2">
-              Perfection
-              <motion.svg 
-                initial={{ pathLength: 0 }}
-                animate={{ pathLength: 1 }}
-                transition={{ duration: 1.5, ease: "easeInOut", delay: 0.5 }}
-                className="absolute -bottom-6 left-0 w-full h-6 text-zinc-400 opacity-80" viewBox="0 0 100 10" preserveAspectRatio="none"
-              >
-                <path d="M0 5 Q 50 10 100 5" stroke="currentColor" strokeWidth="6" fill="transparent" />
-              </motion.svg>
-            </span>
-          </motion.h1>
-          
-          <motion.p variants={popIn} className="text-lg md:text-xl font-bold tracking-widest uppercase text-gray-600 max-w-3xl mx-auto leading-relaxed mt-16 mb-10 bg-white/40 backdrop-blur-sm p-4 rounded-xl border border-gray-600 shadow-sm">
-            Found a glitch in the matrix? Let us know. Your detailed reports directly empower our engineering team to ship a flawless experience.
-          </motion.p>
+           {/* RIGHT: Everything else */}
+           <div className="flex-1 flex flex-col items-start text-left">
+            <motion.div variants={popIn} className="flex justify-start mb-8">
+              <div className="inline-flex items-center gap-2 px-5 py-2.5 rounded-none border border-black/10 bg-white/60 backdrop-blur-xl shadow-sm text-xs font-black uppercase tracking-[0.2em] text-gray-800">
+                <ShieldCheck className="w-4 h-4 text-zinc-500" />
+                Quality Assurance
+              </div>
+            </motion.div>
+            <motion.p variants={popIn} className="text-base md:text-lg font-bold tracking-widest uppercase text-gray-600 leading-relaxed mb-10 bg-blue-100 backdrop-blur-sm p-4 rounded-xl">
+              Found a glitch in the matrix? Let us know. Your detailed reports directly empower our engineering team to ship a flawless experience.
+            </motion.p>
           
           {/* Organized Stats Row with Animations */}
-          <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-6 mb-12">
-            <motion.div variants={popIn} whileHover={{ y: -5, scale: 1.05 }} className="flex items-center gap-4 px-6 py-2.5 bg-green-50/90 backdrop-blur-xl border-2 border-black rounded-full shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] cursor-default">
-              <div className="w-8 h-8 rounded-full bg-green-200 border-2 border-black flex items-center justify-center shadow-sm">
-                <CheckCircle className="w-4 h-4 text-green-800" />
+          <div className="flex flex-nowrap items-center justify-start gap-4 sm:gap-6 mb-12">
+            <motion.div variants={popIn} whileHover={{ y: -5, scale: 1.05 }} className="flex items-center gap-4 px-6 py-2.5 bg-white backdrop-blur-xl border-2 border-black rounded-none shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] cursor-default">
+              <div className="w-8 h-8 rounded-none bg-black border-2 border-black flex items-center justify-center shadow-sm">
+                <CheckCircle className="w-4 h-4 text-white" />
               </div>
               <div className="text-left">
-                <p className="text-[9px] font-black uppercase tracking-widest text-green-800/60 leading-none mb-1">System Status</p>
-                <p className="text-sm font-black uppercase leading-none text-green-950">All Nominal</p>
+                <p className="text-[9px] font-black uppercase tracking-widest text-black/60 leading-none mb-1">System Status</p>
+                <p className="text-sm font-black uppercase leading-none text-black">All Nominal</p>
               </div>
             </motion.div>
 
-            <motion.div variants={popIn} whileHover={{ y: -5, scale: 1.05 }} className="flex items-center gap-4 px-6 py-2.5 bg-red-50/90 backdrop-blur-xl border-2 border-black rounded-full shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] cursor-default">
-              <div className="w-8 h-8 rounded-full bg-red-200 border-2 border-black flex items-center justify-center shadow-sm">
-                <Bug className="w-4 h-4 text-red-800" />
+            <motion.div variants={popIn} whileHover={{ y: -5, scale: 1.05 }} className="flex items-center gap-4 px-6 py-2.5 bg-white backdrop-blur-xl border-2 border-black rounded-none shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] cursor-default">
+              <div className="w-8 h-8 rounded-none bg-black border-2 border-black flex items-center justify-center shadow-sm">
+                <Bug className="w-4 h-4 text-white" />
               </div>
               <div className="text-left">
-                <p className="text-[9px] font-black uppercase tracking-widest text-red-800/60 leading-none mb-1">Avg Resolution</p>
-                <p className="text-sm font-black uppercase leading-none text-red-950">&lt; 24 Hours</p>
+                <p className="text-[9px] font-black uppercase tracking-widest text-black/60  leading-none mb-1">Avg Resolution</p>
+                <p className="text-sm font-black uppercase leading-none text-black">&lt; 24 Hours</p>
               </div>
             </motion.div>
 
-            <motion.div variants={popIn} whileHover={{ y: -5, scale: 1.05 }} className="flex items-center gap-4 px-6 py-2.5 bg-blue-50/90 backdrop-blur-xl border-2 border-black rounded-full shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] cursor-default">
-              <div className="w-8 h-8 rounded-full bg-blue-200 border-2 border-black flex items-center justify-center shadow-sm">
-                <div className="w-2.5 h-2.5 rounded-full bg-blue-600 animate-pulse"></div>
+            <motion.div variants={popIn} whileHover={{ y: -5, scale: 1.05 }} className="flex items-center gap-4 px-6 py-2.5 bg-white backdrop-blur-xl border-2 border-black rounded-none shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] cursor-default">
+              <div className="w-8 h-8 rounded-none bg-black border-2 border-black flex items-center justify-center shadow-sm">
+                <div className="w-2.5 h-2.5 rounded-none bg-white animate-pulse"></div>
               </div>
               <div className="text-left">
-                <p className="text-[9px] font-black uppercase tracking-widest text-blue-800/60 leading-none mb-1">Project Type</p>
-                <p className="text-sm font-black uppercase leading-none text-blue-950">Open Source</p>
+                <p className="text-[9px] font-black uppercase tracking-widest text-black/60 leading-none mb-1">Project Type</p>
+                <p className="text-sm font-black uppercase leading-none text-black">Open Source</p>
               </div>
             </motion.div>
           </div>
@@ -129,6 +117,8 @@ const BugReportsPage = () => {
               <Bug className="w-5 h-5 group-hover:-rotate-12 transition-transform text-black" /> View Issues Page
             </a>
           </motion.div>
+          </div>
+          </div>
         </motion.div>
       </section>
 
