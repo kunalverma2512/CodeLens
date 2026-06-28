@@ -1,5 +1,5 @@
 import { motion, useScroll, useTransform } from "framer-motion";
-import { Bug, MonitorSmartphone, Zap, AlertTriangle, CheckCircle, FileText, ArrowRight, Code, Terminal, Server, ShieldCheck } from "lucide-react";
+import { Bug, MonitorSmartphone, Zap, CheckCircle, FileText, ArrowRight, Code, Terminal, Server, ShieldCheck } from "lucide-react";
 import { useRef, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 const BugReportsPage = () => {
@@ -36,20 +36,7 @@ const BugReportsPage = () => {
       
       {/* ───── Dynamic Hero Section ───── */}
       <section className="relative pt-16 pb-20 px-6 sm:px-8 lg:px-12 flex flex-col items-center text-center border-b-4 border-black bg-white overflow-hidden">
-        
-        {/* Professional, Colorful Dynamic Aurora Background */}
-        <motion.div
-          animate={{
-            background: [
-              "radial-gradient(120% 120% at 0% 0%, #e0f2fe 0%, #ffffff 100%)", // Sky Blue 100
-              "radial-gradient(120% 120% at 100% 0%, #f3e8ff 0%, #ffffff 100%)", // Purple 100
-              "radial-gradient(120% 120% at 50% 100%, #ccfbf1 0%, #ffffff 100%)", // Teal 100
-              "radial-gradient(120% 120% at 0% 0%, #e0f2fe 0%, #ffffff 100%)"
-            ]
-          }}
-          transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-          className="absolute inset-0 pointer-events-none z-0"
-        />
+        <div className="absolute inset-0 bg-white pointer-events-none z-0" />
 
         {/* Extremely faint, professional dot matrix overlay */}
         <div className="absolute inset-0 bg-[radial-gradient(#94a3b8_1px,transparent_1px)] [background-size:32px_32px] opacity-[0.15] pointer-events-none z-0"></div>
@@ -60,61 +47,72 @@ const BugReportsPage = () => {
           animate="visible"
           variants={staggerContainer}
         >
-          <motion.div variants={popIn} className="flex justify-center mb-8">
-            <div className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full border border-black/10 bg-white/60 backdrop-blur-xl shadow-sm text-xs font-black uppercase tracking-[0.2em] text-gray-800">
-              <ShieldCheck className="w-4 h-4 text-blue-500" />
-              Quality Assurance
-            </div>
-          </motion.div>
+          <div className="flex flex-col lg:flex-row gap-24 justify-between items-center">
+            {/* LEFT: Title */}
+            <motion.h1 variants={popIn} className="flex-1 text-5xl md:text-7xl lg:text-[90px] font-black tracking-tighter uppercase leading-[0.9] relative text-left">
+              <span className="block text-transparent bg-clip-text bg-gradient-to-r from-black via-gray-700 to-black">Help Us Build</span>
+              <span className="block relative inline-block mt-2">
+                Perfection
+                <motion.svg 
+                  initial={{ pathLength: 0 }}
+                  animate={{ pathLength: 1 }}
+                  transition={{ duration: 1.5, ease: "easeInOut", delay: 0.5 }}
+                  className="absolute -bottom-6 left-0 w-full h-6 text-zinc-400 opacity-80" viewBox="0 0 100 10" preserveAspectRatio="none"
+                >
+                  <path d="M0 5 Q 50 10 100 5" stroke="currentColor" strokeWidth="6" fill="transparent" />
+                </motion.svg>
+              </span>
+            </motion.h1>
           
-          <motion.h1 variants={popIn} className="text-6xl md:text-8xl lg:text-[100px] font-black tracking-tighter uppercase leading-[0.9] mb-8 relative">
-            <span className="block text-transparent bg-clip-text bg-gradient-to-r from-black via-gray-700 to-black">Help Us Build</span>
-            <span className="block relative inline-block mt-2">
-              Perfection
-              <motion.svg 
-                initial={{ pathLength: 0 }}
-                animate={{ pathLength: 1 }}
-                transition={{ duration: 1.5, ease: "easeInOut", delay: 0.5 }}
-                className="absolute -bottom-6 left-0 w-full h-6 text-blue-500 opacity-80" viewBox="0 0 100 10" preserveAspectRatio="none"
-              >
-                <path d="M0 5 Q 50 10 100 5" stroke="currentColor" strokeWidth="6" fill="transparent" />
-              </motion.svg>
-            </span>
-          </motion.h1>
-          
-          <motion.p variants={popIn} className="text-lg md:text-xl font-bold tracking-widest uppercase text-gray-600 max-w-3xl mx-auto leading-relaxed mt-16 mb-10 bg-white/40 backdrop-blur-sm p-4 rounded-xl border border-white/50 shadow-sm">
-            Found a glitch in the matrix? Let us know. Your detailed reports directly empower our engineering team to ship a flawless experience.
-          </motion.p>
+           {/* RIGHT: Everything else */}
+           <div className="flex-1 flex flex-col items-start text-left">
+            <motion.div variants={popIn} className="flex justify-start mb-8">
+              <div className="inline-flex items-center gap-2 px-5 py-2.5 rounded-none border border-black/10 bg-white/60 backdrop-blur-xl shadow-sm text-xs font-black uppercase tracking-[0.2em] text-gray-800">
+                <ShieldCheck className="w-4 h-4 text-zinc-500" />
+                Quality Assurance
+              </div>
+            </motion.div>
+            <motion.p variants={popIn} className="text-base md:text-lg font-bold tracking-widest uppercase text-gray-600 leading-relaxed mb-10 bg-blue-100 backdrop-blur-sm p-4 rounded-xl">
+              Found a glitch in the matrix? Let us know. Your detailed reports directly empower our engineering team to ship a flawless experience.
+            </motion.p>
           
           {/* Organized Stats Row with Animations */}
-          <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-6 mb-12">
-            <motion.div variants={popIn} whileHover={{ y: -5, scale: 1.05 }} className="flex items-center gap-4 px-6 py-2.5 bg-green-50/90 backdrop-blur-xl border-2 border-black rounded-full shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] cursor-default">
-              <div className="w-8 h-8 rounded-full bg-green-200 border-2 border-black flex items-center justify-center shadow-sm">
-                <CheckCircle className="w-4 h-4 text-green-800" />
+          <div className="flex flex-wrap lg:flex-nowrap items-center justify-start gap-2 sm:gap-4 mb-12">
+          <motion.div
+            variants={popIn}
+            whileHover={{ y: -5, scale: 1.05 }}
+            className="flex-1 min-w-0 flex items-center gap-2 sm:gap-4 px-3 sm:px-6 py-2 bg-white backdrop-blur-xl border-2 border-black rounded-none shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] cursor-default"
+          >
+            <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-none bg-black border-2 border-black flex items-center justify-center shadow-sm shrink-0">
+              <CheckCircle className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white" />
+            </div>
+            <div className="text-left min-w-0">
+              <p className="text-[8px] sm:text-[9px] font-black uppercase tracking-[0.12em] sm:tracking-widest text-black/60 leading-none mb-1">
+                System Status
+              </p>
+              <p className="text-xs sm:text-sm font-black uppercase leading-none text-black">
+                All Nominal
+              </p>
+            </div>
+          </motion.div>
+
+            <motion.div variants={popIn} whileHover={{ y: -5, scale: 1.05 }} className="flex-1 min-w-0 flex items-center gap-2 sm:gap-4 px-3 sm:px-6 py-2 bg-white backdrop-blur-xl border-2 border-black rounded-none shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] cursor-default">
+              <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-none bg-black border-2 border-black flex items-center justify-center shadow-sm shrink-0">
+                <Bug className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white" />
               </div>
-              <div className="text-left">
-                <p className="text-[9px] font-black uppercase tracking-widest text-green-800/60 leading-none mb-1">System Status</p>
-                <p className="text-sm font-black uppercase leading-none text-green-950">All Nominal</p>
+              <div className="text-left min-w-0">
+                <p className="text-[8px] sm:text-[9px] font-black uppercase tracking-[0.12em] sm:tracking-widest text-black/60 leading-none mb-1">Avg Resolution</p>
+                <p className="text-xs sm:text-sm font-black uppercase leading-none text-black">&lt; 24 Hours</p>
               </div>
             </motion.div>
 
-            <motion.div variants={popIn} whileHover={{ y: -5, scale: 1.05 }} className="flex items-center gap-4 px-6 py-2.5 bg-red-50/90 backdrop-blur-xl border-2 border-black rounded-full shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] cursor-default">
-              <div className="w-8 h-8 rounded-full bg-red-200 border-2 border-black flex items-center justify-center shadow-sm">
-                <Bug className="w-4 h-4 text-red-800" />
+            <motion.div variants={popIn} whileHover={{ y: -5, scale: 1.05 }} className="flex-1 min-w-0 flex items-center gap-2 sm:gap-4 px-3 sm:px-6 py-2 bg-white backdrop-blur-xl border-2 border-black rounded-none shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] cursor-default">
+              <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-none bg-black border-2 border-black flex items-center justify-center shadow-sm shrink-0">
+                <div className="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-none bg-white animate-pulse"></div>
               </div>
-              <div className="text-left">
-                <p className="text-[9px] font-black uppercase tracking-widest text-red-800/60 leading-none mb-1">Avg Resolution</p>
-                <p className="text-sm font-black uppercase leading-none text-red-950">&lt; 24 Hours</p>
-              </div>
-            </motion.div>
-
-            <motion.div variants={popIn} whileHover={{ y: -5, scale: 1.05 }} className="flex items-center gap-4 px-6 py-2.5 bg-blue-50/90 backdrop-blur-xl border-2 border-black rounded-full shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] cursor-default">
-              <div className="w-8 h-8 rounded-full bg-blue-200 border-2 border-black flex items-center justify-center shadow-sm">
-                <div className="w-2.5 h-2.5 rounded-full bg-blue-600 animate-pulse"></div>
-              </div>
-              <div className="text-left">
-                <p className="text-[9px] font-black uppercase tracking-widest text-blue-800/60 leading-none mb-1">Project Type</p>
-                <p className="text-sm font-black uppercase leading-none text-blue-950">Open Source</p>
+              <div className="text-left min-w-0">
+                <p className="text-[8px] sm:text-[9px] font-black uppercase tracking-[0.12em] sm:tracking-widest text-black/60 leading-none mb-1">Project Type</p>
+                <p className="text-xs sm:text-sm font-black uppercase leading-none text-black">Open Source</p>
               </div>
             </motion.div>
           </div>
@@ -124,9 +122,11 @@ const BugReportsPage = () => {
               Read The Guide
             </a>
             <a href="https://github.com/kunalverma2512/CodeLens/issues" target="_blank" rel="noopener noreferrer" className="px-8 py-4 bg-white border-4 border-black text-black text-sm font-black uppercase tracking-widest hover:bg-gray-100 transition-colors flex items-center gap-3 group shadow-[8px_8px_0px_0px_rgba(0,0,0,0.1)] hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,0.1)] hover:translate-x-[4px] hover:translate-y-[4px] duration-200">
-              <Bug className="w-5 h-5 group-hover:-rotate-12 transition-transform text-red-500" /> View Issues Page
+              <Bug className="w-5 h-5 group-hover:-rotate-12 transition-transform text-black" /> View Issues Page
             </a>
           </motion.div>
+          </div>
+          </div>
         </motion.div>
       </section>
 
@@ -159,10 +159,10 @@ const BugReportsPage = () => {
           className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
         >
           {[
-            { icon: <MonitorSmartphone />, title: "Interface", desc: "Layout breaks, responsive issues, or typography errors on any device.", color: "bg-blue-300" },
-            { icon: <Zap />, title: "Performance", desc: "Slow load times, rendering lag, or memory leaks impacting usability.", color: "bg-yellow-300" },
-            { icon: <Terminal />, title: "Functionality", desc: "Broken buttons, form submission failures, or routing 404s.", color: "bg-green-300" },
-            { icon: <Server />, title: "Backend API", desc: "Syncing issues with GitHub/Codeforces, timeouts, or data mismatches.", color: "bg-red-300" },
+            { icon: <MonitorSmartphone />, title: "Interface", desc: "Layout breaks, responsive issues, or typography errors on any device.", color: "bg-white" },
+            { icon: <Zap />, title: "Performance", desc: "Slow load times, rendering lag, or memory leaks impacting usability.", color: "bg-white" },
+            { icon: <Terminal />, title: "Functionality", desc: "Broken buttons, form submission failures, or routing 404s.", color: "bg-white" },
+            { icon: <Server />, title: "Backend API", desc: "Syncing issues with GitHub/Codeforces, timeouts, or data mismatches.", color: "bg-white" },
           ].map((feature, idx) => (
             <motion.div 
               key={idx}
@@ -282,7 +282,7 @@ const BugReportsPage = () => {
       </section>
 
       {/* ───── Giant CTA Section ───── */}
-      <section className="relative px-6 sm:px-8 lg:px-12 py-40 bg-[#fffbcc] overflow-hidden">
+      <section className="relative px-6 sm:px-8 lg:px-12 py-40 bg-white overflow-hidden">
         {/* Large decorative floating elements */}
         <motion.div 
           animate={{ y: [-20, 20, -20], rotate: [0, 15, 0] }} 
@@ -310,8 +310,8 @@ const BugReportsPage = () => {
           {/* Enhanced Checkbox background */}
           <motion.div variants={popIn} className="relative mb-12 group">
             {/* Multi-layered staggered shapes */}
-            <div className="absolute inset-0 bg-blue-500 rounded-[30%] rotate-[15deg] group-hover:rotate-[45deg] group-hover:scale-110 transition-transform duration-500 shadow-xl"></div>
-            <div className="absolute inset-0 bg-purple-500 rounded-[30%] -rotate-[15deg] group-hover:-rotate-[45deg] group-hover:scale-110 transition-transform duration-500 shadow-xl mix-blend-multiply"></div>
+            <div className="absolute inset-0 bg-black  rounded-[30%] rotate-[15deg] group-hover:rotate-[45deg] group-hover:scale-110 transition-transform duration-500 shadow-xl"></div>
+            <div className="absolute inset-0 bg-zinc-400 rounded-[30%] -rotate-[15deg] group-hover:-rotate-[45deg] group-hover:scale-110 transition-transform duration-500 shadow-xl mix-blend-multiply"></div>
             
             <div className="relative w-28 h-28 bg-white border-4 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] rounded-full flex items-center justify-center z-10 group-hover:-translate-y-2 group-hover:shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] transition-all duration-300">
               <CheckCircle className="w-14 h-14 text-black" />
