@@ -35,7 +35,7 @@ const BugReportsPage = () => {
     <div ref={containerRef} className="min-h-screen bg-white text-black selection:bg-black selection:text-white overflow-hidden">
       
       {/* ───── Dynamic Hero Section ───── */}
-      <section className="relative pt-16 pb-20 px-6 sm:px-8 lg:px-12 flex flex-col items-center text-center border-b-4 border-black bg-white overflow-hidden">
+      <section className="relative pt-16 pb-20 px-6 sm:px-8 lg:px-12 flex flex-col items-center text-center  bg-white overflow-hidden">
         <div className="absolute inset-0 bg-white pointer-events-none z-0" />
 
         {/* Extremely faint, professional dot matrix overlay */}
@@ -47,9 +47,9 @@ const BugReportsPage = () => {
           animate="visible"
           variants={staggerContainer}
         >
-          <div className="flex flex-col lg:flex-row gap-24 justify-between items-center">
+          <div className="flex flex-col lg:flex-row gap-20 lg:gap-32 justify-center items-center">
             {/* LEFT: Title */}
-            <motion.h1 variants={popIn} className="flex-1 text-5xl md:text-7xl lg:text-[90px] font-black tracking-tighter uppercase leading-[0.9] relative text-left">
+            <motion.h1 variants={popIn} className="flex-1 text-5xl md:text-7xl lg:text-[100px] font-black tracking-tighter uppercase leading-[0.9] relative text-left">
               <span className="block text-transparent bg-clip-text bg-gradient-to-r from-black via-gray-700 to-black">Help Us Build</span>
               <span className="block relative inline-block mt-2">
                 Perfection
@@ -67,12 +67,12 @@ const BugReportsPage = () => {
            {/* RIGHT: Everything else */}
            <div className="flex-1 flex flex-col items-start text-left">
             <motion.div variants={popIn} className="flex justify-start mb-8">
-              <div className="inline-flex items-center gap-2 px-5 py-2.5 rounded-none border border-black/10 bg-white/60 backdrop-blur-xl shadow-sm text-xs font-black uppercase tracking-[0.2em] text-gray-800">
-                <ShieldCheck className="w-4 h-4 text-zinc-500" />
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-none border border-black/10 bg-white/60 backdrop-blur-xl shadow-sm text-xs font-black uppercase tracking-[0.2em] text-gray-800">
+                <ShieldCheck className="w-8 h-4 text-zinc-500" />
                 Quality Assurance
               </div>
             </motion.div>
-            <motion.p variants={popIn} className="text-base md:text-lg font-bold tracking-widest uppercase text-gray-600 leading-relaxed mb-10 bg-blue-100 backdrop-blur-sm p-4 rounded-xl">
+            <motion.p variants={popIn} className="text-lg md:text-xl font-bold tracking-widest uppercase text-gray-600 leading-relaxed mb-10 bg-red-100 backdrop-blur-sm p-4 rounded-xl">
               Found a glitch in the matrix? Let us know. Your detailed reports directly empower our engineering team to ship a flawless experience.
             </motion.p>
           
@@ -87,7 +87,7 @@ const BugReportsPage = () => {
               <CheckCircle className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white" />
             </div>
             <div className="text-left min-w-0">
-              <p className="text-[8px] sm:text-[9px] font-black uppercase tracking-[0.12em] sm:tracking-widest text-black/60 leading-none mb-1">
+              <p className="text-[8px] sm:text-[10px] font-black uppercase tracking-[0.12em] sm:tracking-widest text-black/60 leading-none mb-1">
                 System Status
               </p>
               <p className="text-xs sm:text-sm font-black uppercase leading-none text-black">
@@ -101,7 +101,7 @@ const BugReportsPage = () => {
                 <Bug className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white" />
               </div>
               <div className="text-left min-w-0">
-                <p className="text-[8px] sm:text-[9px] font-black uppercase tracking-[0.12em] sm:tracking-widest text-black/60 leading-none mb-1">Avg Resolution</p>
+                <p className="text-[8px] sm:text-[10px] font-black uppercase tracking-[0.12em] sm:tracking-widest text-black/60 leading-none mb-1">Avg Resolution</p>
                 <p className="text-xs sm:text-sm font-black uppercase leading-none text-black">&lt; 24 Hours</p>
               </div>
             </motion.div>
@@ -111,7 +111,7 @@ const BugReportsPage = () => {
                 <div className="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-none bg-white animate-pulse"></div>
               </div>
               <div className="text-left min-w-0">
-                <p className="text-[8px] sm:text-[9px] font-black uppercase tracking-[0.12em] sm:tracking-widest text-black/60 leading-none mb-1">Project Type</p>
+                <p className="text-[8px] sm:text-[10px] font-black uppercase tracking-[0.12em] sm:tracking-widest text-black/60 leading-none mb-1">Project Type</p>
                 <p className="text-xs sm:text-sm font-black uppercase leading-none text-black">Open Source</p>
               </div>
             </motion.div>
