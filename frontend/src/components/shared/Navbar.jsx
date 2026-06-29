@@ -380,12 +380,17 @@ export default function Navbar() {
       <div className="max-w-[1400px] mx-auto flex items-center justify-between px-4 sm:px-6 lg:px-8 h-14 gap-4">
 
         {/* ── Wordmark ──────────────────────────────────────────────────── */}
+        {/* ── Logo ─────────────────────────────────────────────────────── */}
         <Link
           to="/"
           onClick={closeMenu}
-          className="text-lg font-black tracking-tighter uppercase text-black hover:opacity-60 transition-opacity flex-shrink-0"
+          className="flex items-center flex-shrink-0 hover:opacity-80 transition-opacity"
         >
-          CODELENS
+          <img
+            src="/logo.png"
+            alt="CodeLens"
+            className="h-10 w-auto"
+          />
         </Link>
 
         {/* ── Desktop Centre Nav ────────────────────────────────────────── */}

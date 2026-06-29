@@ -17,9 +17,13 @@ export default function Footer() {
           <div className="md:col-span-2 xl:col-span-1 flex flex-col gap-6 border-b-4 border-black pb-10 md:border-b-0 md:pb-0 md:border-r-4 md:pr-10 xl:border-r-4 xl:pr-8">
             <Link
               to="/"
-              className="text-5xl font-black tracking-tighter uppercase text-black leading-none hover:opacity-70 transition-opacity"
+              className="hover:opacity-70 transition-opacity"
             >
-              CODE<br />LENS
+              <img
+                 src="/logo.png"
+                 alt="CodeLens"
+                 className="h-24 w-auto"
+              />
             </Link>
             <p className="text-sm font-bold tracking-widest uppercase leading-relaxed text-black max-w-xs">
               The developer intelligence platform. Unify your competitive programming journey across Codeforces, LeetCode &amp; GitHub — with AI-driven insights, zero noise.
@@ -223,14 +227,13 @@ export default function Footer() {
       </div>
 
       {/* ───── Large Brand Stamp ───── */}
-      <div className="border-t-4 border-black overflow-hidden select-none">
-        <p
-          className="text-black font-black tracking-tighter uppercase leading-none whitespace-nowrap px-6 sm:px-8 lg:px-12 py-6"
-          style={{ fontSize: "clamp(3rem, 10vw, 9rem)", opacity: 0.05 }}
-          aria-hidden="true"
-        >
-          CODELENS
-        </p>
+      <div className="border-t-4 border-black overflow-hidden select-none flex justify-center py-8">
+        <img
+         src="/logo.png"
+         alt=""
+         aria-hidden="true"
+         className="h-32 md:h-40 lg:h-48 w-auto opacity-5"
+        />
       </div>
 
       {/* ───── Bottom Bar ───── */}

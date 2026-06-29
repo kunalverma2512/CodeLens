@@ -3,9 +3,16 @@ const Spinner = () => {
     <div
       role="status"
       aria-live="polite"
-      className="min-h-screen flex items-center justify-center bg-white overflow-hidden"
+      className="min-h-screen flex flex-col items-center justify-center bg-white overflow-hidden"
     >
       <span className="sr-only">Loading, please wait...</span>
+
+      {/* CodeLens Logo */}
+      <img
+        src="/favicon.png"
+        alt="CodeLens"
+        className="w-12 h-12 mb-8"
+      />
       <div className="relative w-32 h-32 animate-rotate">
         {/* Outer Square */}
         <div className="absolute inset-0 border-[5px] border-black animate-scale-1" />
