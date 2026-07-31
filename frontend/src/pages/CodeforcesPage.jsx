@@ -496,7 +496,7 @@ export default function CodeforcesPage() {
                 .sort(([a], [b]) => {
                   if (a === "unrated") return 1;
                   if (b === "unrated") return -1;
-                  return parseInt(a) - parseInt(b);
+                  return parseInt(a, 10) - parseInt(b, 10);
                 })
                 .map(([rating, count]) => {
                   const max = Math.max(...Object.values(stats.byRating || {}).map(Number));
