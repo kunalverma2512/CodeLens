@@ -1,0 +1,14 @@
+# Add 'Frontend' label to any change within the 'frontend' folder
+Frontend:
+  - changed-files:
+      - any-glob-to-any-file: "frontend/**"
+
+# Add 'backend' label to any change within the 'server' folder
+backend:
+  - changed-files:
+      - any-glob-to-any-file: "server/**"
+
+# Add 'documentation' label to any markdown files
+documentation:
+  - changed-files:
+      - any-glob-to-any-file: "**/*.md"
