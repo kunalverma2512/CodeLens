@@ -44,7 +44,7 @@ CODEFORCES TELEMETRY:
 - Difficulty Distribution: ${
         Object.entries(profile.stats?.byRating || {})
           .filter(([, v]) => v > 0)
-          .sort(([a], [b]) => parseInt(a) - parseInt(b))
+          .sort(([a], [b]) => parseInt(a, 10) - parseInt(b, 10))
           .map(([r, c]) => `${r === "2500plus" ? "2500+" : r}(${c})`)
           .join(", ") || "No data yet"
       }
