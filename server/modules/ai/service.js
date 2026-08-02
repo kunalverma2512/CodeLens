@@ -436,7 +436,7 @@ class AiService {
     // Convert stored messages (excluding the just-added one) to Gemini history format
     // We pass all messages EXCEPT the last one (the current user message) as history
     const historyMessages = conversation.messages.slice(0, -1);
-    const geminiHistory = historyMessages.map((msg) => ({
+    const geminiHistory = (historyMessages ?? []).map((msg) => ({
       role: msg.role === "assistant" ? "model" : "user",
       parts: [{ text: msg.content }],
     }));

@@ -280,7 +280,7 @@ class CodeforcesService {
       }
 
       // 4. Persist grouped submission documents
-      const submissionDocs = submissions.map((sub) => ({
+      const submissionDocs = (submissions ?? []).map((sub) => ({
         user: userId,
         submissionId: sub.id,
         contestId: sub.contestId,

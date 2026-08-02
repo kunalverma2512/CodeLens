@@ -65,7 +65,7 @@ function ActivityHeatmap({ dailyActivity = {} }) {
         <div className="flex gap-1 min-w-max">
           {(weeks ?? []).map((week, wi) => (
             <div key={wi} className="flex flex-col gap-1">
-              {week.map(({ key, count }) => (
+              {(week ?? []).map(({ key, count }) => (
                 <div
                   key={key}
                   title={`${key}: ${count} submission${count !== 1 ? "s" : ""}`}
