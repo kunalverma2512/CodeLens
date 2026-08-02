@@ -63,9 +63,9 @@ function ActivityHeatmap({ dailyActivity = {} }) {
     <div>
       <div className="overflow-x-auto pb-2">
         <div className="flex gap-1 min-w-max">
-          {weeks.map((week, wi) => (
+          {(weeks ?? []).map((week, wi) => (
             <div key={wi} className="flex flex-col gap-1">
-              {week.map(({ key, count }) => (
+              {(week ?? []).map(({ key, count }) => (
                 <div
                   key={key}
                   title={`${key}: ${count} submission${count !== 1 ? "s" : ""}`}
@@ -496,7 +496,7 @@ export default function CodeforcesPage() {
                 .sort(([a], [b]) => {
                   if (a === "unrated") return 1;
                   if (b === "unrated") return -1;
-                  return parseInt(a) - parseInt(b);
+                  return parseInt(a, 10) - parseInt(b, 10);
                 })
                 .map(([rating, count]) => {
                   const max = Math.max(...Object.values(stats.byRating || {}).map(Number));
