@@ -320,7 +320,7 @@ class AiService {
       .lean();
 
     // Attach a short preview of the last message
-    return conversations.map((conv) => ({
+    return (conversations ?? []).map((conv) => ({
       _id: conv._id,
       title: conv.title,
       pinned: conv.pinned,

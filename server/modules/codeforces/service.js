@@ -274,7 +274,7 @@ class CodeforcesService {
       // 3. Compute contest participation count from rating history
       stats.contestsParticipated = ratingHistory.length;
       if (ratingHistory.length > 0) {
-        const ranks = ratingHistory.map((r) => r.rank).filter(Boolean);
+        const ranks = (ratingHistory ?? []).map((r) => r.rank).filter(Boolean);
         stats.bestRank = ranks.length ? Math.min(...ranks) : null;
         stats.worstRank = ranks.length ? Math.max(...ranks) : null;
       }

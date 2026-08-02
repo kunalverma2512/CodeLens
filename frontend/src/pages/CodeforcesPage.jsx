@@ -63,7 +63,7 @@ function ActivityHeatmap({ dailyActivity = {} }) {
     <div>
       <div className="overflow-x-auto pb-2">
         <div className="flex gap-1 min-w-max">
-          {weeks.map((week, wi) => (
+          {(weeks ?? []).map((week, wi) => (
             <div key={wi} className="flex flex-col gap-1">
               {week.map(({ key, count }) => (
                 <div
