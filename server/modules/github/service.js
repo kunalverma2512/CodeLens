@@ -174,6 +174,6 @@ class GitHubService {
     // Per-repo language bytes (top 10 repos only, to avoid rate limit)
     const topRepos = (repos || []).sort((a, b) => b.stargazers_count - a.stargazers_count).slice(0, 10);
     const repoLanguages = await Promise.all(
-      topRepos.map(r => ghFetch(`${GH_API}/repos/${r.full_name}/languages`, token)
+      (topRepos ?? []).map(r => ghFetch(`${GH_API}/repos/${r.full_name}/languages`, token)
         .then(langs => ({ repo: r.name, langs: langs || {} })))
         .catch(err => console.error(err))
