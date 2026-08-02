@@ -30,7 +30,7 @@ const computeActivityData = (submissions) => {
   }
 
   // Compute streak
-  const dates = Object.keys(dailyActivity).sort();
+  const dates = Object.keys(dailyActivity).sort((a, b) => a - b);
   let currentStreak = 0;
   let longestStreak = 0;
   let tempStreak = 0;
