@@ -205,6 +205,12 @@ class CodeforcesService {
       throw new ApiError(400, "No pending verification. Please re-initiate connection.");
     }
 
+    // Bind to the handle vetted during initiateConnection (the one the
+    // duplicate-handle uniqueness guard ran against), not whatever the client
+    // re-sends now. Otherwise the finally-bound handle can diverge from the one
+    // that passed the uniqueness check, producing inconsistent state.
+    handle = profile.handle;
+
     if (new Date() > profile.verificationExpiry) {
       throw new ApiError(400, "Verification code expired. Please re-initiate connection.");
     }
