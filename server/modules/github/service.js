@@ -235,12 +235,19 @@ class GitHubService {
     };
   }
 
-  /** ── Full dashboard (cached) ────────────────────────────────────────── */
+  /** Cached GitHub dashboard data older than this is re-fetched on read. */
+  static #DASHBOARD_CACHE_MAX_AGE_MS = 6 * 60 * 60 * 1000; // 6 hours
+
+  /** ── Full dashboard (cached with TTL) ───────────────────────────────── */
   static async getDashboard(userId) {
     // Check if we have cached data for this user
     let githubData = await GithubData.findOne({ userId });
-    
-    if (githubData && githubData.data) {
+
+    const cacheAge = githubData?.lastSyncedAt
+      ? Date.now() - new Date(githubData.lastSyncedAt).getTime()
+      : Infinity;
+
+    if (githubData && githubData.data && cacheAge < this.#DASHBOARD_CACHE_MAX_AGE_MS) {
       console.log(`[GitHub] ✓ Dashboard returned from cache for user ${userId}`);
       return {
         ...githubData.data,
@@ -248,20 +255,33 @@ class GitHubService {
       };
     }
 
-    // If no cache, fetch fresh data and store it
-    const { token, username } = await this.#getToken(userId);
-    const data = await this.#fetchDashboardData(userId, token, username);
-    
-    await GithubData.findOneAndUpdate(
-      { userId },
-      { userId, data, lastSyncedAt: new Date() },
-      { upsert: true, new: true }
-    );
+    // No cache or stale — fetch fresh data and store it. If the refresh fails
+    // but we still have a (stale) cache, serve that rather than erroring out.
+    try {
+      const { token, username } = await this.#getToken(userId);
+      const data = await this.#fetchDashboardData(userId, token, username);
+      const now = new Date();
 
-    return {
-      ...data,
-      lastSyncedAt: new Date()
-    };
+      await GithubData.findOneAndUpdate(
+        { userId },
+        { userId, data, lastSyncedAt: now },
+        { upsert: true, new: true }
+      );
+
+      return {
+        ...data,
+        lastSyncedAt: now
+      };
+    } catch (err) {
+      if (githubData && githubData.data) {
+        console.warn(`[GitHub] refresh failed for user ${userId}, serving stale cache: ${err.message}`);
+        return {
+          ...githubData.data,
+          lastSyncedAt: githubData.lastSyncedAt
+        };
+      }
+      throw err;
+    }
   }
 
   /** ── Manual Sync Dashboard ─────────────────────────────────────────── */
