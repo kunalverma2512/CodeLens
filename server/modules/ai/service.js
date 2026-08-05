@@ -227,12 +227,20 @@ class AiService {
     const user = await User.findById(userId).select("name email dashboardSummary").lean();
     if (!user) throw new ApiError(401, "User not found.");
 
-    // 2. Return cached summary if it exists
-    if (user.dashboardSummary && user.dashboardSummary.content) {
-      return user.dashboardSummary.content;
+    // 2. Return cached summary if it's still fresh. Without a TTL the summary
+    //    was returned forever — nothing (not a CF sync, not new contests)
+    //    regenerated it, so the "growth insight" could permanently contradict
+    //    the user's current stats.
+    const SUMMARY_MAX_AGE_MS = 24 * 60 * 60 * 1000; // 24 hours
+    const cached = user.dashboardSummary;
+    const summaryAge = cached?.lastGeneratedAt
+      ? Date.now() - new Date(cached.lastGeneratedAt).getTime()
+      : Infinity;
+    if (cached && cached.content && summaryAge < SUMMARY_MAX_AGE_MS) {
+      return cached.content;
     }
 
-    console.log(`[AI] ▶ No cached summary found for ${user.name}. Generating new summary...`);
+    console.log(`[AI] ▶ No fresh cached summary for ${user.name}. Generating new summary...`);
 
     // 3. Fetch data for generation
     const [cfProfile, recentContests] = await Promise.all([
