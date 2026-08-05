@@ -18,14 +18,29 @@ class AuthService {
   // ── Registration ────────────────────────────────────────────────────────────
 
   static async register({ name, email, password }) {
+    // Uniform response for every branch so registration can't be used to
+    // enumerate which emails are already taken.
+    const GENERIC_MESSAGE =
+      "If this email is available, a verification OTP has been sent. Please check your inbox.";
     const existingUser = await AuthRepository.findUserByEmailWithoutPassword(email);
+
     if (existingUser) {
-      throw new ApiError(409, "User already exists with this email");
+      // A verified account gets nothing (they should log in); an unverified
+      // one gets a fresh signup OTP so a legitimate re-registration still
+      // works. The response is identical either way — no account existence
+      // is revealed.
+      if (!existingUser.isVerified) {
+        await AuthRepository.deleteOtp(email, "signup");
+        const plainOtp = generateOTP();
+        const hashedOtp = await bcrypt.hash(plainOtp, 4);
+        await AuthRepository.createOtp({ email, otp: hashedOtp, purpose: "signup" });
+        await sendVerificationOTP(email, plainOtp);
+      }
+      return { message: GENERIC_MESSAGE };
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
-
-    const user = await AuthRepository.createUser({
+    await AuthRepository.createUser({
       name,
       email,
       password: hashedPassword,
@@ -38,10 +53,7 @@ class AuthService {
     await AuthRepository.createOtp({ email, otp: hashedOtp, purpose: "signup" });
     await sendVerificationOTP(email, plainOtp);
 
-    return {
-      message: "Registration successful. Please check your email for OTP verification.",
-      user: { id: user._id, name: user.name, email: user.email, isVerified: user.isVerified }
-    };
+    return { message: GENERIC_MESSAGE };
   }
 
   // ── OTP Verification ────────────────────────────────────────────────────────
@@ -111,21 +123,15 @@ class AuthService {
   // ── Forgot / Reset Password ──────────────────────────────────────────────────
 
   static async forgotPassword({ email }) {
+    const GENERIC_MESSAGE =
+      "If an account with that email exists, a password reset OTP has been sent.";
     const user = await AuthRepository.findUserByEmailWithoutPassword(email);
-    if (!user) {
-      throw new ApiError(404, "User not found");
-    }
 
-    // Forgot password is only meaningful for users who have completed
-    // email verification. An unverified user should complete their signup
-    // first — they have an OTP flow for that, not a password reset flow.
-    if (!user.isVerified) {
-      throw new ApiError(403, "Please verify your email before resetting your password. Check your inbox for the original verification code or request a new one.");
-    }
-
-    // GitHub-only accounts have no password to reset.
-    if (user.authProvider === "github") {
-      throw new ApiError(400, "This account uses GitHub login. Password reset is not available.");
+    // Only a verified, password-based account can actually reset. Every other
+    // case (no user / unverified / GitHub-only) returns the same generic
+    // response so the endpoint never reveals whether an email is registered.
+    if (!user || !user.isVerified || user.authProvider === "github") {
+      return { message: GENERIC_MESSAGE };
     }
 
     const plainOtp = generateOTP();
@@ -134,7 +140,7 @@ class AuthService {
     await AuthRepository.createOtp({ email, otp: hashedOtp, purpose: "forgot-password" });
     await sendPasswordResetOTP(email, plainOtp);
 
-    return { message: "Password reset OTP sent to your email" };
+    return { message: GENERIC_MESSAGE };
   }
 
 
@@ -159,13 +165,15 @@ class AuthService {
   // ── Resend OTP ───────────────────────────────────────────────────────────────
 
   static async resendOtp({ email, purpose }) {
+    const GENERIC_MESSAGE =
+      "If an account with that email exists, an OTP has been sent.";
     const user = await AuthRepository.findUserByEmailWithoutPassword(email);
-    if (!user) {
-      throw new ApiError(404, "User not found");
-    }
 
-    if (purpose === "signup" && user.isVerified) {
-      throw new ApiError(400, "Already verified");
+    // No user, or a signup resend for an already-verified account: return the
+    // same generic response instead of a distinct error, so the endpoint
+    // can't be used to probe which emails are registered / verified.
+    if (!user || (purpose === "signup" && user.isVerified)) {
+      return { message: GENERIC_MESSAGE };
     }
 
     await AuthRepository.deleteOtp(email, purpose);
@@ -181,7 +189,7 @@ class AuthService {
       await sendPasswordResetOTP(email, plainOtp);
     }
 
-    return { message: "OTP resent successfully" };
+    return { message: GENERIC_MESSAGE };
   }
 
   // ── GitHub OAuth — Start ─────────────────────────────────────────────────────
