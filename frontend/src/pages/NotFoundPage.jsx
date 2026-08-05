@@ -29,6 +29,7 @@ export default function NotFoundPage() {
           <div className="relative z-10 flex h-full flex-col justify-between">
             {/* Label */}
             <div>
+              <img src="/logo.svg" alt="CodeLens" className="h-8 w-auto mb-6" />
               <p className="text-xs font-black uppercase tracking-[0.35em] text-black sm:text-sm">
                 Error / Route Unavailable
               </p>

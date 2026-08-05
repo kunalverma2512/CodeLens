@@ -385,9 +385,9 @@ export default function Navbar() {
         <Link
           to="/"
           onClick={closeMenu}
-          className="text-lg font-black tracking-tighter uppercase text-black hover:opacity-60 transition-opacity flex-shrink-0"
+          className="hover:opacity-60 transition-opacity flex-shrink-0"
         >
-          CODELENS
+          <img src="/logo.svg" alt="CodeLens" className="h-8 w-auto" />
         </Link>
 
         {/* ── Desktop Centre Nav ────────────────────────────────────────── */}
