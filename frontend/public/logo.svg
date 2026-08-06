@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 700 200" width="700" height="200">
+  <rect x="10" y="10" width="680" height="180" fill="none" stroke="#0D1117" stroke-width="6"/>
+  <rect x="30" y="30" width="330" height="140" fill="#0D1117"/>
+  <text x="195" y="115" font-family="Arial, Helvetica, sans-serif" font-weight="700" font-size="52" fill="#FFFFFF" text-anchor="middle">CODE</text>
+  <text x="527" y="115" font-family="Arial, Helvetica, sans-serif" font-weight="700" font-size="52" fill="#0D1117" text-anchor="middle">LENS</text>
+</svg>

@@ -17,9 +17,10 @@ export default function Footer() {
           <div className="md:col-span-2 xl:col-span-1 flex flex-col gap-6 border-b-4 border-black pb-10 md:border-b-0 md:pb-0 md:border-r-4 md:pr-10 xl:border-r-4 xl:pr-8">
             <Link
               to="/"
-              className="text-5xl font-black tracking-tighter uppercase text-black leading-none hover:opacity-70 transition-opacity"
+              className="hover:opacity-70 transition-opacity"
             >
-              CODE<br />LENS
+              <img src="/favicon.svg" alt="CodeLens" className="h-14 w-auto sm:hidden" />
+              <img src="/logo.svg" alt="CodeLens" className="hidden h-14 w-auto sm:block" />
             </Link>
             <p className="text-sm font-bold tracking-widest uppercase leading-relaxed text-black max-w-xs">
               The developer intelligence platform. Unify your competitive programming journey across Codeforces, LeetCode &amp; GitHub — with AI-driven insights, zero noise.
