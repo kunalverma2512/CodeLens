@@ -19,7 +19,8 @@ export default function Footer() {
               to="/"
               className="hover:opacity-70 transition-opacity"
             >
-              <img src="/logo.svg" alt="CodeLens" className="h-14 w-auto" />
+              <img src="/favicon.svg" alt="CodeLens" className="h-14 w-auto sm:hidden" />
+              <img src="/logo.svg" alt="CodeLens" className="hidden h-14 w-auto sm:block" />
             </Link>
             <p className="text-sm font-bold tracking-widest uppercase leading-relaxed text-black max-w-xs">
               The developer intelligence platform. Unify your competitive programming journey across Codeforces, LeetCode &amp; GitHub — with AI-driven insights, zero noise.

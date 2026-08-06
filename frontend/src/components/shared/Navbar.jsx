@@ -387,7 +387,8 @@ export default function Navbar() {
           onClick={closeMenu}
           className="hover:opacity-60 transition-opacity flex-shrink-0"
         >
-          <img src="/logo.svg" alt="CodeLens" className="h-8 w-auto" />
+          <img src="/favicon.svg" alt="CodeLens" className="h-8 w-auto sm:hidden" />
+          <img src="/logo.svg" alt="CodeLens" className="hidden h-8 w-auto sm:block" />
         </Link>
 
         {/* ── Desktop Centre Nav ────────────────────────────────────────── */}
