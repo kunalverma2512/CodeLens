@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useMemo } from "react";
+import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { useAuth } from "../context/AuthContext";
 import {
   getUpcomingCodeforcesContests,
@@ -16,26 +16,40 @@ export const useContests = () => {
   const [error, setError] = useState(null);
   const [now, setNow] = useState(Date.now());
 
+  // Each fetch increments its own counter before firing; a response only
+  // gets applied if the counter still matches when it resolves. This
+  // guards against: (a) a slower earlier request resolving after a newer
+  // one (e.g. rapid refetch/retry), and (b) any response resolving after
+  // unmount (the cleanup effect below bumps both counters on unmount, so
+  // no in-flight request's captured id can ever match again).
+  const contestsRequestId = useRef(0);
+  const remindersRequestId = useRef(0);
+
   const fetchContests = useCallback(async () => {
+    const requestId = ++contestsRequestId.current;
     setLoading(true);
     setError(null);
     try {
       const { data } = await getUpcomingCodeforcesContests();
+      if (requestId !== contestsRequestId.current) return; // superseded or unmounted
       setContests(data.data || []);
     } catch (err) {
+      if (requestId !== contestsRequestId.current) return;
       setError(err.response?.data?.message || "Failed to load upcoming contests.");
     } finally {
-      setLoading(false);
+      if (requestId === contestsRequestId.current) setLoading(false);
     }
   }, []);
 
   const fetchReminders = useCallback(async () => {
+    const requestId = ++remindersRequestId.current;
     if (!isAuthenticated) {
       setReminderIds([]);
       return;
     }
     try {
       const { data } = await getMyReminderIds();
+      if (requestId !== remindersRequestId.current) return;
       setReminderIds(data.data || []);
     } catch {
       // Non-fatal
@@ -53,6 +67,15 @@ export const useContests = () => {
   useEffect(() => {
     const id = setInterval(() => setNow(Date.now()), 1000);
     return () => clearInterval(id);
+  }, []);
+
+  // On unmount, invalidate any still-in-flight requests so their eventual
+  // resolution can never pass the requestId check above.
+  useEffect(() => {
+    return () => {
+      contestsRequestId.current += 1;
+      remindersRequestId.current += 1;
+    };
   }, []);
 
   const toggleReminder = async (contestId) => {

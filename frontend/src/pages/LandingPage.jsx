@@ -15,9 +15,11 @@ function useWordCycle(words) {
       return () => clearTimeout(timeout);
     }
     if (subIndex === 0 && reverse) {
-      setReverse(false);
-      setIndex((prev) => (prev + 1) % words.length);
-      return;
+      const timeout = setTimeout(() => {
+        setReverse(false);
+        setIndex((prev) => (prev + 1) % words.length);
+      }, 0);
+      return () => clearTimeout(timeout);
     }
 
     const timeout = setTimeout(() => {
