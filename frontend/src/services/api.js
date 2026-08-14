@@ -6,10 +6,52 @@ const api = axios.create({
   withCredentials: true,  // CRITICAL: sends HttpOnly cookies with every request automatically
 });
 
+const csrfClient = axios.create({
+  baseURL: import.meta.env.VITE_API_BASE_URL,
+  withCredentials: true,
+});
+
+let csrfToken = null;
+let csrfTokenRequest = null;
+
+const UNSAFE_METHODS = new Set(["POST", "PUT", "PATCH", "DELETE"]);
+
+const isCsrfTokenRequest = (url = "") => url.includes("/auth/csrf-token");
+
+const ensureCsrfToken = async () => {
+  if (csrfToken) return csrfToken;
+  if (csrfTokenRequest) return csrfTokenRequest;
+
+  csrfTokenRequest = csrfClient
+    .get("/auth/csrf-token")
+    .then((response) => {
+      csrfToken = response.data?.data?.csrfToken ?? null;
+      return csrfToken;
+    })
+    .finally(() => {
+      csrfTokenRequest = null;
+    });
+
+  return csrfTokenRequest;
+};
+
+export const getCsrfToken = ensureCsrfToken;
+
 // ── Request interceptor ───────────────────────────────────────────────────────
-// No token injection needed — cookies are sent automatically by the browser.
-// We keep this interceptor only as a hook for future request modifications.
-api.interceptors.request.use((config) => config);
+api.interceptors.request.use(async (config) => {
+  const method = (config.method || "GET").toUpperCase();
+  const shouldAttachCsrf = UNSAFE_METHODS.has(method) && !isCsrfTokenRequest(config.url);
+
+  if (shouldAttachCsrf) {
+    const token = await ensureCsrfToken();
+    if (token) {
+      config.headers = config.headers || {};
+      config.headers["X-CSRF-Token"] = token;
+    }
+  }
+
+  return config;
+});
 
 // ── Response interceptor ──────────────────────────────────────────────────────
 // IMPORTANT: Only redirect to /login for 401s on OUR auth-sensitive endpoints.
@@ -22,6 +64,22 @@ api.interceptors.response.use(
   async (error) => {
     const status = error.response?.status;
     const requestUrl = error.config?.url || "";
+
+    if (
+      status === 403 &&
+      !isCsrfTokenRequest(requestUrl) &&
+      !error.config?._csrfRetried &&
+      String(error.response?.data?.message || "").toLowerCase().includes("csrf")
+    ) {
+      error.config._csrfRetried = true;
+      csrfToken = null;
+      const token = await ensureCsrfToken();
+      if (token) {
+        error.config.headers = error.config.headers || {};
+        error.config.headers["X-CSRF-Token"] = token;
+      }
+      return api(error.config);
+    }
 
     if (status === 401) {
       const isAuthPath = AUTH_ONLY_PATHS.some((p) => requestUrl.includes(p));

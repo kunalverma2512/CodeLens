@@ -45,6 +45,11 @@ const errorHandler = (err, req, res, next) => {
     message = "Token expired.";
     errorResponse.message = message;
   }
+  else if (err.code === "EBADCSRFTOKEN") {
+    statusCode = 403;
+    message = "Invalid CSRF token.";
+    errorResponse.message = message;
+  }
   // Handle other errors
   else if (err.message) {
     message = err.message;

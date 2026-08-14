@@ -1,5 +1,6 @@
 import { Router } from "express";
 import authMiddleware from "../../middlewares/authMiddleware.js";
+import { csrfProtection } from "../../middlewares/csrfProtection.js";
 import AiController from "./controller.js";
 import { apexChatLimiter } from "../../middlewares/rateLimiter.js";
 
@@ -7,6 +8,7 @@ const router = Router();
 
 // All AI routes require authentication
 router.use(authMiddleware);
+router.use(csrfProtection);
 
 // ── Existing routes (insight + dashboard summary) ──────────────────────────────
 
@@ -64,4 +66,3 @@ router.post("/apex/conversations/:id/message", AiController.sendMessage);
 router.delete("/apex/conversations/:id", AiController.deleteConversation);
 
 export default router;
-

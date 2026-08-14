@@ -1,4 +1,4 @@
-import api from "./api.js";
+import api, { getCsrfToken } from "./api.js";
 
 // ── Base URL for SSE (native fetch — axios doesn't support streaming) ──────────
 // We derive it from the same VITE_API_BASE_URL env var used by axios.
@@ -83,11 +83,15 @@ export const sendMessage = (conversationId, message, onChunk, onDone, onError) =
 
   const run = async () => {
     try {
+      const csrfToken = await getCsrfToken();
       const response = await fetch(
         `${SSE_BASE}/ai/apex/conversations/${conversationId}/message`,
         {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: {
+            "Content-Type": "application/json",
+            ...(csrfToken ? { "X-CSRF-Token": csrfToken } : {}),
+          },
           credentials: "include",     // Send auth cookies
           signal: controller.signal,  // Allows cancellation
           body: JSON.stringify({ message }),
