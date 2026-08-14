@@ -1,5 +1,6 @@
 import { Router } from "express";
 import authMiddleware from "../../middlewares/authMiddleware.js";
+import { csrfProtection } from "../../middlewares/csrfProtection.js";
 import CodeforcesController from "./controller.js";
 import {
   validate,
@@ -11,6 +12,7 @@ const router = Router();
 
 // All routes require authenticated user
 router.use(authMiddleware);
+router.use(csrfProtection);
 
 // ── Connection Flow ──────────────────────────────────────────────────────────
 // Step 1: supply handle → get back verification code to set as CF surname

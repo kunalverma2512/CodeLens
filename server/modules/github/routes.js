@@ -1,5 +1,6 @@
 import { Router } from "express";
 import authMiddleware from "../../middlewares/authMiddleware.js";
+import { csrfProtection } from "../../middlewares/csrfProtection.js";
 import { githubSyncLimiter } from "../../middlewares/rateLimiter.js";
 import GitHubController from "./controller.js";
 
@@ -7,6 +8,7 @@ const router = Router();
 
 // All routes require authentication
 router.use(authMiddleware);
+router.use(csrfProtection);
 
 /**
  * GET /api/github/dashboard

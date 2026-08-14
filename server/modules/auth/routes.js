@@ -13,6 +13,7 @@ import {
 } from "./validation.js";
 import AuthController from "./controller.js";
 import authMiddleware from "../../middlewares/authMiddleware.js";
+import { csrfProtection } from "../../middlewares/csrfProtection.js";
 import rateLimit from "express-rate-limit";
 
 const router = Router();
@@ -42,6 +43,16 @@ router.post("/forgot-password",  authRateLimit, validate(forgotPasswordSchema), 
 router.post("/reset-password",   authRateLimit, validate(resetPasswordSchema),   AuthController.resetPassword);
 router.post("/resend-otp",       authRateLimit, validate(resendOtpSchema),       AuthController.resendOtp);
 
+router.get("/csrf-token", csrfProtection, (req, res) => {
+  res.status(200).json({
+    success: true,
+    message: "CSRF token generated",
+    data: {
+      csrfToken: req.csrfToken(),
+    },
+  });
+});
+
 // ── Session Routes ────────────────────────────────────────────────────────────
 /**
  * GET /api/auth/me
@@ -55,13 +66,13 @@ router.get("/me", authMiddleware, AuthController.getMe);
  * authMiddleware populates req.user for DB-side revocation.
  * Cookies are cleared even if auth fails (best-effort).
  */
-router.post("/logout", authMiddleware, AuthController.logout);
+router.post("/logout", authMiddleware, csrfProtection, AuthController.logout);
 
 /**
  * POST /api/auth/refresh
  * Issues new access token from refresh token cookie.
  */
-router.post("/refresh", AuthController.refresh);
+router.post("/refresh", csrfProtection, AuthController.refresh);
 
 // ── GitHub OAuth Routes ───────────────────────────────────────────────────────
 
