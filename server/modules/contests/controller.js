@@ -43,11 +43,9 @@ class ContestController {
 
   static async removeReminder(req, res, next) {
     try {
-      const contestId = parseInt(req.params.contestId, 10);
-      if (Number.isNaN(contestId)) {
-        throw new ApiError(400, "Invalid contest id.");
-      }
-      const result = await ContestService.removeReminder(req.user._id, contestId);
+      // req.params.contestId is already a validated, coerced number here —
+      // see validateParams(contestIdParamSchema) in routes.js.
+      const result = await ContestService.removeReminder(req.user._id, req.params.contestId);
       res.status(200).json(ApiResponse.success(result.message, result));
     } catch (err) {
       next(err instanceof ApiError ? err : new ApiError(500, err.message));
@@ -56,11 +54,7 @@ class ContestController {
 
   static async markNotified(req, res, next) {
     try {
-      const contestId = parseInt(req.params.contestId, 10);
-      if (Number.isNaN(contestId)) {
-        throw new ApiError(400, "Invalid contest id.");
-      }
-      const result = await ContestService.markReminderNotified(req.user._id, contestId);
+      const result = await ContestService.markReminderNotified(req.user._id, req.params.contestId);
       res.status(200).json(ApiResponse.success(result.message, result));
     } catch (err) {
       next(err instanceof ApiError ? err : new ApiError(500, err.message));
