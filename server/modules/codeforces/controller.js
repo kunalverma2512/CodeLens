@@ -69,7 +69,7 @@ class CodeforcesController {
    */
   static async getRecentSubmissions(req, res, next) {
     try {
-      const count = Math.min(parseInt(req.query.count) || 20, 100);
+      const count = Math.min(parseInt(req.query.count, 10) || 20, 100);
       const submissions = await CodeforcesService.getRecentSubmissions(
         req.user._id,
         count
