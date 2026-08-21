@@ -44,7 +44,7 @@ CODEFORCES TELEMETRY:
 - Difficulty Distribution: ${
         Object.entries(profile.stats?.byRating || {})
           .filter(([, v]) => v > 0)
-          .sort(([a], [b]) => parseInt(a) - parseInt(b))
+          .sort(([a], [b]) => parseInt(a, 10) - parseInt(b, 10))
           .map(([r, c]) => `${r === "2500plus" ? "2500+" : r}(${c})`)
           .join(", ") || "No data yet"
       }
@@ -320,7 +320,7 @@ class AiService {
       .lean();
 
     // Attach a short preview of the last message
-    return conversations.map((conv) => ({
+    return (conversations ?? []).map((conv) => ({
       _id: conv._id,
       title: conv.title,
       pinned: conv.pinned,
@@ -436,7 +436,7 @@ class AiService {
     // Convert stored messages (excluding the just-added one) to Gemini history format
     // We pass all messages EXCEPT the last one (the current user message) as history
     const historyMessages = conversation.messages.slice(0, -1);
-    const geminiHistory = historyMessages.map((msg) => ({
+    const geminiHistory = (historyMessages ?? []).map((msg) => ({
       role: msg.role === "assistant" ? "model" : "user",
       parts: [{ text: msg.content }],
     }));
