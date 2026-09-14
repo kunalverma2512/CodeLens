@@ -38,7 +38,7 @@ const corsOptions = {
   },
   methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
   credentials: true,             // Required for cookies to be sent cross-origin
-  allowedHeaders: ["Content-Type", "Authorization"]
+  allowedHeaders: ["Content-Type", "Authorization", "x-csrf-token"]
 };
 
 app.use(cors(corsOptions));
